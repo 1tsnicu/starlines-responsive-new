@@ -1,73 +1,228 @@
-# Welcome to your Lovable project
+# Starlines — Bus Travel Booking UI
 
-## Project info
+A modern, responsive bus travel booking interface built with React, TypeScript, Tailwind CSS, and shadcn/ui components.
 
-**URL**: https://lovable.dev/projects/3c13e7b7-b1d0-4cab-a0ba-05d2c6961311
+## 🚀 Features
 
-## How can I edit this code?
+### ✅ Implemented (MVP UI)
+- **Design System**: Complete color scheme, typography, spacing, and component library
+- **App Shell**: Header with navigation, language/currency selectors, mobile drawer
+- **Home Page**: Hero search form, features section, popular routes, promo carousel, blog teasers, app CTA
+- **Components**: SearchForm, Header, Footer, FeaturesSection, PopularRoutesSection, PromoCarousel, BlogTeasers, AppCTA
+- **Utility Components**: PageHeader, EmptyState, ErrorState, Stepper
+- **Mock Services**: Fake data for routes, cities, OTP verification, payment status, ticket lookup
 
-There are several ways of editing your application.
+### 🔄 In Progress
+- Search results page with filters
+- Trip details page
+- Checkout flow with stepper
+- Payment flow and status pages
+- My tickets page
+- Additional pages (Timetable, Blog, About, Contacts, FAQ, Legal)
 
-**Use Lovable**
+### 📋 Planned
+- Dark mode toggle
+- i18n internationalization
+- PWA capabilities
+- Advanced filtering and sorting
+- Seat selection interface
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3c13e7b7-b1d0-4cab-a0ba-05d2c6961311) and start prompting.
+## 🛠️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Framework**: React 18 + TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Icons**: Lucide React
+- **State Management**: React Query (TanStack Query)
+- **Routing**: React Router DOM
+- **Forms**: React Hook Form + Zod validation
+- **UI Components**: Radix UI primitives + shadcn/ui
+- **Animations**: Framer Motion (ready for integration)
 
-**Use your preferred IDE**
+## 🎨 Design System
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Colors
+- **Primary**: Indigo (#4F46E5) - easily rebrandable
+- **Text**: Dark (#0B1220) / Light (#F5F7FB)
+- **Surface**: Light (#F8FAFC) / Dark (#0F172A)
+- **Feedback**: Success, Warning, Danger, Info
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Typography
+- **Font**: Inter (system fallback)
+- **Scale**: xs(12) → 5xl(48)
+- **Line Height**: 1.4-1.6
 
-Follow these steps:
+### Spacing & Layout
+- **Container**: max-w-[1200px]
+- **Spacing**: 4/8/12/16/24/32/40
+- **Radius**: md(10), lg(14), xl(20), 2xl(24)
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🚀 Getting Started
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Prerequisites
+- Node.js 18+ 
+- npm, yarn, or bun
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Installation
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd starlight-routes
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   bun install
+   ```
+
+3. **Start development server**
+   ```bash
 npm run dev
+   # or
+   yarn dev
+   # or
+   bun dev
+   ```
+
+4. **Open your browser**
+   Navigate to `http://localhost:5173`
+
+### Build for Production
+
+```bash
+npm run build
+# or
+yarn build
+# or
+bun run build
 ```
 
-**Edit a file directly in GitHub**
+## 📁 Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```
+src/
+├── components/           # React components
+│   ├── ui/             # shadcn/ui components
+│   ├── Header.tsx      # Main navigation
+│   ├── Footer.tsx      # Site footer
+│   ├── HeroSection.tsx # Hero with search
+│   ├── SearchForm.tsx  # Main search form
+│   └── ...             # Other components
+├── lib/                # Utilities and services
+│   ├── mock-data.ts    # Mock data service
+│   └── utils.ts        # Helper functions
+├── pages/              # Page components
+│   ├── Index.tsx       # Home page
+│   └── NotFound.tsx    # 404 page
+├── hooks/              # Custom React hooks
+└── index.css           # Global styles & design system
+```
 
-**Use GitHub Codespaces**
+## 🎯 Component Architecture
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Atoms
+- Button, Input, Select, Checkbox, Badge, etc.
 
-## What technologies are used for this project?
+### Molecules
+- SearchForm, DateRangePicker, PassengersPicker, etc.
 
-This project is built with:
+### Organisms
+- Header, Footer, ResultsList, CheckoutForm, etc.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Layouts
+- AppLayout, SidebarLayout, TwoColumns, etc.
 
-## How can I deploy this project?
+## 🔧 Development
 
-Simply open [Lovable](https://lovable.dev/projects/3c13e7b7-b1d0-4cab-a0ba-05d2c6961311) and click on Share -> Publish.
+### Adding New Components
 
-## Can I connect a custom domain to my Lovable project?
+1. Create component file in `src/components/`
+2. Follow naming convention: `PascalCase.tsx`
+3. Use shadcn/ui components when possible
+4. Follow the design system (colors, spacing, typography)
+5. Add TypeScript interfaces for props
 
-Yes, you can!
+### Styling Guidelines
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Use Tailwind CSS classes
+- Follow the design system spacing (4, 8, 12, 16, 24, 32, 40)
+- Use CSS variables for colors: `bg-primary`, `text-foreground`
+- Apply hover effects: `hover-lift` utility class
+- Use focus styles: `focus-ring` utility class
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### Mock Data
+
+- All fake data is in `src/lib/mock-data.ts`
+- Simulate API delays (400-800ms)
+- Use realistic data structures
+- Easy to replace with real API calls later
+
+## 🌐 Internationalization
+
+Ready for i18n with:
+- Language switcher (RO/EN/RU/UA)
+- Currency switcher (MDL/EUR/USD)
+- Localized date/time formatting
+- RTL support preparation
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Breakpoints: sm(640), md(768), lg(1024), xl(1280), 2xl(1536)
+- Mobile drawer navigation
+- Responsive grid layouts
+- Touch-friendly interactions
+
+## ♿ Accessibility
+
+- Semantic HTML structure
+- ARIA labels and roles
+- Keyboard navigation support
+- Focus management
+- Screen reader compatibility
+- High contrast support
+
+## 🧪 Testing
+
+```bash
+# Run linting
+npm run lint
+
+# Run type checking
+npm run type-check
+```
+
+## 📦 Deployment
+
+The project builds to static files that can be deployed to:
+- Vercel
+- Netlify
+- GitHub Pages
+- Any static hosting service
+
+## 🤝 Contributing
+
+1. Follow the existing code style
+2. Use conventional commit messages
+3. Test your changes thoroughly
+4. Update documentation as needed
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For questions or issues:
+1. Check the existing documentation
+2. Review the component examples
+3. Open an issue with detailed description
+
+---
+
+**Built with ❤️ for modern bus travel booking experiences**

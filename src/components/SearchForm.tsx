@@ -1,20 +1,26 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeftRight, Calendar as CalendarIcon, MapPin, Users } from "lucide-react";
+import { ArrowLeftRight, Calendar as CalendarIcon, MapPin, Users, Briefcase } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const SearchForm = () => {
+  const { t } = useLocalization();
+  const navigate = useNavigate();
   const [fromCity, setFromCity] = useState("");
   const [toCity, setToCity] = useState("");
   const [departureDate, setDepartureDate] = useState<Date>();
   const [returnDate, setReturnDate] = useState<Date>();
   const [passengers, setPassengers] = useState("1");
+  const [baggage, setBaggage] = useState("1");
   const [isRoundTrip, setIsRoundTrip] = useState(false);
 
   const handleSwapCities = () => {
@@ -23,9 +29,41 @@ const SearchForm = () => {
     setToCity(temp);
   };
 
+  const handleSearch = () => {
+    if (!fromCity.trim() || !toCity.trim() || !departureDate) {
+      return; // Could add validation feedback here
+    }
+
+    const searchParams = new URLSearchParams({
+      from: fromCity,
+      to: toCity,
+      date: format(departureDate, "yyyy-MM-dd"),
+      passengers: passengers,
+      baggage: baggage
+    });
+
+    if (isRoundTrip && returnDate) {
+      searchParams.append("returnDate", format(returnDate, "yyyy-MM-dd"));
+    }
+
+    navigate(`/search?${searchParams.toString()}`);
+  };
+
+  const quickRoutes = [
+    { from: "Chișinău", to: "București" },
+    { from: "Chișinău", to: "Istanbul" },
+    { from: "Chișinău", to: "Moscow" },
+    { from: "Chișinău", to: "Kiev" },
+  ];
+
+  const handleQuickRoute = (route: { from: string; to: string }) => {
+    setFromCity(route.from);
+    setToCity(route.to);
+  };
+
   return (
     <div className="w-full max-w-6xl mx-auto">
-      <div className="bg-card rounded-2xl shadow-card p-6 border border-border">
+      <div className="bg-card rounded-2xl shadow-lg p-6 md:p-8 border border-border">
         {/* Trip Type Toggle */}
         <div className="flex items-center gap-4 mb-6">
           <button
@@ -37,7 +75,7 @@ const SearchForm = () => {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
-            One Way
+            {t('search.oneWay')}
           </button>
           <button
             onClick={() => setIsRoundTrip(true)}
@@ -48,15 +86,34 @@ const SearchForm = () => {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
-            Round Trip
+            {t('search.roundTrip')}
           </button>
+        </div>
+
+        {/* Quick Routes Chips */}
+        <div className="mb-6">
+          <Label className="text-sm font-medium text-muted-foreground mb-3 block">
+            {t('search.popularRoutes')}
+          </Label>
+          <div className="flex flex-wrap gap-2">
+            {quickRoutes.map((route, index) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                onClick={() => handleQuickRoute(route)}
+              >
+                {route.from} → {route.to}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
           {/* From City */}
           <div className="lg:col-span-3 space-y-2">
             <Label htmlFor="from" className="text-sm font-medium">
-              From
+              {t('search.from')}
             </Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -86,13 +143,13 @@ const SearchForm = () => {
           {/* To City */}
           <div className="lg:col-span-3 space-y-2">
             <Label htmlFor="to" className="text-sm font-medium">
-              To
+              {t('search.to')}
             </Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="to"
-                placeholder="Destination city"
+                placeholder={t('search.to')}
                 value={toCity}
                 onChange={(e) => setToCity(e.target.value)}
                 className="pl-10 h-12"
@@ -103,7 +160,7 @@ const SearchForm = () => {
           {/* Departure Date */}
           <div className="lg:col-span-2 space-y-2">
             <Label className="text-sm font-medium">
-              Departure
+              {t('search.departure')}
             </Label>
             <Popover>
               <PopoverTrigger asChild>
@@ -115,7 +172,7 @@ const SearchForm = () => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {departureDate ? format(departureDate, "PPP") : "Select date"}
+                  {departureDate ? format(departureDate, "PPP") : t('search.selectDate')}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -134,7 +191,7 @@ const SearchForm = () => {
           {isRoundTrip && (
             <div className="lg:col-span-2 space-y-2">
               <Label className="text-sm font-medium">
-                Return
+                {t('search.return')}
               </Label>
               <Popover>
                 <PopoverTrigger asChild>
@@ -146,7 +203,7 @@ const SearchForm = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {returnDate ? format(returnDate, "PPP") : "Select date"}
+                    {returnDate ? format(returnDate, "PPP") : t('search.selectDate')}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -165,7 +222,7 @@ const SearchForm = () => {
           {/* Passengers */}
           <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-1" : "lg:col-span-2")}>
             <Label className="text-sm font-medium">
-              Passengers
+              {t('search.passengers')}
             </Label>
             <Select value={passengers} onValueChange={setPassengers}>
               <SelectTrigger className="h-12">
@@ -184,13 +241,36 @@ const SearchForm = () => {
             </Select>
           </div>
 
+          {/* Baggage */}
+          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-1" : "lg:col-span-2")}>
+            <Label className="text-sm font-medium">
+              Baggage
+            </Label>
+            <Select value={baggage} onValueChange={setBaggage}>
+              <SelectTrigger className="h-12">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  <SelectValue />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                {[0, 1, 2, 3].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} {num === 1 ? "Bag" : "Bags"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Search Button */}
           <div className={cn("", isRoundTrip ? "lg:col-span-1" : "lg:col-span-1")}>
             <Button 
               className="w-full h-12 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
               size="lg"
+              onClick={handleSearch}
             >
-              Search
+              {t('search.searchTickets')}
             </Button>
           </div>
         </div>

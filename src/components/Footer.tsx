@@ -1,93 +1,183 @@
+import { Link } from "react-router-dom";
+import { 
+  Bus, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  Clock, 
+  Shield, 
+  Star,
+  Facebook,
+  Instagram,
+  Twitter
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from "lucide-react";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const Footer = () => {
+  const { t } = useLocalization();
+  const currentYear = new Date().getFullYear();
+
+  // Simplified footer sections
+  const footerSections = [
+    {
+      title: t('footer.transport'),
+      links: [
+        { name: t('header.routes'), href: "/transport-routes" },
+        { name: t('header.timetable'), href: "/timetable" },
+        { name: t('header.bookings'), href: "/search" },
+        { name: t('header.myTickets'), href: "/my-tickets" }
+      ]
+    },
+    {
+      title: t('footer.info'),
+      links: [
+        { name: t('about.title'), href: "/about" },
+        { name: t('contact.title'), href: "/contacts" },
+        { name: t('index.faq'), href: "/faq" },
+        { name: t('blog.title'), href: "/blog" }
+      ]
+    },
+    {
+      title: t('footer.support'),
+      links: [
+        { name: t('index.faq'), href: "/faq" },
+        { name: 'Contact Urgent', href: "/contacts" },
+        { name: t('legal.terms'), href: "/legal/terms" },
+        { name: t('legal.privacy'), href: "/legal/privacy" }
+      ]
+    }
+  ];
+
   return (
-    <footer className="bg-primary text-primary-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <footer className="bg-foreground text-background">
+      {/* Main Footer Content */}
+      <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="space-y-4">
-            <div className="text-2xl font-bold">Starlines</div>
-            <p className="text-primary-foreground/80">
-              Your trusted partner for comfortable and safe bus travel across Europe.
-            </p>
-            <div className="flex space-x-4">
-              <Button variant="ghost" size="sm" className="p-2 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                <Facebook className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="p-2 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                <Twitter className="h-5 w-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="p-2 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-                <Instagram className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Quick Links */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Quick Links</h3>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Timetable</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">My Tickets</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Open Date Tickets</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Loyalty Program</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">FAQ</a></li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Support</h3>
-            <ul className="space-y-2">
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Help Center</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Terms & Conditions</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="text-primary-foreground/80 hover:text-primary-foreground transition-colors">Return Policy</a></li>
-            </ul>
-          </div>
-
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Contact</h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Phone className="h-4 w-4" />
-                <span className="text-primary-foreground/80">+373 22 123 456</span>
+          <div className="lg:col-span-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center">
+                <Bus className="h-6 w-6 text-foreground" />
               </div>
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4" />
-                <span className="text-primary-foreground/80">info@starlines.md</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4" />
-                <span className="text-primary-foreground/80">Chișinău, Moldova</span>
+              <div>
+                <h3 className="text-lg font-bold">Starlines</h3>
+                <p className="text-sm text-background/70">Transport Internațional</p>
               </div>
             </div>
             
-            {/* Newsletter */}
-            <div className="mt-6">
-              <h4 className="font-medium mb-2">Newsletter</h4>
-              <div className="flex gap-2">
-                <Input 
-                  placeholder="Your email" 
-                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60"
-                />
-                <Button variant="secondary" size="sm">
-                  Subscribe
-                </Button>
+            <p className="text-sm text-background/70 mb-4">
+              {t('hero.subtitle')}
+            </p>
+
+            {/* Trust Badges */}
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-1 text-xs">
+                <Shield className="h-3 w-3 text-green-400" />
+                <span>{t('features.safeTransport')}</span>
               </div>
+              <div className="flex items-center gap-1 text-xs">
+                <Star className="h-3 w-3 text-yellow-400" />
+                <span>{t('header.trust.experience')}</span>
+              </div>
+            </div>
+
+            {/* Social Media */}
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-background/70 hover:text-background hover:bg-background/10">
+                <Facebook className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-background/70 hover:text-background hover:bg-background/10">
+                <Instagram className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-background/70 hover:text-background hover:bg-background/10">
+                <Twitter className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Navigation Links */}
+          {footerSections.map((section) => (
+            <div key={section.title}>
+              <h4 className="font-semibold mb-4 text-background">{section.title}</h4>
+              <ul className="space-y-2">
+                {section.links.map((link) => (
+                  <li key={link.name}>
+                    <Link
+                      to={link.href}
+                      className="text-sm text-background/70 hover:text-background transition-colors"
+                    >
+                      {link.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Contact Bar */}
+      <div className="border-t border-background/20 bg-foreground/95">
+        <div className="container py-4">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            {/* Contact Info */}
+            <div className="flex flex-col sm:flex-row items-center gap-6 text-sm text-background/70">
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4" />
+                <span>+373 60 12 34 56</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                <span>contact@starlines.md</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                <span>{t('index.workingHours')}</span>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex items-center gap-3">
+              <Link to="/search">
+                <Button size="sm" variant="secondary" className="bg-background text-foreground hover:bg-background/90">
+                  {t('index.bookNow')}
+                </Button>
+              </Link>
+              <Link to="/contacts">
+                <Button size="sm" variant="outline" className="border-background/30 text-background hover:bg-background hover:text-foreground">
+                  {t('contact.title')}
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
-        
-        <div className="border-t border-primary-foreground/20 mt-12 pt-8 text-center">
-          <p className="text-primary-foreground/80">
-            © 2024 Starlines. All rights reserved.
-          </p>
+      </div>
+
+      {/* Bottom Bar */}
+      <div className="border-t border-background/20 bg-foreground/90">
+        <div className="container py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-background/70">
+            <div className="flex items-center gap-4">
+              <span>&copy; {currentYear} Starlines. {t('footer.rights')}</span>
+              <span>•</span>
+              <span>{t('hero.subtitle')}</span>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Link to="/legal/terms" className="hover:text-background transition-colors">
+                {t('legal.terms')}
+              </Link>
+              <span>•</span>
+              <Link to="/legal/privacy" className="hover:text-background transition-colors">
+                {t('legal.privacy')}
+              </Link>
+              <span>•</span>
+              <Link to="/legal/refunds" className="hover:text-background transition-colors">
+                {t('legal.refund')}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
