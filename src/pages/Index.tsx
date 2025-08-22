@@ -30,7 +30,7 @@ const Index = () => {
       href: "/search",
       icon: <Calendar className="h-8 w-8" />,
       color: "bg-blue-500",
-      buttonText: t('index.bookNow')
+      buttonText: t('index.readyBookNow')
     },
     {
       title: t('index.viewRoutes'),

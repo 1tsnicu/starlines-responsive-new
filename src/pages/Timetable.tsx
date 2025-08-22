@@ -5,10 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { routes } from "@/lib/mock-data";
+import { routes, infoBusAPI } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { useLocalization } from "@/contexts/LocalizationContext";
+import { useNavigate } from "react-router-dom";
 
 const Timetable = () => {
+  const { t } = useLocalization();
+  const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedOperator, setSelectedOperator] = useState<string>("all");
   const [selectedDirection, setSelectedDirection] = useState<string>("all");
@@ -52,24 +56,66 @@ const Timetable = () => {
 
   // Format date for display
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    const dayOfWeek = date.getDay();
+    const dayNames = ['days.sunday', 'days.monday', 'days.tuesday', 'days.wednesday', 'days.thursday', 'days.friday', 'days.saturday'];
+    const dayName = t(dayNames[dayOfWeek]);
+    
+    const month = date.getMonth();
+    const monthNames = ['months.january', 'months.february', 'months.march', 'months.april', 'months.may', 'months.june', 'months.july', 'months.august', 'months.september', 'months.october', 'months.november', 'months.december'];
+    const monthName = t(monthNames[month]);
+    
+    return `${dayName}, ${monthName} ${date.getDate()}, ${date.getFullYear()}`;
   };
 
   // Get day of week
   const getDayOfWeek = (date: Date) => {
-    return date.toLocaleDateString("en-US", { weekday: "long" });
+    const dayOfWeek = date.getDay();
+    const dayNames = ['days.sunday', 'days.monday', 'days.tuesday', 'days.wednesday', 'days.thursday', 'days.friday', 'days.saturday'];
+    return t(dayNames[dayOfWeek]);
   };
 
   // Check if route operates on selected day
   const isRouteOperating = (route: typeof routes[0]) => {
     // Mock logic - in real app this would check actual schedule
-    const dayOfWeek = getDayOfWeek(selectedDate);
-    return route.operatingDays?.includes(dayOfWeek) ?? true;
+    // For now, assume all routes operate daily
+    return true;
+  };
+
+  // Handle booking a route
+  const handleBookRoute = async (route: typeof routes[0]) => {
+    try {
+      // Find the corresponding route in infoBusAPI
+      const allRoutes = await infoBusAPI.getAllRoutes();
+      const infoBusRoute = allRoutes.find(r => 
+        r.from === route.from.name && 
+        r.to === route.to.name
+      );
+      
+      if (!infoBusRoute) {
+        console.error('Route not found in infoBusAPI', {
+          searchingFor: { from: route.from.name, to: route.to.name },
+          availableRoutes: allRoutes.map(r => ({ from: r.from, to: r.to, id: r.id }))
+        });
+        return;
+      }
+      
+      const routeParams = new URLSearchParams({
+        routeId: infoBusRoute.id,
+        from: infoBusRoute.from,
+        to: infoBusRoute.to,
+        date: selectedDate.toISOString().split('T')[0],
+        passengers: '1',
+        fareType: 'economy',
+        price: infoBusRoute.price.economy.toString(),
+        departureTime: infoBusRoute.departureTime,
+        arrivalTime: infoBusRoute.arrivalTime,
+        duration: infoBusRoute.duration,
+        operator: infoBusRoute.operator
+      });
+      navigate(`/trip-details?${routeParams.toString()}`);
+    } catch (error) {
+      console.error('Error finding route:', error);
+    }
   };
 
   const CalendarView = () => (
@@ -89,7 +135,7 @@ const Timetable = () => {
           <p className="text-sm text-muted-foreground">{getDayOfWeek(selectedDate)}</p>
         </div>
         <Button variant="outline" size="sm" onClick={goToToday}>
-          Today
+          {t('timetable.today')}
         </Button>
       </div>
 
@@ -124,24 +170,24 @@ const Timetable = () => {
                             </div>
                           </div>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span>Duration: {route.duration}</span>
-                            <span>Stops: {route.stops}</span>
-                            <span>Operator: {route.operator}</span>
+                            <span>{t('timetable.duration')}: {route.duration}</span>
+                            <span>{t('timetable.stops')}: {route.stops}</span>
+                            <span>{t('timetable.operator')}: {route.operator}</span>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-primary mb-1">
                             €{route.price}
                           </div>
-                          <Button size="sm" variant="outline">
-                            Book
+                          <Button size="sm" variant="outline" onClick={() => handleBookRoute(route)}>
+                            {t('timetable.book')}
                           </Button>
                         </div>
                       </div>
                     ))}
                   {routesAtTime.filter(route => isRouteOperating(route)).length === 0 && (
                     <div className="text-center py-4 text-muted-foreground">
-                      No routes operating at this time
+                      {t('timetable.noRoutesOperating')}
                     </div>
                   )}
                 </div>
@@ -167,7 +213,7 @@ const Timetable = () => {
                     {route.departureTime}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {route.duration} • {route.stops} stops
+                    {route.duration} • {route.stops} {route.stops === 1 ? t('timetable.stop') : t('timetable.stops')}
                   </div>
                 </div>
 
@@ -209,13 +255,13 @@ const Timetable = () => {
                 {/* Price & Action */}
                 <div className="md:col-span-3 text-right">
                   <div className="mb-2">
-                    <span className="text-xs text-muted-foreground">From</span>
+                    <span className="text-xs text-muted-foreground">{t('timetable.from')}</span>
                     <div className="text-2xl font-bold text-primary">
                       €{route.price}
                     </div>
                   </div>
-                  <Button size="sm" className="w-full">
-                    Book Now
+                  <Button size="sm" className="w-full" onClick={() => handleBookRoute(route)}>
+                    {t('timetable.bookNow')}
                   </Button>
                 </div>
               </div>
@@ -232,10 +278,10 @@ const Timetable = () => {
         <div className="container py-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Bus Timetable
+              {t('timetable.title')}
             </h1>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              View complete schedules for all Starlines routes. Filter by date, operator, or direction to find your perfect journey.
+              {t('timetable.description')}
             </p>
           </div>
         </div>
@@ -249,16 +295,16 @@ const Timetable = () => {
               {/* Operator Filter */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Operator
+                  {t('timetable.operator')}
                 </label>
                 <Select value={selectedOperator} onValueChange={setSelectedOperator}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All operators" />
+                    <SelectValue placeholder={t('timetable.allOperators')} />
                   </SelectTrigger>
                   <SelectContent>
                     {operators.map((operator) => (
                       <SelectItem key={operator} value={operator}>
-                        {operator === "all" ? "All operators" : operator}
+                        {operator === "all" ? t('timetable.allOperators') : operator}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -268,16 +314,16 @@ const Timetable = () => {
               {/* Direction Filter */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Direction
+                  {t('timetable.direction')}
                 </label>
                 <Select value={selectedDirection} onValueChange={setSelectedDirection}>
                   <SelectTrigger>
-                    <SelectValue placeholder="All directions" />
+                    <SelectValue placeholder={t('timetable.allDirections')} />
                   </SelectTrigger>
                   <SelectContent>
                     {directions.map((direction) => (
                       <SelectItem key={direction} value={direction}>
-                        {direction === "all" ? "All directions" : direction}
+                        {direction === "all" ? t('timetable.allDirections') : direction}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -287,12 +333,12 @@ const Timetable = () => {
               {/* View Mode */}
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  View Mode
+                  {t('timetable.viewMode')}
                 </label>
                 <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "calendar" | "list")}>
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                    <TabsTrigger value="list">List</TabsTrigger>
+                    <TabsTrigger value="calendar">{t('timetable.calendar')}</TabsTrigger>
+                    <TabsTrigger value="list">{t('timetable.list')}</TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
@@ -305,7 +351,9 @@ const Timetable = () => {
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">
-              {filteredRoutes.filter(route => isRouteOperating(route)).length} routes operating on {formatDate(selectedDate)}
+              {t('timetable.routesOperating')
+                .replace('{count}', filteredRoutes.filter(route => isRouteOperating(route)).length.toString())
+                .replace('{date}', formatDate(selectedDate))}
             </span>
           </div>
         </div>

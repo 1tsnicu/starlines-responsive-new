@@ -33,7 +33,8 @@ const Sitemap = () => {
       title: "Booking & Travel",
       icon: Ticket,
       links: [
-        { name: "Trip Details", href: "/trip/1", description: "View detailed trip information" },
+        { name: "Transport Routes", href: "/transport-routes", description: "Browse all available routes" },
+        { name: "Trip Details", href: "/trip-details", description: "View detailed trip information" },
         { name: "Checkout", href: "/checkout", description: "Complete your booking process" },
         { name: "Payment Status", href: "/payment/status", description: "Check payment confirmation" },
       ]
@@ -53,8 +54,6 @@ const Sitemap = () => {
       icon: FileText,
       links: [
         { name: "Blog", href: "/blog", description: "Travel articles and news" },
-        { name: "Travel Tips", href: "/blog/travel-tips", description: "Helpful travel advice" },
-        { name: "Destination Guides", href: "/blog/destinations", description: "City and country guides" },
       ]
     },
     {
@@ -63,18 +62,15 @@ const Sitemap = () => {
       links: [
         { name: "Terms of Service", href: "/legal/terms", description: "Terms and conditions" },
         { name: "Privacy Policy", href: "/legal/privacy", description: "Data protection information" },
-        { name: "Refund Policy", href: "/legal/returns", description: "Cancellation and refund rules" },
-        { name: "Cookie Policy", href: "/legal/cookies", description: "Cookie usage information" },
+        { name: "Refund Policy", href: "/legal/refunds", description: "Cancellation and refund rules" },
       ]
     },
     {
-      title: "Account & Settings",
-      icon: Users,
+      title: "Admin & Management",
+      icon: Settings,
       links: [
-        { name: "Sign In", href: "/auth/signin", description: "Access your account" },
-        { name: "Register", href: "/auth/register", description: "Create new account" },
-        { name: "Profile Settings", href: "/profile", description: "Manage your preferences" },
-        { name: "Booking History", href: "/bookings", description: "View past trips" },
+        { name: "Admin Routes", href: "/admin/routes", description: "Manage transport routes" },
+        { name: "Login", href: "/login", description: "Administrative access" },
       ]
     }
   ];

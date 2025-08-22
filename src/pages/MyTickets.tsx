@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Download, QrCode, Mail, Copy, ArrowRight, Ticket, Calendar, MapPin, Clock, Bus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,21 +11,38 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { lookupTicket } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { useLocalization } from "@/contexts/LocalizationContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const MyTickets = () => {
+  const { t } = useLocalization();
+  const { user, signIn, signUp, signOut, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("lookup");
   const [orderNumber, setOrderNumber] = useState("");
   const [securityCode, setSecurityCode] = useState("");
   const [ticket, setTicket] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authForm, setAuthForm] = useState({
+    email: "",
+    password: "",
+    confirmPassword: "",
+    firstName: "",
+    lastName: ""
+  });
+  const [formLoading, setFormLoading] = useState(false);
   const { toast } = useToast();
+
+  // Check if user is authenticated
+  const isAuthenticated = !!user;
 
   const handleTicketLookup = async () => {
     if (!orderNumber.trim() || !securityCode.trim()) {
       toast({
-        title: "Missing Information",
-        description: "Please enter both order number and security code.",
+        title: t('myTickets.missingInformation'),
+        description: t('myTickets.enterBothFields'),
         variant: "destructive"
       });
       return;
@@ -36,13 +53,13 @@ const MyTickets = () => {
       const ticketData = await lookupTicket(orderNumber, securityCode);
       setTicket(ticketData);
       toast({
-        title: "Ticket Found",
-        description: "Your ticket has been retrieved successfully.",
+        title: t('myTickets.ticketFound'),
+        description: t('myTickets.ticketRetrieved'),
       });
     } catch (error) {
       toast({
-        title: "Ticket Not Found",
-        description: "Please check your order number and security code.",
+        title: t('myTickets.ticketNotFound'),
+        description: t('myTickets.checkDetails'),
         variant: "destructive"
       });
       setTicket(null);
@@ -54,9 +71,118 @@ const MyTickets = () => {
   const handleCopyCode = (text: string, type: string) => {
     navigator.clipboard.writeText(text);
     toast({
-      title: "Copied!",
-      description: `${type} has been copied to clipboard.`,
+      title: t('myTickets.copied'),
+      description: `${type} ${t('myTickets.copiedToClipboard')}`,
     });
+  };
+
+  const handleSignIn = () => {
+    setAuthMode("signin");
+    setShowAuthDialog(true);
+  };
+
+  const handleCreateAccount = () => {
+    setAuthMode("signup");
+    setShowAuthDialog(true);
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+
+    try {
+      if (authMode === "signin") {
+        // Sign in with Supabase
+        const { error } = await signIn(authForm.email, authForm.password);
+        
+        if (error) {
+          toast({
+            title: t('myTickets.signInError'),
+            description: error.message || t('myTickets.invalidCredentials'),
+            variant: "destructive"
+          });
+        } else {
+          setShowAuthDialog(false);
+          // Clear form
+          setAuthForm({
+            email: "",
+            password: "",
+            confirmPassword: "",
+            firstName: "",
+            lastName: ""
+          });
+          toast({
+            title: t('myTickets.signInSuccess'),
+            description: t('myTickets.welcomeBack'),
+          });
+        }
+      } else {
+        // Sign up with Supabase
+        if (authForm.password !== authForm.confirmPassword) {
+          toast({
+            title: t('myTickets.signUpError'),
+            description: t('myTickets.passwordMismatch'),
+            variant: "destructive"
+          });
+          return;
+        }
+
+        const { error } = await signUp(authForm.email, authForm.password, authForm.firstName, authForm.lastName);
+        
+        if (error) {
+          toast({
+            title: t('myTickets.signUpError'),
+            description: error.message || t('myTickets.fillAllFields'),
+            variant: "destructive"
+          });
+        } else {
+          setShowAuthDialog(false);
+          // Clear form
+          setAuthForm({
+            email: "",
+            password: "",
+            confirmPassword: "",
+            firstName: "",
+            lastName: ""
+          });
+          toast({
+            title: t('myTickets.signUpSuccess'),
+            description: t('myTickets.accountCreated'),
+          });
+        }
+      }
+    } catch (error) {
+      toast({
+        title: t('myTickets.authError'),
+        description: t('myTickets.tryAgain'),
+        variant: "destructive"
+      });
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      setAuthForm({
+        email: "",
+        password: "",
+        confirmPassword: "",
+        firstName: "",
+        lastName: ""
+      });
+      toast({
+        title: t('myTickets.signOutSuccess'),
+        description: t('myTickets.signedOut'),
+      });
+    } catch (error) {
+      toast({
+        title: t('myTickets.signOutError'),
+        description: t('myTickets.tryAgain'),
+        variant: "destructive"
+      });
+    }
   };
 
   const mockTickets = [
@@ -105,9 +231,9 @@ const MyTickets = () => {
       <div className="bg-surface border-b border-border">
         <div className="container py-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2">My Tickets</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">{t('myTickets.title')}</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Look up your tickets, download PDFs, and manage your bookings
+              {t('myTickets.subtitle')}
             </p>
           </div>
         </div>
@@ -118,11 +244,11 @@ const MyTickets = () => {
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="lookup" className="flex items-center gap-2">
               <Search className="h-4 w-4" />
-              Look Up Ticket
+              {t('myTickets.lookupTab')}
             </TabsTrigger>
             <TabsTrigger value="account" className="flex items-center gap-2">
               <Ticket className="h-4 w-4" />
-              My Account
+              {t('myTickets.accountTab')}
             </TabsTrigger>
           </TabsList>
 
@@ -131,23 +257,23 @@ const MyTickets = () => {
               {/* Lookup Form */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Find Your Ticket</CardTitle>
+                  <CardTitle>{t('myTickets.findTicket')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="orderNumber">Order Number</Label>
+                    <Label htmlFor="orderNumber">{t('myTickets.orderNumber')}</Label>
                     <Input
                       id="orderNumber"
-                      placeholder="e.g., STL-2024-001"
+                      placeholder={t('myTickets.orderNumberPlaceholder')}
                       value={orderNumber}
                       onChange={(e) => setOrderNumber(e.target.value)}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="securityCode">Security Code</Label>
+                    <Label htmlFor="securityCode">{t('myTickets.securityCode')}</Label>
                     <Input
                       id="securityCode"
-                      placeholder="Enter security code"
+                      placeholder={t('myTickets.securityCodePlaceholder')}
                       value={securityCode}
                       onChange={(e) => setSecurityCode(e.target.value)}
                       type="password"
@@ -158,12 +284,12 @@ const MyTickets = () => {
                     disabled={loading}
                     className="w-full"
                   >
-                    {loading ? "Searching..." : "Find Ticket"}
+                    {loading ? t('myTickets.searching') : t('myTickets.findTicketButton')}
                   </Button>
                   
                   <div className="text-sm text-muted-foreground text-center">
-                    <p>Don't have your details?</p>
-                    <p>Check your confirmation email or contact support</p>
+                    <p>{t('myTickets.helpText1')}</p>
+                    <p>{t('myTickets.helpText2')}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -174,43 +300,43 @@ const MyTickets = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
-                        <span>Ticket Details</span>
+                        <span>{t('myTickets.ticketDetails')}</span>
                         {getStatusBadge(ticket.status)}
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Order Number</span>
+                          <span className="text-muted-foreground">{t('myTickets.orderNumber')}</span>
                           <div className="flex items-center gap-2">
                             <span className="font-mono font-medium">{ticket.orderNumber}</span>
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleCopyCode(ticket.orderNumber, "Order number")}
+                              onClick={() => handleCopyCode(ticket.orderNumber, t('myTickets.orderNumber'))}
                             >
                               <Copy className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Route</span>
+                          <span className="text-muted-foreground">{t('myTickets.route')}</span>
                           <span className="font-medium">{ticket.route.from.name} → {ticket.route.to.name}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Date</span>
+                          <span className="text-muted-foreground">{t('myTickets.date')}</span>
                           <span>{ticket.departureDate}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Time</span>
+                          <span className="text-muted-foreground">{t('myTickets.time')}</span>
                           <span>{ticket.route.departureTime} - {ticket.route.arrivalTime}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Passengers</span>
+                          <span className="text-muted-foreground">{t('myTickets.passengers')}</span>
                           <span>{ticket.passengers.length}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">Total Paid</span>
+                          <span className="text-muted-foreground">{t('myTickets.totalPaid')}</span>
                           <span className="font-bold text-primary">
                             {ticket.currency} {ticket.totalPrice}
                           </span>
@@ -222,38 +348,38 @@ const MyTickets = () => {
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Button size="sm" className="gap-2 flex-1">
                           <Download className="h-4 w-4" />
-                          Download PDF
+                          {t('myTickets.downloadPDF')}
                         </Button>
                         <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm" className="gap-2 flex-1">
                               <QrCode className="h-4 w-4" />
-                              Show QR
+                              {t('myTickets.showQR')}
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
                             <DialogHeader>
-                              <DialogTitle>Your Ticket QR Code</DialogTitle>
+                              <DialogTitle>{t('myTickets.qrCodeTitle')}</DialogTitle>
                               <DialogDescription>
-                                Show this QR code to the driver when boarding
+                                {t('myTickets.qrCodeDescription')}
                               </DialogDescription>
                             </DialogHeader>
                             <div className="text-center space-y-4">
                               <div className="w-48 h-48 bg-muted rounded-lg mx-auto flex items-center justify-center">
                                 <div className="text-center">
                                   <div className="w-32 h-32 bg-black rounded-lg mx-auto mb-2"></div>
-                                  <p className="text-xs text-muted-foreground">QR Code Placeholder</p>
+                                  <p className="text-xs text-muted-foreground">{t('myTickets.qrCodePlaceholder')}</p>
                                 </div>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                Order: {ticket.orderNumber}
+                                {t('myTickets.order')}: {ticket.orderNumber}
                               </p>
                             </div>
                           </DialogContent>
                         </Dialog>
                         <Button variant="outline" size="sm" className="gap-2 flex-1">
                           <Mail className="h-4 w-4" />
-                          Email
+                          {t('myTickets.email')}
                         </Button>
                       </div>
                     </CardContent>
@@ -263,7 +389,7 @@ const MyTickets = () => {
                     <CardContent className="flex items-center justify-center h-64">
                       <div className="text-center text-muted-foreground">
                         <Ticket className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                        <p>Enter your order details to find your ticket</p>
+                        <p>{t('myTickets.enterOrderDetails')}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -277,31 +403,60 @@ const MyTickets = () => {
               {/* Account Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Account Information</CardTitle>
+                  <CardTitle>{t('myTickets.accountInformation')}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Ticket className="h-8 w-8 text-muted-foreground" />
+                  {!isAuthenticated ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Ticket className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {t('myTickets.signInMessage')}
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        {t('myTickets.createAccountMessage')}
+                      </p>
+                      <div className="flex gap-3 justify-center">
+                        <Button onClick={handleSignIn}>{t('myTickets.signIn')}</Button>
+                        <Button variant="outline" onClick={handleCreateAccount}>{t('myTickets.createAccount')}</Button>
+                      </div>
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Sign in to access your tickets
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      Create an account or sign in to view all your bookings and tickets
-                    </p>
-                    <div className="flex gap-3 justify-center">
-                      <Button>Sign In</Button>
-                      <Button variant="outline">Create Account</Button>
+                  ) : (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Ticket className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        {t('myTickets.welcomeMessage')}
+                      </h3>
+                      {user && (
+                        <div className="mb-4">
+                          <p className="text-sm text-muted-foreground">
+                            {user.first_name} {user.last_name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.email}
+                          </p>
+                        </div>
+                      )}
+                      <p className="text-muted-foreground mb-4">
+                        {t('myTickets.accountActive')}
+                      </p>
+                      <div className="flex gap-3 justify-center">
+                        <Button variant="outline" onClick={handleSignOut}>
+                          {t('myTickets.signOut')}
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
               {/* Recent Bookings */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Recent Bookings</CardTitle>
+                  <CardTitle>{t('myTickets.recentBookings')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -324,7 +479,7 @@ const MyTickets = () => {
                               </span>
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
-                                {ticket.passengers} {ticket.passengers === 1 ? "passenger" : "passengers"}
+                                {ticket.passengers} {ticket.passengers === 1 ? t('myTickets.passenger') : t('myTickets.passengers')}
                               </span>
                             </div>
                           </div>
@@ -347,25 +502,25 @@ const MyTickets = () => {
               {/* Quick Actions */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
+                  <CardTitle>{t('myTickets.quickActions')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Button variant="outline" className="h-auto p-4 flex-col gap-2">
                       <Download className="h-6 w-6" />
-                      <span>Download All Tickets</span>
+                      <span>{t('myTickets.downloadAllTickets')}</span>
                     </Button>
                     <Button variant="outline" className="h-auto p-4 flex-col gap-2">
                       <Mail className="h-6 w-6" />
-                      <span>Email All Tickets</span>
+                      <span>{t('myTickets.emailAllTickets')}</span>
                     </Button>
                     <Button variant="outline" className="h-auto p-4 flex-col gap-2">
                       <Calendar className="h-6 w-6" />
-                      <span>View Calendar</span>
+                      <span>{t('myTickets.viewCalendar')}</span>
                     </Button>
                     <Button variant="outline" className="h-auto p-4 flex-col gap-2">
                       <ArrowRight className="h-6 w-6" />
-                      <span>Book New Trip</span>
+                      <span>{t('myTickets.bookNewTrip')}</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -374,6 +529,105 @@ const MyTickets = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Authentication Dialog */}
+      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {authMode === "signin" ? t('myTickets.signIn') : t('myTickets.createAccount')}
+            </DialogTitle>
+            <DialogDescription>
+              {authMode === "signin" 
+                ? t('myTickets.signInDescription') 
+                : t('myTickets.signUpDescription')
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleAuthSubmit} className="space-y-4">
+            {authMode === "signup" && (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="firstName">{t('myTickets.firstName')}</Label>
+                    <Input
+                      id="firstName"
+                      value={authForm.firstName}
+                      onChange={(e) => setAuthForm({...authForm, firstName: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lastName">{t('myTickets.lastName')}</Label>
+                    <Input
+                      id="lastName"
+                      value={authForm.lastName}
+                      onChange={(e) => setAuthForm({...authForm, lastName: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+            
+            <div>
+              <Label htmlFor="email">{t('myTickets.email')}</Label>
+              <Input
+                id="email"
+                type="email"
+                value={authForm.email}
+                onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="password">{t('myTickets.password')}</Label>
+              <Input
+                id="password"
+                type="password"
+                value={authForm.password}
+                onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                required
+              />
+            </div>
+            
+            {authMode === "signup" && (
+              <div>
+                <Label htmlFor="confirmPassword">{t('myTickets.confirmPassword')}</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={authForm.confirmPassword}
+                  onChange={(e) => setAuthForm({...authForm, confirmPassword: e.target.value})}
+                  required
+                />
+              </div>
+            )}
+            
+            <div className="flex gap-3 pt-4">
+              <Button 
+                type="submit" 
+                className="flex-1" 
+                disabled={formLoading}
+              >
+                {formLoading ? t('myTickets.processing') : (
+                  authMode === "signin" ? t('myTickets.signIn') : t('myTickets.createAccount')
+                )}
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setShowAuthDialog(false)}
+                disabled={formLoading}
+              >
+                {t('myTickets.cancel')}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

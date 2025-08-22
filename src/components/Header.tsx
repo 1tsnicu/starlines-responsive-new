@@ -37,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import QuickNav from "./QuickNav";
+
 import { useLocalization, SUPPORTED_LANGUAGES, SUPPORTED_CURRENCIES } from "@/contexts/LocalizationContext";
 
 const Header = () => {
@@ -304,9 +304,6 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
-            {/* Quick Navigation Dropdown */}
-            <QuickNav />
-
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"

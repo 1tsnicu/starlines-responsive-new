@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LocalizationProvider } from "@/contexts/LocalizationContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -40,15 +41,16 @@ function App() {
   return (
   <QueryClientProvider client={queryClient}>
     <LocalizationProvider>
-      <TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
           <Router>
             <div className="min-h-screen flex flex-col">
               <Header />
               <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Index />} />
+                <Routes>
+                  <Route path="/" element={<Index />} />
                   <Route path="/search" element={<SearchResults />} />
-                  <Route path="/trip/:id" element={<TripDetails />} />
+                  <Route path="/trip-details" element={<TripDetails />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="/payment/status" element={<PaymentStatus />} />
                   <Route path="/my-tickets" element={<MyTickets />} />
@@ -64,13 +66,14 @@ function App() {
                   <Route path="/transport-routes" element={<TransportRoutes />} />
                   <Route path="/admin/routes" element={<AdminRoutes />} />
                   <Route path="/login" element={<Login />} />
-          </Routes>
+                </Routes>
               </main>
               <Footer />
             </div>
             <Toaster />
           </Router>
-      </TooltipProvider>
+        </TooltipProvider>
+      </AuthProvider>
     </LocalizationProvider>
   </QueryClientProvider>
 );

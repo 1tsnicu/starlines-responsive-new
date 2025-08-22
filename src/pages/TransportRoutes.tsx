@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { 
   Route,
   Map,
@@ -18,7 +19,9 @@ import {
   Calendar,
   TrendingUp,
   Phone,
-  Mail
+  Mail,
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,105 +30,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PageHeader from "@/components/PageHeader";
 import { useLocalization } from "@/contexts/LocalizationContext";
-
-// Mock routes data for public display
-const publicRoutes = [
-  {
-    id: "1",
-    from: "Chișinău",
-    to: "Berlin",
-    operator: "InfoBus",
-    departure: "08:00",
-    arrival: "22:00",
-    duration: "14h",
-    price: 85,
-    frequency: "Daily",
-    amenities: ["WiFi", "USB", "WC", "Refreshments"],
-    rating: 4.8,
-    reviews: 127,
-    isPopular: true
-  },
-  {
-    id: "2",
-    from: "Chișinău",
-    to: "Munich",
-    operator: "InfoBus",
-    departure: "10:30",
-    arrival: "01:30",
-    duration: "15h",
-    price: 90,
-    frequency: "Daily",
-    amenities: ["WiFi", "USB", "WC", "Entertainment"],
-    rating: 4.7,
-    reviews: 89,
-    isPopular: true
-  },
-  {
-    id: "3",
-    from: "Chișinău",
-    to: "Frankfurt",
-    operator: "InfoBus",
-    departure: "12:00",
-    arrival: "03:00",
-    duration: "15h",
-    price: 88,
-    frequency: "Daily",
-    amenities: ["WiFi", "USB", "WC"],
-    rating: 4.6,
-    reviews: 156,
-    isPopular: false
-  },
-  {
-    id: "4",
-    from: "Chișinău",
-    to: "Viena",
-    operator: "Starlines Custom",
-    departure: "14:00",
-    arrival: "04:00",
-    duration: "14h",
-    price: 100,
-    frequency: "2x weekly",
-    amenities: ["WiFi", "USB", "WC", "Premium Service"],
-    rating: 4.9,
-    reviews: 43,
-    isPopular: true
-  },
-  {
-    id: "5",
-    from: "Chișinău",
-    to: "Warsaw",
-    operator: "InfoBus",
-    departure: "16:00",
-    arrival: "06:00",
-    duration: "14h",
-    price: 75,
-    frequency: "Daily",
-    amenities: ["WiFi", "USB", "WC"],
-    rating: 4.5,
-    reviews: 78,
-    isPopular: false
-  },
-  {
-    id: "6",
-    from: "Chișinău",
-    to: "Prague",
-    operator: "InfoBus",
-    departure: "18:00",
-    arrival: "08:00",
-    duration: "14h",
-    price: 82,
-    frequency: "Daily",
-    amenities: ["WiFi", "USB", "WC", "Refreshments"],
-    rating: 4.7,
-    reviews: 94,
-    isPopular: false
-  }
-];
+import { infoBusAPI, InfoBusRoute } from "@/lib/mock-data";
 
 const TransportRoutes: React.FC = () => {
   const { t, formatPrice } = useLocalization();
+  const navigate = useNavigate();
+  
+  // State for UI
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [fromCity, setFromCity] = useState("all");
@@ -133,12 +47,44 @@ const TransportRoutes: React.FC = () => {
   const [operator, setOperator] = useState("all");
   const [priceRange, setPriceRange] = useState("all");
   const [sortBy, setSortBy] = useState("departure");
-  const [filteredRoutes, setFilteredRoutes] = useState(publicRoutes);
+  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  
+  // State for data
+  const [routes, setRoutes] = useState<InfoBusRoute[]>([]);
+  const [filteredRoutes, setFilteredRoutes] = useState<InfoBusRoute[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // State for advanced filters dialog
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [maxStops, setMaxStops] = useState("all");
+  const [ratingFilter, setRatingFilter] = useState("all");
+
+  // Load routes data on component mount
+  useEffect(() => {
+    const loadRoutes = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await infoBusAPI.getVisibleRoutes();
+        setRoutes(data);
+      } catch (err) {
+        setError("Failed to load routes. Please try again later.");
+        console.error("Error loading routes:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRoutes();
+  }, []);
 
   // Filter and sort routes
   useEffect(() => {
-    let filtered = publicRoutes;
+    let filtered = [...routes];
     
+    // Text search
     if (searchTerm) {
       filtered = filtered.filter(route => 
         route.from.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -147,6 +93,7 @@ const TransportRoutes: React.FC = () => {
       );
     }
     
+    // City filters
     if (fromCity !== "all") {
       filtered = filtered.filter(route => route.from === fromCity);
     }
@@ -155,59 +102,109 @@ const TransportRoutes: React.FC = () => {
       filtered = filtered.filter(route => route.to === toCity);
     }
     
+    // Operator filter
     if (operator !== "all") {
       filtered = filtered.filter(route => route.operator === operator);
     }
     
+    // Price range filter
     if (priceRange !== "all") {
       const [min, max] = priceRange.split("-").map(Number);
       if (max) {
-        filtered = filtered.filter(route => route.price >= min && route.price <= max);
+        filtered = filtered.filter(route => route.price.economy >= min && route.price.economy <= max);
       } else {
-        filtered = filtered.filter(route => route.price >= min);
+        filtered = filtered.filter(route => route.price.economy >= min);
       }
+    }
+    
+    // Advanced filters
+    if (selectedAmenities.length > 0) {
+      filtered = filtered.filter(route => 
+        selectedAmenities.every(amenity => route.amenities.includes(amenity))
+      );
+    }
+    
+    if (ratingFilter !== "all") {
+      const minRating = parseFloat(ratingFilter);
+      filtered = filtered.filter(route => route.price.economy >= minRating);
     }
     
     // Sort routes
     filtered.sort((a, b) => {
       switch (sortBy) {
         case "price":
-          return a.price - b.price;
+          return a.price.economy - b.price.economy;
         case "duration":
           return parseInt(a.duration) - parseInt(b.duration);
         case "rating":
-          return b.rating - a.rating;
+          return b.price.economy - a.price.economy; // Using price as mock rating
         case "departure":
         default:
-          return a.departure.localeCompare(b.departure);
+          return a.departureTime.localeCompare(b.departureTime);
       }
     });
     
     setFilteredRoutes(filtered);
-  }, [searchTerm, fromCity, toCity, operator, priceRange, sortBy]);
+  }, [routes, searchTerm, fromCity, toCity, operator, priceRange, sortBy, selectedAmenities, ratingFilter]);
 
+  // Helper functions
   const getCities = () => {
-    const cities = [...new Set([...publicRoutes.map(r => r.from), ...publicRoutes.map(r => r.to)])];
+    const cities = [...new Set([...routes.map(r => r.from), ...routes.map(r => r.to)])];
     return cities.sort();
   };
 
   const getOperators = () => {
-    const operators = [...new Set(publicRoutes.map(r => r.operator))];
+    const operators = [...new Set(routes.map(r => r.operator))];
     return operators.sort();
+  };
+
+  const getAllAmenities = () => {
+    const amenities = [...new Set(routes.flatMap(r => r.amenities))];
+    return amenities.sort();
   };
 
   const getAmenityIcon = (amenity: string) => {
     switch (amenity.toLowerCase()) {
       case "wifi": return <Wifi className="h-3 w-3" />;
-      case "usb": return <Zap className="h-3 w-3" />;
+      case "usb charging": return <Zap className="h-3 w-3" />;
       case "wc": return <Bath className="h-3 w-3" />;
       case "refreshments": return <Coffee className="h-3 w-3" />;
+      case "entertainment": return <TrendingUp className="h-3 w-3" />;
+      case "ac": return <Star className="h-3 w-3" />;
       default: return <Star className="h-3 w-3" />;
     }
   };
 
   const formatDuration = (duration: string) => duration.replace('h', 'h ');
   const formatTime = (time: string) => time;
+
+  // Event handlers
+  const handleViewDetails = (routeId: string) => {
+    navigate(`/trip-details?routeId=${routeId}&date=${selectedDate}&passengers=1`);
+  };
+
+  const handleBookNow = (routeId: string) => {
+    navigate(`/search-results?from=${routes.find(r => r.id === routeId)?.from}&to=${routes.find(r => r.id === routeId)?.to}&date=${selectedDate}&passengers=1`);
+  };
+
+  const clearAllFilters = () => {
+    setSearchTerm("");
+    setFromCity("all");
+    setToCity("all");
+    setOperator("all");
+    setPriceRange("all");
+    setSelectedAmenities([]);
+    setRatingFilter("all");
+    setMaxStops("all");
+  };
+
+  const toggleAmenity = (amenity: string) => {
+    setSelectedAmenities(prev => 
+      prev.includes(amenity) 
+        ? prev.filter(a => a !== amenity)
+        : [...prev, amenity]
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -222,102 +219,123 @@ const TransportRoutes: React.FC = () => {
 
       {/* InfoBus-like Header */}
       <div className="py-8 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-border">
-        <div className="container">
-          <div className="flex items-center justify-between mb-6">
+        <div className="container max-w-7xl mx-auto px-4">
+          {/* Header Section - Better alignment */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <Bus className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Bus Routes</h1>
-                <p className="text-lg text-foreground/70">Find and book your perfect journey across Europe</p>
+                <h1 className="text-3xl font-bold text-foreground">{t('transport.busRoutes')}</h1>
+                <p className="text-lg text-foreground/70">{t('transport.findJourney')}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            
+            {/* View Mode Buttons - Better positioning */}
+            <div className="flex items-center gap-3 flex-shrink-0">
               <Button
                 variant={viewMode === "list" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setViewMode("list")}
-                className="px-6"
+                className="px-6 h-12"
               >
                 <List className="h-5 w-5 mr-2" />
-                List View
+                {t('transport.listView')}
               </Button>
               <Button
                 variant={viewMode === "map" ? "default" : "outline"}
                 size="lg"
                 onClick={() => setViewMode("map")}
-                className="px-6"
+                className="px-6 h-12"
               >
                 <Map className="h-5 w-5 mr-2" />
-                Map View
+                {t('transport.mapView')}
               </Button>
             </div>
           </div>
 
-          {/* Search and Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-            <div className="relative lg:col-span-2">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/50" />
-              <Input
-                placeholder="Search routes, cities, or operators..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-12 text-base"
-              />
+          {/* Search and Filters - Improved grid layout */}
+          <div className="space-y-6">
+            {/* Search Bar - Full width on mobile, contained on larger screens */}
+            <div className="w-full">
+              <div className="relative max-w-2xl">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-foreground/50" />
+                <Input
+                  placeholder={t('transport.searchPlaceholder')}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 h-12 text-base w-full"
+                />
+              </div>
             </div>
             
-            <Select value={fromCity} onValueChange={setFromCity}>
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="From City" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Cities</SelectItem>
-                {getCities().map(city => (
-                  <SelectItem key={city} value={city}>{city}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Select value={toCity} onValueChange={setToCity}>
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="To City" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Cities</SelectItem>
-                {getCities().map(city => (
-                  <SelectItem key={city} value={city}>{city}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            <Select value={operator} onValueChange={setOperator}>
-              <SelectTrigger className="h-12">
-                <SelectValue placeholder="Operator" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Operators</SelectItem>
-                {getOperators().map(op => (
-                  <SelectItem key={op} value={op}>{op}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            
-            {/* Price Range Filter */}
-            <div className="space-y-2">
-              <Label htmlFor="price-range" className="text-sm font-medium">Interval Preț</Label>
-              <Select value={priceRange} onValueChange={setPriceRange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selectează intervalul de preț" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toate prețurile</SelectItem>
-                  <SelectItem value="0-80">Sub {formatPrice(80)}</SelectItem>
-                  <SelectItem value="80-100">{formatPrice(80)} - {formatPrice(100)}</SelectItem>
-                  <SelectItem value="100-150">{formatPrice(100)} - {formatPrice(150)}</SelectItem>
-                  <SelectItem value="150-">Peste {formatPrice(150)}</SelectItem>
-                </SelectContent>
-              </Select>
+            {/* Filters Grid - Better responsive layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* From City */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground/80">{t('transport.fromCity')}</Label>
+                <Select value={fromCity} onValueChange={setFromCity}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={t('transport.allCities')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('transport.allCities')}</SelectItem>
+                    {getCities().map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* To City */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground/80">{t('transport.toCity')}</Label>
+                <Select value={toCity} onValueChange={setToCity}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={t('transport.allCities')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('transport.allCities')}</SelectItem>
+                    {getCities().map(city => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Operator */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground/80">{t('transport.operator')}</Label>
+                <Select value={operator} onValueChange={setOperator}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={t('transport.allOperators')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('transport.allOperators')}</SelectItem>
+                    {getOperators().map(op => (
+                      <SelectItem key={op} value={op}>{op}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Price Range Filter */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-foreground/80">{t('transport.priceInterval')}</Label>
+                <Select value={priceRange} onValueChange={setPriceRange}>
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={t('transport.selectPriceInterval')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t('transport.allPrices')}</SelectItem>
+                    <SelectItem value="0-80">{t('transport.below80')}</SelectItem>
+                    <SelectItem value="80-100">{t('transport.80to100')}</SelectItem>
+                    <SelectItem value="100-150">{t('transport.100to150')}</SelectItem>
+                    <SelectItem value="150-">{t('transport.above150')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>
@@ -325,39 +343,121 @@ const TransportRoutes: React.FC = () => {
 
       {/* Results and Sorting */}
       <div className="py-6 bg-white border-b border-border">
-        <div className="container">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="container max-w-7xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
               <p className="text-sm text-foreground/70">
-                Showing <span className="font-semibold text-foreground">{filteredRoutes.length}</span> of {publicRoutes.length} routes
+                {t('transport.showingRoutes').replace('{count}', filteredRoutes.length.toString()).replace('{total}', routes.length.toString())}
               </p>
               {filteredRoutes.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-foreground/70">Sort by:</span>
+                  <span className="text-sm text-foreground/70">{t('transport.sortBy')}</span>
                   <Select value={sortBy} onValueChange={setSortBy}>
-                    <SelectTrigger className="w-40">
+                    <SelectTrigger className="w-40 h-9">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="departure">Departure Time</SelectItem>
-                      <SelectItem value="price">Price (Low to High)</SelectItem>
-                      <SelectItem value="duration">Duration</SelectItem>
-                      <SelectItem value="rating">Rating</SelectItem>
+                      <SelectItem value="departure">{t('transport.departureTime')}</SelectItem>
+                      <SelectItem value="price">{t('transport.priceLowToHigh')}</SelectItem>
+                      <SelectItem value="duration">{t('transport.duration')}</SelectItem>
+                      <SelectItem value="rating">{t('transport.rating')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               )}
             </div>
             
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Advanced Filters
-              </Button>
-              <Button variant="outline" size="sm">
-                <Calendar className="h-4 w-4 mr-2" />
-                Date Picker
-              </Button>
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <Dialog open={showAdvancedFilters} onOpenChange={setShowAdvancedFilters}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-9">
+                    <Filter className="h-4 w-4 mr-2" />
+                    {t('transport.advancedFilters')}
+                    {(selectedAmenities.length > 0 || ratingFilter !== "all") && (
+                      <Badge variant="secondary" className="ml-2 h-4 w-4 p-0 text-xs">
+                        {selectedAmenities.length + (ratingFilter !== "all" ? 1 : 0)}
+                      </Badge>
+                    )}
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{t('transport.advancedFilters')}</DialogTitle>
+                    <DialogDescription>
+                      Filter routes by amenities and other preferences
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    {/* Amenities Filter */}
+                    <div>
+                      <Label className="text-sm font-medium">Amenities</Label>
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        {getAllAmenities().map(amenity => (
+                          <div key={amenity} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              id={amenity}
+                              checked={selectedAmenities.includes(amenity)}
+                              onChange={() => toggleAmenity(amenity)}
+                              className="rounded border-border"
+                            />
+                            <label htmlFor={amenity} className="text-sm flex items-center gap-1">
+                              {getAmenityIcon(amenity)}
+                              {amenity}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Rating Filter */}
+                    <div>
+                      <Label className="text-sm font-medium">Minimum Price</Label>
+                      <Select value={ratingFilter} onValueChange={setRatingFilter}>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue placeholder="Any price" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any price</SelectItem>
+                          <SelectItem value="50">Above €50</SelectItem>
+                          <SelectItem value="75">Above €75</SelectItem>
+                          <SelectItem value="100">Above €100</SelectItem>
+                          <SelectItem value="150">Above €150</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-6">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1" 
+                      onClick={() => {
+                        setSelectedAmenities([]);
+                        setRatingFilter("all");
+                      }}
+                    >
+                      Clear
+                    </Button>
+                    <Button 
+                      className="flex-1"
+                      onClick={() => setShowAdvancedFilters(false)}
+                    >
+                      Apply
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                <Input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="h-9 w-auto"
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -365,8 +465,26 @@ const TransportRoutes: React.FC = () => {
 
       {/* Routes Display */}
       <div className="py-8">
-        <div className="container">
-          {viewMode === "list" ? (
+        <div className="container max-w-7xl mx-auto px-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
+                <p className="text-foreground/70">Loading routes...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <Card className="border-border">
+              <CardContent className="p-12 text-center">
+                <AlertCircle className="h-16 w-16 text-destructive mx-auto mb-4" />
+                <h3 className="text-xl font-medium text-foreground mb-2">Error Loading Routes</h3>
+                <p className="text-foreground/70 mb-6">{error}</p>
+                <Button onClick={() => window.location.reload()}>
+                  Try Again
+                </Button>
+              </CardContent>
+            </Card>
+          ) : viewMode === "list" ? (
             <div className="space-y-6">
               {filteredRoutes.length > 0 ? (
                 filteredRoutes.map((route) => (
@@ -390,7 +508,7 @@ const TransportRoutes: React.FC = () => {
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm mb-4">
                             <div className="flex items-center gap-2">
                               <Clock className="h-4 w-4 text-foreground/50" />
-                              <span><strong>{route.departure}</strong> - {route.arrival}</span>
+                              <span><strong>{route.departureTime}</strong> - {route.arrivalTime}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="h-4 w-4 text-foreground/50" />
@@ -402,38 +520,52 @@ const TransportRoutes: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-2">
                               <Users className="h-4 w-4 text-foreground/50" />
-                              <span><strong>{route.reviews}</strong> reviews</span>
+                              <span><strong>Daily</strong> service</span>
                             </div>
                           </div>
                         </div>
                         
                         {/* Price and Actions */}
                         <div className="text-right ml-8">
-                          <div className="text-3xl font-bold text-primary mb-3">
-                            {formatPrice(route.price)}
+                          <div className="space-y-1 mb-3">
+                            <div className="text-xs text-foreground/60">from</div>
+                            <div className="text-3xl font-bold text-primary">
+                              {formatPrice(route.price.economy)}
+                            </div>
+                            <div className="text-xs text-foreground/60">Economy</div>
                           </div>
                           <div className="flex items-center gap-2 mb-4">
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                              <span className="text-sm font-medium">{route.rating}</span>
-                            </div>
                             <Badge variant="outline" className="text-xs">
                               {route.operator}
                             </Badge>
-                            {route.isPopular && (
-                              <Badge variant="secondary" className="text-xs bg-orange-100 text-orange-800">
-                                Popular
+                            {route.isCustom && (
+                              <Badge variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                Custom Route
+                              </Badge>
+                            )}
+                            {route.price.economy < 80 && (
+                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                                {t('transport.popular')}
                               </Badge>
                             )}
                           </div>
                           <div className="flex gap-2">
-                            <Button size="lg" className="px-6">
+                            <Button 
+                              size="lg" 
+                              className="px-6"
+                              onClick={() => handleViewDetails(route.id)}
+                            >
                               <Eye className="h-4 w-4 mr-2" />
-                              View Details
+                              {t('transport.viewDetails')}
                             </Button>
-                            <Button size="lg" variant="outline" className="px-6">
+                            <Button 
+                              size="lg" 
+                              variant="outline" 
+                              className="px-6"
+                              onClick={() => handleBookNow(route.id)}
+                            >
                               <Calendar className="h-4 w-4 mr-2" />
-                              Book Now
+                              {t('transport.bookNow')}
                             </Button>
                           </div>
                         </div>
@@ -455,18 +587,12 @@ const TransportRoutes: React.FC = () => {
                 <Card className="border-border">
                   <CardContent className="p-12 text-center">
                     <Search className="h-16 w-16 text-foreground/30 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium text-foreground mb-2">No routes found</h3>
+                    <h3 className="text-xl font-medium text-foreground mb-2">{t('transport.noRoutesFound')}</h3>
                     <p className="text-foreground/70 mb-6">
-                      Try adjusting your search criteria or filters to find available routes.
+                      {t('transport.tryAdjusting')}
                     </p>
-                    <Button onClick={() => {
-                      setSearchTerm("");
-                      setFromCity("all");
-                      setToCity("all");
-                      setOperator("all");
-                      setPriceRange("all");
-                    }}>
-                      Clear All Filters
+                    <Button onClick={clearAllFilters}>
+                      {t('transport.clearAllFilters')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -476,12 +602,12 @@ const TransportRoutes: React.FC = () => {
             <Card className="border-border">
               <CardContent className="p-12 text-center">
                 <Map className="h-16 w-16 text-foreground/30 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-foreground mb-2">Interactive Map View</h3>
+                <h3 className="text-xl font-medium text-foreground mb-2">{t('transport.interactiveMapView')}</h3>
                 <p className="text-foreground/70 mb-6">
-                  Map view will be implemented here showing route visualization across Europe.
+                  {t('transport.mapViewDescription')}
                 </p>
                 <Button onClick={() => setViewMode("list")}>
-                  Switch to List View
+                  {t('transport.switchToListView')}
                 </Button>
               </CardContent>
             </Card>
@@ -491,21 +617,30 @@ const TransportRoutes: React.FC = () => {
 
       {/* Call to Action */}
       <div className="py-12 bg-gradient-to-r from-primary/10 to-accent/10">
-        <div className="container text-center">
+        <div className="container max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-foreground mb-4">
-            Can't find the route you're looking for?
+            {t('transport.cantFindRoute')}
           </h2>
           <p className="text-foreground/70 mb-6 max-w-2xl mx-auto">
-            Contact our customer service team to request custom routes or get assistance with your travel plans.
+            {t('transport.contactService')}
           </p>
-          <div className="flex items-center justify-center gap-4">
-            <Button size="lg" className="px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              size="lg" 
+              className="px-8 h-12"
+              onClick={() => window.open('mailto:custom@starlines.com?subject=Custom Route Request', '_blank')}
+            >
               <Route className="h-5 w-5 mr-2" />
-              Request Custom Route
+              {t('transport.requestCustomRoute')}
             </Button>
-            <Button size="lg" variant="outline" className="px-8">
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="px-8 h-12"
+              onClick={() => window.open('tel:+37360123456', '_self')}
+            >
               <Users className="h-5 w-5 mr-2" />
-              Contact Support
+              {t('transport.contactSupport')}
             </Button>
           </div>
         </div>

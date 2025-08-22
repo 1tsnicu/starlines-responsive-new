@@ -1,50 +1,121 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Clock, MapPin, Star, Wifi, Zap, Bath, Snowflake, Users, Bus, Shield, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Separator } from "@/components/ui/separator";
-import { routes, fareTypes } from "@/lib/mock-data";
+import { infoBusAPI, InfoBusRoute } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
 const TripDetails: React.FC = () => {
-  const { formatPrice } = useLocalization();
-  const { id } = useParams<{ id: string }>();
+  const { formatPrice, t } = useLocalization();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [selectedFare, setSelectedFare] = useState<string>("");
+  const [selectedFare, setSelectedFare] = useState<string>("economy");
   const [passengers, setPassengers] = useState(1);
+  const [route, setRoute] = useState<InfoBusRoute | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Find the route by ID
-  const route = routes.find(r => r.id === id);
+  // Get route ID from query parameters
+  const routeId = searchParams.get("routeId");
+  const selectedDate = searchParams.get("date") || new Date().toISOString().split('T')[0];
+  const initialPassengers = parseInt(searchParams.get("passengers") || "1");
 
   useEffect(() => {
-    if (route && fareTypes.length > 0) {
-      setSelectedFare(fareTypes[0].id);
-    }
-  }, [route]);
+    setPassengers(initialPassengers);
+  }, [initialPassengers]);
 
-  if (!route) {
+  // Load route data
+  useEffect(() => {
+    const loadRoute = async () => {
+      if (!routeId) {
+        setError("No route ID provided");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const allRoutes = await infoBusAPI.getAllRoutes();
+        const foundRoute = allRoutes.find(r => r.id === routeId);
+        
+        if (foundRoute) {
+          setRoute(foundRoute);
+        } else {
+          setError("Route not found");
+        }
+      } catch (err) {
+        setError("Failed to load route details");
+        console.error("Error loading route:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadRoute();
+  }, [routeId]);
+
+  // Loading state
+  if (loading) {
     return (
-      <div className="container py-8">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground mb-4">Route not found</h2>
-          <Button onClick={() => navigate("/")}>Back to Home</Button>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-foreground/70">{t('tripDetails.loading')}</p>
         </div>
       </div>
     );
   }
 
-  const selectedFareData = fareTypes.find(f => f.id === selectedFare);
-  const totalPrice = selectedFareData ? selectedFareData.price * passengers : 0;
+  // Error state
+  if (error || !route) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-foreground mb-4">
+            {error || t('tripDetails.error.routeNotFound')}
+          </h2>
+          <Button onClick={() => navigate("/transport-routes")}>
+            {t('tripDetails.backToRoutes')}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate total price based on selected fare type
+  const totalPrice = route.price[selectedFare as keyof typeof route.price] * passengers;
+
+  // Handle checkout navigation
+  const handleContinueToCheckout = () => {
+    if (!route) return;
+
+    // Create checkout URL with all necessary parameters
+    const checkoutParams = new URLSearchParams({
+      routeId: route.id,
+      from: route.from,
+      to: route.to,
+      date: selectedDate,
+      passengers: passengers.toString(),
+      fareType: selectedFare,
+      price: route.price[selectedFare as keyof typeof route.price].toString(),
+      departureTime: route.departureTime,
+      arrivalTime: route.arrivalTime,
+      duration: route.duration,
+      operator: route.operator
+    });
+
+    navigate(`/checkout?${checkoutParams.toString()}`);
+  };
 
   const stops = [
-    { city: route.from.name, time: route.departureTime, type: "departure" },
-    { city: "Bălți", time: "10:30", type: "stop", duration: "15 min" },
-    { city: "Ungheni", time: "12:45", type: "stop", duration: "20 min" },
-    { city: route.to.name, time: route.arrivalTime, type: "arrival" }
+    { city: route.from, time: route.departureTime, type: "departure" },
+    { city: route.to, time: route.arrivalTime, type: "arrival" }
   ];
 
   const getAmenityIcon = (amenity: string) => {
@@ -65,10 +136,10 @@ const TripDetails: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                {route.from.name} → {route.to.name}
+                {route.from} → {route.to}
               </h1>
               <p className="text-lg text-muted-foreground">
-                {route.departureTime} - {route.arrivalTime} • {route.duration} • {route.stops} stops
+                {route.departureTime} - {route.arrivalTime} • {route.duration} • {t('tripDetails.dailyService')}
               </p>
               <div className="flex items-center gap-4 mt-3">
                 <div className="flex items-center gap-2">
@@ -77,18 +148,18 @@ const TripDetails: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-warning fill-warning" />
-                  <span className="text-sm font-medium">{route.rating}</span>
-                  <span className="text-sm text-muted-foreground">({route.reviews} reviews)</span>
+                  <span className="text-sm font-medium">4.8</span>
+                  <span className="text-sm text-muted-foreground">(150+ {t('tripDetails.reviews')})</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={() => navigate("/search")}>
-                Back to Search
+                {t('tripDetails.backToSearch')}
               </Button>
               <Button>
-                Book Now
+                {t('tripDetails.bookNow')}
               </Button>
             </div>
           </div>
@@ -104,7 +175,7 @@ const TripDetails: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="h-5 w-5" />
-                  Journey Timeline
+                  {t('tripDetails.journeyTimeline')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -114,9 +185,6 @@ const TripDetails: React.FC = () => {
                       {/* Time */}
                       <div className="w-20 text-right">
                         <div className="font-semibold text-foreground">{stop.time}</div>
-                        {stop.duration && (
-                          <div className="text-xs text-muted-foreground">{stop.duration}</div>
-                        )}
                       </div>
 
                       {/* Timeline Line */}
@@ -136,9 +204,9 @@ const TripDetails: React.FC = () => {
                       <div className="flex-1">
                         <div className="font-medium text-foreground">{stop.city}</div>
                         <div className="text-sm text-muted-foreground">
-                          {stop.type === "departure" && "Departure"}
+                          {stop.type === "departure" && t('tripDetails.departure')}
                           {stop.type === "stop" && "Stop"}
-                          {stop.type === "arrival" && "Arrival"}
+                          {stop.type === "arrival" && t('tripDetails.arrival')}
                         </div>
                       </div>
                     </div>
@@ -148,7 +216,7 @@ const TripDetails: React.FC = () => {
                 {/* Map Placeholder */}
                 <div className="mt-8 p-6 bg-muted rounded-lg text-center">
                   <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                  <p className="text-muted-foreground">Interactive map coming soon</p>
+                  <p className="text-muted-foreground">{t('tripDetails.interactiveMapComingSoon')}</p>
                 </div>
               </CardContent>
             </Card>
@@ -158,53 +226,53 @@ const TripDetails: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Shield className="h-5 w-5" />
-                  Fare Rules & Policies
+                  {t('tripDetails.fareRulesPolicies')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="baggage">
-                    <AccordionTrigger>Baggage Allowance</AccordionTrigger>
+                    <AccordionTrigger>{t('tripDetails.baggageAllowance')}</AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span>Hand luggage</span>
+                          <span>{t('tripDetails.handLuggage')}</span>
                           <Badge variant="outline">1 piece (max 10kg)</Badge>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span>Checked baggage</span>
+                          <span>{t('tripDetails.checkedBaggage')}</span>
                           <Badge variant="outline">1 piece (max 20kg)</Badge>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span>Oversized items</span>
-                          <Badge variant="outline">{formatPrice(15)} extra</Badge>
+                          <span>{t('tripDetails.oversizedItems')}</span>
+                          <Badge variant="outline">{formatPrice(15)} {t('tripDetails.extra')}</Badge>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="changes">
-                    <AccordionTrigger>Changes & Cancellations</AccordionTrigger>
+                    <AccordionTrigger>{t('tripDetails.changesCancellations')}</AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
-                          <span>Free changes</span>
-                          <Badge variant="outline">Up to 2 hours before departure</Badge>
+                          <span>{t('tripDetails.freeChanges')}</span>
+                          <Badge variant="outline">{t('tripDetails.upTo2HoursBefore')}</Badge>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span>Cancellation fee</span>
-                          <Badge variant="outline">{formatPrice(10)} (24h before) / {formatPrice(25)} (same day)</Badge>
+                          <span>{t('tripDetails.cancellationFee')}</span>
+                          <Badge variant="outline">{formatPrice(10)} ({t('tripDetails.before24h')}) / {formatPrice(25)} ({t('tripDetails.sameDay')})</Badge>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span>No-show</span>
-                          <Badge variant="outline">100% of fare</Badge>
+                          <span>{t('tripDetails.noShow')}</span>
+                          <Badge variant="outline">100% {t('tripDetails.ofFare')}</Badge>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="refunds">
-                    <AccordionTrigger>Refund Policy</AccordionTrigger>
+                    <AccordionTrigger>{t('tripDetails.refundPolicy')}</AccordionTrigger>
                     <AccordionContent>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
@@ -281,26 +349,30 @@ const TripDetails: React.FC = () => {
             <div className="sticky top-24">
               <Card className="border-primary/20 shadow-lg">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-xl">Select Your Fare</CardTitle>
+                  <CardTitle className="text-xl">{t('tripDetails.selectYourFare')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {/* Fare Types */}
                   <div className="space-y-3">
-                    {fareTypes.map((fare) => (
+                    {[
+                      { key: 'economy', name: 'Economy', price: route.price.economy, features: [t('tripDetails.standardSeat'), t('tripDetails.handLuggage'), t('tripDetails.basicAmenities')] },
+                      { key: 'premium', name: 'Premium', price: route.price.premium, features: [t('tripDetails.premiumSeat'), t('tripDetails.extraLegroom'), t('tripDetails.priorityBoarding'), t('tripDetails.refreshments')] },
+                      { key: 'business', name: 'Business', price: route.price.business, features: [t('tripDetails.businessSeat'), t('tripDetails.maximumComfort'), t('tripDetails.premiumAmenities'), t('tripDetails.flexibleChanges')] }
+                    ].map((fare) => (
                       <div
-                        key={fare.id}
+                        key={fare.key}
                         className={cn(
                           "p-4 border-2 rounded-lg cursor-pointer transition-all",
-                          selectedFare === fare.id
+                          selectedFare === fare.key
                             ? "border-primary bg-primary/5"
                             : "border-border hover:border-primary/50"
                         )}
-                        onClick={() => setSelectedFare(fare.id)}
+                        onClick={() => setSelectedFare(fare.key)}
                       >
                         <div className="flex items-center justify-between mb-2">
                           <div className="font-semibold text-foreground">{fare.name}</div>
                           <div className="text-lg font-bold text-primary">
-                            €{fare.price}
+                            {formatPrice(fare.price)}
                           </div>
                         </div>
                         <div className="space-y-1">
@@ -312,12 +384,8 @@ const TripDetails: React.FC = () => {
                           ))}
                         </div>
                         <div className="flex items-center gap-2 mt-2">
-                          {fare.refundable && (
-                            <Badge variant="secondary" className="text-xs">Refundable</Badge>
-                          )}
-                          {fare.changeable && (
-                            <Badge variant="secondary" className="text-xs">Changeable</Badge>
-                          )}
+                          <Badge variant="secondary" className="text-xs">{t('tripDetails.flexible')}</Badge>
+                          <Badge variant="secondary" className="text-xs">{t('tripDetails.changeable')}</Badge>
                         </div>
                       </div>
                     ))}
@@ -326,7 +394,7 @@ const TripDetails: React.FC = () => {
                   {/* Passengers */}
                   <div>
                     <label className="text-sm font-medium text-foreground mb-2 block">
-                      Number of Passengers
+                      {t('tripDetails.numberOfPassengers')}
                     </label>
                     <div className="flex items-center gap-2">
                       <Button
@@ -352,40 +420,40 @@ const TripDetails: React.FC = () => {
                   <Separator />
 
                   {/* Total */}
-                  <div className="space-y-3">
+                                    <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Fare per person</span>
-                      <span>€{selectedFareData?.price || 0}</span>
+                      <span className="text-muted-foreground">{t('tripDetails.farePerPerson')}</span>
+                      <span>{formatPrice(route.price[selectedFare as keyof typeof route.price])}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Passengers</span>
+                      <span className="text-muted-foreground">{t('tripDetails.numberOfPassengers')}</span>
                       <span>{passengers}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground">Service fee</span>
-                                              <span>{formatPrice(2.50)}</span>
+                      <span className="text-muted-foreground">{t('tripDetails.serviceFee')}</span>
+                      <span>{formatPrice(2.50)}</span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-lg font-bold">
-                      <span>Total</span>
+                      <span>{t('tripDetails.total')}</span>
                       <span className="text-primary">€{(totalPrice + 2.50).toFixed(2)}</span>
                     </div>
                   </div>
 
                   {/* CTA */}
-                  <Button className="w-full" size="lg">
-                    Continue to Checkout
+                  <Button className="w-full" size="lg" onClick={handleContinueToCheckout}>
+                    {t('tripDetails.continueToCheckout')}
                   </Button>
 
                   {/* Security Info */}
                   <div className="text-center text-xs text-muted-foreground">
                     <div className="flex items-center justify-center gap-1 mb-1">
                       <Shield className="h-3 w-3" />
-                      Secure Payment
+                      {t('tripDetails.securePayment')}
                     </div>
                     <div className="flex items-center justify-center gap-1">
                       <CreditCard className="h-3 w-3" />
-                      Multiple payment methods accepted
+                      {t('tripDetails.multiplePaymentMethods')}
                     </div>
                   </div>
                 </CardContent>

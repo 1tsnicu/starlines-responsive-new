@@ -22,8 +22,10 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import PageHeader from "@/components/PageHeader";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const Contacts = () => {
+  const { t } = useLocalization();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -54,35 +56,35 @@ const Contacts = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.firstName.trim()) {
-      newErrors.firstName = "Prenumele este obligatoriu";
+      newErrors.firstName = t('contacts.form.validation.firstName.required');
     }
 
     if (!formData.lastName.trim()) {
-      newErrors.lastName = "Numele este obligatoriu";
+      newErrors.lastName = t('contacts.form.validation.lastName.required');
     }
 
     if (!formData.destination.trim()) {
-      newErrors.destination = "Destinația este obligatorie";
+      newErrors.destination = t('contacts.form.validation.destination.required');
     }
 
     if (!formData.date) {
-      newErrors.date = "Data este obligatorie";
+      newErrors.date = t('contacts.form.validation.date.required');
     }
 
     if (formData.minors > 0 && !formData.minorAge) {
-      newErrors.minorAge = "Vârsta minorului este obligatorie când călătorește un minor";
+      newErrors.minorAge = t('contacts.form.validation.minorAge.required');
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Numărul de telefon este obligatoriu";
+      newErrors.phone = t('contacts.form.validation.phone.required');
     } else if (!/^(\+373|0)[0-9]{8}$/.test(formData.phone.replace(/\s/g, ""))) {
-      newErrors.phone = "Numărul de telefon nu este valid (format: +373XXXXXXXX sau 0XXXXXXXX)";
+      newErrors.phone = t('contacts.form.validation.phone.invalid');
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email-ul este obligatoriu";
+      newErrors.email = t('contacts.form.validation.email.required');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email-ul nu este valid";
+      newErrors.email = t('contacts.form.validation.email.invalid');
     }
 
     setErrors(newErrors);
@@ -123,24 +125,24 @@ const Contacts = () => {
   };
 
   const popularDestinations = [
-    "Berlin, Germania",
-    "Munich, Germania", 
-    "Frankfurt, Germania",
-    "Viena, Austria",
-    "Warsaw, Polonia",
-    "Prague, Cehia",
-    "București, România",
-    "Istanbul, Turcia"
+    t('contacts.popularDestinations.berlin'),
+    t('contacts.popularDestinations.munich'),
+    t('contacts.popularDestinations.frankfurt'),
+    t('contacts.popularDestinations.vienna'),
+    t('contacts.popularDestinations.warsaw'),
+    t('contacts.popularDestinations.prague'),
+    t('contacts.popularDestinations.bucharest'),
+    t('contacts.popularDestinations.istanbul')
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <PageHeader
-        title="Contacte"
-        description="Suntem aici să vă ajutăm să vă planificați călătoria perfectă"
+        title={t('contacts.title')}
+        description={t('contacts.description')}
         breadcrumbs={[
-          { label: "Home", href: "/" },
-          { label: "Contacte", href: "/contacts" }
+          { label: t('contacts.breadcrumbHome'), href: "/" },
+          { label: t('contacts.breadcrumbContacts'), href: "/contacts" }
         ]}
       />
 
@@ -149,11 +151,10 @@ const Contacts = () => {
         <div className="container">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              Suntem aici să vă ajutăm
+              {t('contacts.weAreHereToHelp.title')}
             </h2>
             <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
-              Echipa noastră de specialiști este pregătită să vă ofere asistență personalizată 
-              pentru a vă planifica călătoria perfectă în Europa.
+              {t('contacts.weAreHereToHelp.description')}
             </p>
           </div>
 
@@ -163,8 +164,8 @@ const Contacts = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Mail className="h-8 w-8 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Email</h3>
-                <p className="text-foreground/70 mb-4">Pentru întrebări generale și asistență</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{t('contacts.email.title')}</h3>
+                <p className="text-foreground/70 mb-4">{t('contacts.email.description')}</p>
                 <a 
                   href="mailto:contact@starlines.md" 
                   className="text-blue-600 hover:text-blue-700 font-medium hover:underline"
@@ -179,8 +180,8 @@ const Contacts = () => {
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="h-8 w-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Telefon</h3>
-                <p className="text-foreground/70 mb-4">Suport telefonic în timpul programului</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{t('contacts.phone.title')}</h3>
+                <p className="text-foreground/70 mb-4">{t('contacts.phone.description')}</p>
                 <a 
                   href="tel:+37360123456" 
                   className="text-green-600 hover:text-green-700 font-medium hover:underline"
@@ -195,9 +196,9 @@ const Contacts = () => {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">Program</h3>
-                <p className="text-foreground/70 mb-4">Luni - Vineri: 9:00 - 18:00</p>
-                <p className="text-foreground/70">Sâmbătă: 9:00 - 14:00</p>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{t('contacts.schedule.title')}</h3>
+                <p className="text-foreground/70 mb-4">{t('contacts.schedule.weekdays')}</p>
+                <p className="text-foreground/70">{t('contacts.schedule.saturday')}</p>
               </CardContent>
             </Card>
           </div>
@@ -209,11 +210,10 @@ const Contacts = () => {
         <div className="container max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-foreground mb-4">
-              Formular de Contact Complex
+              {t('contacts.form.title')}
             </h2>
             <p className="text-lg text-foreground/70">
-              Completați formularul de mai jos pentru a primi o ofertă personalizată 
-              pentru călătoria dvs. în Europa.
+              {t('contacts.form.description')}
             </p>
           </div>
 
@@ -222,14 +222,13 @@ const Contacts = () => {
               <CardContent className="p-8 text-center">
                 <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-green-800 mb-2">
-                  Mulțumim pentru mesaj!
+                  {t('contacts.success.title')}
                 </h3>
                 <p className="text-green-700 mb-4">
-                  Am primit solicitarea dvs. și vă vom contacta în cel mai scurt timp 
-                  pentru a discuta despre călătoria dvs.
+                  {t('contacts.success.description')}
                 </p>
                 <Badge variant="outline" className="text-green-700 border-green-300">
-                  Răspuns în 24 de ore
+                  {t('contacts.success.responseTime')}
                 </Badge>
               </CardContent>
             </Card>
@@ -238,7 +237,7 @@ const Contacts = () => {
               <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-border">
                 <CardTitle className="flex items-center gap-2 text-foreground">
                   <User className="h-5 w-5" />
-                  Informații Personale și Detalii Călătorie
+                  {t('contacts.form.personalInfo.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-8">
@@ -247,19 +246,19 @@ const Contacts = () => {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                       <User className="h-4 w-4" />
-                      Informații Personale
+                      {t('contacts.form.personalInfo.section')}
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="firstName" className="text-foreground">
-                          Prenume <span className="text-red-500">*</span>
+                          {t('contacts.form.firstName.label')} <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="firstName"
                           value={formData.firstName}
                           onChange={(e) => handleInputChange("firstName", e.target.value)}
                           className={`mt-1 ${errors.firstName ? "border-red-500" : ""}`}
-                          placeholder="Introduceți prenumele"
+                          placeholder={t('contacts.form.firstName.placeholder')}
                         />
                         {errors.firstName && (
                           <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -271,14 +270,14 @@ const Contacts = () => {
                       
                       <div>
                         <Label htmlFor="lastName" className="text-foreground">
-                          Nume <span className="text-red-500">*</span>
+                          {t('contacts.form.lastName.label')} <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="lastName"
                           value={formData.lastName}
                           onChange={(e) => handleInputChange("lastName", e.target.value)}
                           className={`mt-1 ${errors.lastName ? "border-red-500" : ""}`}
-                          placeholder="Introduceți numele"
+                          placeholder={t('contacts.form.lastName.placeholder')}
                         />
                         {errors.lastName && (
                           <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -296,31 +295,31 @@ const Contacts = () => {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      Detalii Călătorie
+                      {t('contacts.form.travelDetails.section')}
                     </h3>
                     
                     <div>
                       <Label htmlFor="destination" className="text-foreground">
-                        Destinație <span className="text-red-500">*</span>
+                        {t('contacts.form.destination.label')} <span className="text-red-500">*</span>
                       </Label>
                       <Select 
                         value={formData.destination} 
                         onValueChange={(value) => handleInputChange("destination", value)}
                       >
                         <SelectTrigger className={`mt-1 ${errors.destination ? "border-red-500" : ""}`}>
-                          <SelectValue placeholder="Selectați destinația" />
+                          <SelectValue placeholder={t('contacts.form.destination.placeholder')} />
                         </SelectTrigger>
                         <SelectContent>
                           {popularDestinations.map((dest) => (
                             <SelectItem key={dest} value={dest}>{dest}</SelectItem>
                           ))}
-                          <SelectItem value="other">Altă destinație</SelectItem>
+                          <SelectItem value="other">{t('contacts.form.destination.other')}</SelectItem>
                         </SelectContent>
                       </Select>
                       {formData.destination === "other" && (
                         <Input
                           className="mt-2"
-                          placeholder="Specificați destinația"
+                          placeholder={t('contacts.form.destination.otherPlaceholder')}
                           onChange={(e) => handleInputChange("destination", e.target.value)}
                         />
                       )}
@@ -334,7 +333,7 @@ const Contacts = () => {
 
                     <div>
                       <Label htmlFor="date" className="text-foreground">
-                        Data Călătoriei <span className="text-red-500">*</span>
+                        {t('contacts.form.date.label')} <span className="text-red-500">*</span>
                       </Label>
                       <Input
                         id="date"
@@ -359,13 +358,13 @@ const Contacts = () => {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Pasageri
+                      {t('contacts.form.passengers.section')}
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor="adults" className="text-foreground">
-                          Adulți
+                          {t('contacts.form.adults.label')}
                         </Label>
                         <Select 
                           value={formData.adults.toString()} 
@@ -384,7 +383,7 @@ const Contacts = () => {
                       
                       <div>
                         <Label htmlFor="minors" className="text-foreground">
-                          Minori
+                          {t('contacts.form.minors.label')}
                         </Label>
                         <Select 
                           value={formData.minors.toString()} 
@@ -404,14 +403,14 @@ const Contacts = () => {
                       {formData.minors > 0 && (
                         <div>
                           <Label htmlFor="minorAge" className="text-foreground">
-                            Vârsta Minorului <span className="text-red-500">*</span>
+                            {t('contacts.form.minorAge.label')} <span className="text-red-500">*</span>
                           </Label>
                           <Input
                             id="minorAge"
                             value={formData.minorAge}
                             onChange={(e) => handleInputChange("minorAge", e.target.value)}
                             className={`mt-1 ${errors.minorAge ? "border-red-500" : ""}`}
-                            placeholder="Ex: 12 ani"
+                            placeholder={t('contacts.form.minorAge.placeholder')}
                           />
                           {errors.minorAge && (
                             <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -430,20 +429,20 @@ const Contacts = () => {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                       <Phone className="h-4 w-4" />
-                      Informații de Contact
+                      {t('contacts.form.contactInfo.section')}
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="phone" className="text-foreground">
-                          Număr de Telefon <span className="text-red-500">*</span>
+                          {t('contacts.form.phone.label')} <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="phone"
                           value={formData.phone}
                           onChange={(e) => handleInputChange("phone", e.target.value)}
                           className={`mt-1 ${errors.phone ? "border-red-500" : ""}`}
-                          placeholder="+373 60 12 34 56"
+                          placeholder={t('contacts.form.phone.placeholder')}
                         />
                         {errors.phone && (
                           <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -455,7 +454,7 @@ const Contacts = () => {
                       
                       <div>
                         <Label htmlFor="email" className="text-foreground">
-                          Email <span className="text-red-500">*</span>
+                          {t('contacts.form.email.label')} <span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="email"
@@ -463,7 +462,7 @@ const Contacts = () => {
                           value={formData.email}
                           onChange={(e) => handleInputChange("email", e.target.value)}
                           className={`mt-1 ${errors.email ? "border-red-500" : ""}`}
-                          placeholder="exemplu@email.com"
+                          placeholder={t('contacts.form.email.placeholder')}
                         />
                         {errors.email && (
                           <p className="text-red-500 text-sm mt-1 flex items-center gap-1">
@@ -481,19 +480,19 @@ const Contacts = () => {
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      Mesaj Suplimentar
+                      {t('contacts.form.additionalMessage.section')}
                     </h3>
                     
                     <div>
                       <Label htmlFor="message" className="text-foreground">
-                        Mesaj (opțional)
+                        {t('contacts.form.message.label')}
                       </Label>
                       <Textarea
                         id="message"
                         value={formData.message}
                         onChange={(e) => handleInputChange("message", e.target.value)}
                         className="mt-1 min-h-[100px]"
-                        placeholder="Descrieți cerințele speciale, preferințe de cazare, sau alte detalii importante pentru călătoria dvs..."
+                        placeholder={t('contacts.form.message.placeholder')}
                       />
                     </div>
                   </div>
@@ -509,12 +508,12 @@ const Contacts = () => {
                       {isSubmitting ? (
                         <>
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                          Se trimite...
+                          {t('contacts.form.submit.sending')}
                         </>
                       ) : (
                         <>
                           <Send className="h-5 w-5 mr-2" />
-                          Trimite Solicitarea
+                          {t('contacts.form.submit.send')}
                         </>
                       )}
                     </Button>
@@ -532,60 +531,58 @@ const Contacts = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl font-bold text-foreground mb-6">
-                Despre Starlines
+                {t('contacts.company.about.title')}
               </h2>
               <p className="text-foreground/70 mb-6 text-lg leading-relaxed">
-                Suntem o companie de transport internațional cu experiență de peste 10 ani 
-                în organizarea călătoriilor de autobuz în Europa. Ne mândrim cu serviciul 
-                de calitate și atenția la detalii pentru fiecare pasager.
+                {t('contacts.company.about.description')}
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <Building className="h-5 w-5 text-primary" />
-                  <span className="text-foreground/70">Companie înregistrată în Republica Moldova</span>
+                  <span className="text-foreground/70">{t('contacts.company.registered')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Globe className="h-5 w-5 text-primary" />
-                  <span className="text-foreground/70">Rute în 15+ țări europene</span>
+                  <span className="text-foreground/70">{t('contacts.company.routes')}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Users className="h-5 w-5 text-primary" />
-                  <span className="text-foreground/70">Peste 50,000 de pasageri mulțumiți</span>
+                  <span className="text-foreground/70">{t('contacts.company.passengers')}</span>
                 </div>
               </div>
             </div>
             
             <div className="bg-white rounded-lg p-8 shadow-lg border border-border">
               <h3 className="text-xl font-semibold text-foreground mb-4">
-                De ce să alegeți Starlines?
+                {t('contacts.company.whyChoose.title')}
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-foreground">Prețuri Competitive</h4>
-                    <p className="text-sm text-foreground/70">Oferte speciale și reduceri pentru grupuri</p>
+                    <h4 className="font-medium text-foreground">{t('contacts.company.competitivePrices.title')}</h4>
+                    <p className="text-sm text-foreground/70">{t('contacts.company.competitivePrices.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-foreground">Serviciu Personalizat</h4>
-                    <p className="text-sm text-foreground/70">Asistență individuală pentru fiecare călătorie</p>
+                    <h4 className="font-medium text-foreground">{t('contacts.company.personalizedService.title')}</h4>
+                    <p className="text-sm text-foreground/70">{t('contacts.company.personalizedService.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-foreground">Siguranță Garantată</h4>
-                    <p className="text-sm text-foreground/70">Autobuze moderne cu toate standardele de siguranță</p>
+                    <h4 className="font-medium text-foreground">{t('contacts.company.guaranteedSafety.title')}</h4>
+                    <p className="text-sm text-foreground/70">{t('contacts.company.guaranteedSafety.description')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <h4 className="font-medium text-foreground">Suport 24/7</h4>
-                    <p className="text-sm text-foreground/70">Asistență telefonică în timpul călătoriei</p>
+                    <h4 className="font-medium text-foreground">{t('contacts.company.support24.title')}</h4>
+                    <p className="text-sm text-foreground/70">{t('contacts.company.support24.description')}</p>
                   </div>
                 </div>
               </div>

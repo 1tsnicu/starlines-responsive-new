@@ -1,81 +1,83 @@
 import { Shield, Eye, Database, Lock, Users, FileText, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const PrivacyPolicy = () => {
+  const { t } = useLocalization();
   const sections = [
     {
       id: "introduction",
-      title: "1. Introduction",
+      title: t('privacy.section1.title'),
       icon: Eye,
-      content: `Starlines ("we," "our," or "us") is committed to protecting your privacy and personal data. This Privacy Policy explains how we collect, use, process, and protect your information when you use our website, mobile application, and services. We comply with applicable data protection laws including GDPR.`
+      content: t('privacy.section1.content')
     },
     {
       id: "information-collected",
-      title: "2. Information We Collect",
+      title: t('privacy.section2.title'),
       icon: Database,
-      content: `We collect information you provide directly (name, email, phone, payment details), information collected automatically (IP address, browser type, device information, usage data), and information from third parties (payment processors, social media platforms if you choose to connect).`
+      content: t('privacy.section2.content')
     },
     {
       id: "how-we-use",
-      title: "3. How We Use Your Information",
+      title: t('privacy.section3.title'),
       icon: Users,
-      content: `We use your information to process bookings and payments, provide customer support, send booking confirmations and travel updates, improve our services, comply with legal obligations, prevent fraud and ensure security, and send marketing communications (with your consent).`
+      content: t('privacy.section3.content')
     },
     {
       id: "information-sharing",
-      title: "4. Information Sharing and Disclosure",
+      title: t('privacy.section4.title'),
       icon: Shield,
-      content: `We do not sell your personal information. We may share your information with service providers (payment processors, IT support), business partners (bus operators), legal authorities when required by law, and in case of business transfers (mergers, acquisitions).`
+      content: t('privacy.section4.content')
     },
     {
       id: "data-security",
-      title: "5. Data Security",
+      title: t('privacy.section5.title'),
       icon: Lock,
-      content: `We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. This includes encryption, secure servers, access controls, and regular security audits.`
+      content: t('privacy.section5.content')
     },
     {
       id: "data-retention",
-      title: "6. Data Retention",
-      content: `We retain your personal data only as long as necessary for the purposes outlined in this policy or as required by law. Booking data is typically retained for 7 years for accounting and legal purposes. Marketing data is retained until you withdraw consent.`
+      title: t('privacy.section6.title'),
+      content: t('privacy.section6.content')
     },
     {
       id: "your-rights",
-      title: "7. Your Rights",
-      content: `Under GDPR and other applicable laws, you have the right to access, rectify, erase, restrict processing, data portability, object to processing, and withdraw consent. You can exercise these rights by contacting us at privacy@starlines.md.`
+      title: t('privacy.section7.title'),
+      content: t('privacy.section7.content')
     },
     {
       id: "cookies",
-      title: "8. Cookies and Tracking",
-      content: `We use cookies and similar technologies to improve your experience, analyze usage, and provide personalized content. You can control cookie preferences through your browser settings. See our Cookie Policy for detailed information about the cookies we use.`
+      title: t('privacy.section8.title'),
+      content: t('privacy.section8.content')
     },
     {
       id: "international-transfers",
-      title: "9. International Data Transfers",
-      content: `Your data may be transferred to and processed in countries outside your residence. We ensure appropriate safeguards are in place, including adequacy decisions, standard contractual clauses, or other legally approved mechanisms.`
+      title: t('privacy.section9.title'),
+      content: t('privacy.section9.content')
     },
     {
       id: "children",
-      title: "10. Children's Privacy",
-      content: `Our services are not directed to children under 16. We do not knowingly collect personal information from children under 16. If we become aware that we have collected such information, we will delete it promptly.`
+      title: t('privacy.section10.title'),
+      content: t('privacy.section10.content')
     },
     {
       id: "changes",
-      title: "11. Changes to Privacy Policy",
-      content: `We may update this Privacy Policy periodically. We will notify you of material changes by email or through our website. The updated policy will be effective when posted. Your continued use constitutes acceptance of changes.`
+      title: t('privacy.section11.title'),
+      content: t('privacy.section11.content')
     },
     {
       id: "contact",
-      title: "12. Contact Information",
-      content: `For privacy-related questions or to exercise your rights, contact our Data Protection Officer at privacy@starlines.md or write to us at: Starlines Data Protection, Str. Ismail 123, Chișinău MD-2001, Moldova.`
+      title: t('privacy.section12.title'),
+      content: t('privacy.section12.content')
     }
   ];
 
   const dataTypes = [
-    { category: "Personal Information", items: ["Name", "Email address", "Phone number", "Date of birth"] },
-    { category: "Payment Information", items: ["Credit card details", "Billing address", "Payment history"] },
-    { category: "Travel Information", items: ["Booking history", "Travel preferences", "Special requirements"] },
-    { category: "Technical Information", items: ["IP address", "Browser type", "Device information", "Usage analytics"] }
+    { category: t('privacy.personalInformation'), items: [t('privacy.name'), t('privacy.emailAddress'), t('privacy.phoneNumber'), t('privacy.dateOfBirth')] },
+    { category: t('privacy.paymentInformation'), items: [t('privacy.creditCardDetails'), t('privacy.billingAddress'), t('privacy.paymentHistory')] },
+    { category: t('privacy.travelInformation'), items: [t('privacy.bookingHistory'), t('privacy.travelPreferences'), t('privacy.specialRequirements')] },
+    { category: t('privacy.technicalInformation'), items: [t('privacy.ipAddress'), t('privacy.browserType'), t('privacy.deviceInformation'), t('privacy.usageAnalytics')] }
   ];
 
   return (
@@ -90,20 +92,19 @@ const PrivacyPolicy = () => {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Privacy Policy
+              {t('privacy.title')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              We value your privacy and are committed to protecting your personal data. 
-              This policy explains how we collect, use, and safeguard your information.
+              {t('privacy.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-4 mt-4">
               <Badge variant="outline" className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                Last updated: January 1, 2024
+                {t('privacy.lastUpdated')}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 <FileText className="h-3 w-3" />
-                GDPR Compliant
+                {t('privacy.gdprCompliant')}
               </Badge>
             </div>
           </div>
@@ -116,7 +117,7 @@ const PrivacyPolicy = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
-              Types of Data We Collect
+              {t('privacy.typesOfData')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -143,7 +144,7 @@ const PrivacyPolicy = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Quick Navigation
+              {t('privacy.quickNavigation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -190,24 +191,24 @@ const PrivacyPolicy = () => {
               <div className="flex justify-center mb-4">
                 <Users className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Exercise Your Privacy Rights
-              </h3>
-              <p className="text-muted-foreground">
-                You have control over your personal data. Contact us to exercise any of these rights:
-              </p>
+                          <h3 className="text-lg font-semibold text-foreground mb-2">
+              {t('privacy.exerciseYourRights')}
+            </h3>
+            <p className="text-muted-foreground">
+              {t('privacy.rightsDescription')}
+            </p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {[
-                "Access your data",
-                "Rectify inaccuracies", 
-                "Erase your data",
-                "Restrict processing",
-                "Data portability",
-                "Object to processing",
-                "Withdraw consent",
-                "File a complaint"
+                t('privacy.accessData'),
+                t('privacy.rectifyInaccuracies'), 
+                t('privacy.eraseData'),
+                t('privacy.restrictProcessing'),
+                t('privacy.dataPortability'),
+                t('privacy.objectToProcessing'),
+                t('privacy.withdrawConsent'),
+                t('privacy.fileComplaint')
               ].map((right) => (
                 <div key={right} className="flex items-center gap-2 text-sm">
                   <div className="w-2 h-2 bg-primary rounded-full" />
@@ -218,9 +219,9 @@ const PrivacyPolicy = () => {
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Contact our Data Protection Officer at{" "}
-                <span className="font-medium text-primary">privacy@starlines.md</span> or 
-                call <span className="font-medium text-primary">+373 22 123 456</span>
+                {t('privacy.contactDPO')}{" "}
+                <span className="font-medium text-primary">privacy@starlines.md</span> {t('privacy.orCall')} 
+                <span className="font-medium text-primary">+373 22 123 456</span>
               </p>
             </div>
           </CardContent>

@@ -2,50 +2,53 @@ import { Star, Users, Award, MapPin, Clock, Shield, Heart, Target, TrendingUp, G
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const About = () => {
+  const { t } = useLocalization();
+  
   const stats = [
-    { label: "Years of Service", value: "15+", icon: Clock, description: "Building trust since 2009" },
-    { label: "Routes Covered", value: "300+", icon: MapPin, description: "Across 12 countries" },
-    { label: "Happy Customers", value: "2M+", icon: Users, description: "Satisfied travelers" },
-    { label: "Safety Record", value: "99.9%", icon: Shield, description: "Perfect safety score" }
+    { label: t('about.yearsOfService'), value: "15+", icon: Clock, description: t('about.buildingTrust') },
+    { label: t('about.routesCovered'), value: "300+", icon: MapPin, description: t('about.acrossCountries') },
+    { label: t('about.happyCustomers'), value: "2M+", icon: Users, description: t('about.satisfiedTravelers') },
+    { label: t('about.safetyRecord'), value: "99.9%", icon: Shield, description: t('about.perfectSafetyScore') }
   ];
 
   const values = [
     {
       icon: Shield,
-      title: "Safety Above All",
-      description: "We believe that safety is not just a priority—it's our foundation. Every journey begins with rigorous safety protocols, state-of-the-art vehicle maintenance, and highly trained drivers who prioritize your well-being above everything else.",
+      title: t('about.safetyAboveAll'),
+      description: t('about.safetyDescription'),
       color: "from-blue-500 to-blue-600"
     },
     {
       icon: Heart,
-      title: "Passenger-Centric",
-      description: "Every decision we make is guided by one question: 'How does this improve our passengers' experience?' From comfortable seating to seamless booking, we put you at the heart of everything we do.",
+      title: t('about.passengerCentric'),
+      description: t('about.passengerDescription'),
       color: "from-pink-500 to-pink-600"
     },
     {
       icon: Target,
-      title: "Reliability Promise",
-      description: "When you choose Starlines, you're choosing dependability. Our 99.9% on-time performance isn't just a statistic—it's our commitment to getting you where you need to be, when you need to be there.",
+      title: t('about.reliabilityPromise'),
+      description: t('about.reliabilityDescription'),
       color: "from-green-500 to-green-600"
     },
     {
       icon: Rocket,
-      title: "Innovation Driven",
-      description: "We're not just keeping up with technology—we're leading the way. From AI-powered route optimization to eco-friendly vehicles, we're constantly pushing boundaries to create the future of transportation.",
+      title: t('about.innovationDriven'),
+      description: t('about.innovationDescription'),
       color: "from-purple-500 to-purple-600"
     },
     {
       icon: Leaf,
-      title: "Sustainability First",
-      description: "Our commitment to the environment goes beyond compliance. We're actively reducing our carbon footprint through electric buses, renewable energy, and sustainable practices that protect our planet for future generations.",
+      title: t('about.sustainabilityFirst'),
+      description: t('about.sustainabilityDescription'),
       color: "from-emerald-500 to-emerald-600"
     },
     {
       icon: Compass,
-      title: "Community Impact",
-      description: "We're more than a transportation company—we're a bridge between communities. By connecting people and places, we're helping to build stronger, more connected societies across Eastern Europe.",
+      title: t('about.communityImpact'),
+      description: t('about.communityDescription'),
       color: "from-orange-500 to-orange-600"
     }
   ];
@@ -53,30 +56,30 @@ const About = () => {
   const team = [
     {
       name: "Mihai Popescu",
-      position: "CEO & Founder",
-      bio: "A visionary entrepreneur with 25+ years in transportation, Mihai started Starlines with a simple dream: to make quality bus travel accessible to everyone in Eastern Europe. His passion for innovation and customer service drives our company forward.",
-      expertise: ["Strategic Vision", "Industry Leadership", "Customer Experience"],
+      position: t('about.ceoFounder'),
+      bio: t('about.mihaiBio'),
+      expertise: [t('about.strategicVision'), t('about.industryLeadership'), t('about.customerExperience')],
       image: "/api/placeholder/150/150"
     },
     {
       name: "Elena Dumitrescu",
-      position: "Chief Operations Officer",
-      bio: "Elena brings military precision to our operations. With a background in logistics and a passion for efficiency, she ensures that every Starlines journey runs like clockwork, maintaining our reputation for reliability.",
-      expertise: ["Operations Excellence", "Logistics", "Quality Control"],
+      position: t('about.coo'),
+      bio: t('about.elenaBio'),
+      expertise: [t('about.operationsExcellence'), t('about.logistics'), t('about.qualityControl')],
       image: "/api/placeholder/150/150"
     },
     {
       name: "Alexandru Ionescu",
-      position: "Chief Customer Officer",
-      bio: "Alexandru believes that exceptional customer service is an art form. He's built our customer experience team from the ground up, creating a culture where every passenger feels valued and heard.",
-      expertise: ["Customer Experience", "Team Building", "Service Innovation"],
+      position: t('about.cco'),
+      bio: t('about.alexandruBio'),
+      expertise: [t('about.customerExperience'), t('about.teamBuilding'), t('about.serviceInnovation')],
       image: "/api/placeholder/150/150"
     },
     {
       name: "Maria Radu",
-      position: "Chief Technology Officer",
-      bio: "Maria is our digital architect, transforming how people interact with transportation. From our award-winning app to AI-powered route optimization, she's making travel smarter, faster, and more enjoyable.",
-      expertise: ["Digital Transformation", "AI & Machine Learning", "Product Development"],
+      position: t('about.cto'),
+      bio: t('about.mariaBio'),
+      expertise: [t('about.digitalTransformation'), t('about.aiMachineLearning'), t('about.productDevelopment')],
       image: "/api/placeholder/150/150"
     }
   ];
@@ -84,63 +87,63 @@ const About = () => {
   const achievements = [
     {
       year: "2009",
-      title: "The Dream Begins",
-      description: "Starlines was born from a simple observation: quality bus travel in Eastern Europe was either too expensive or too unreliable. We started with 3 buses and a big dream.",
+      title: t('about.dreamBegins'),
+      description: t('about.dreamDescription'),
       icon: Star,
-      impact: "3 routes, 3 buses, unlimited ambition"
+      impact: t('about.dreamImpact')
     },
     {
       year: "2012",
-      title: "Breaking Borders",
-      description: "Our first international expansion proved that quality knows no boundaries. We connected Moldova to Romania and Ukraine, showing that great service transcends borders.",
+      title: t('about.breakingBorders'),
+      description: t('about.bordersDescription'),
       icon: Globe,
-      impact: "50+ routes across 3 countries"
+      impact: t('about.bordersImpact')
     },
     {
       year: "2015",
-      title: "Digital Revolution",
-      description: "We launched our first online platform, making booking as easy as a few clicks. This wasn't just an upgrade—it was a complete reimagining of how people book travel.",
+      title: t('about.digitalRevolution'),
+      description: t('about.digitalDescription'),
       icon: Zap,
-      impact: "First online booking platform in the region"
+      impact: t('about.digitalImpact')
     },
     {
       year: "2018",
-      title: "European Expansion",
-      description: "Our network grew to cover the heart of Eastern Europe. From the Baltic to the Black Sea, Starlines became synonymous with reliable cross-border travel.",
+      title: t('about.europeanExpansion'),
+      description: t('about.expansionDescription'),
       icon: MapPin,
-      impact: "200+ routes across 8 countries"
+      impact: t('about.expansionImpact')
     },
     {
       year: "2021",
-      title: "Green Revolution",
-      description: "We introduced our first electric buses and launched carbon offset programs. Sustainability isn't just good business—it's our responsibility to future generations.",
+      title: t('about.greenRevolution'),
+      description: t('about.greenDescription'),
       icon: Leaf,
-      impact: "First electric bus fleet in the region"
+      impact: t('about.greenImpact')
     },
     {
       year: "2024",
-      title: "Industry Leadership",
-      description: "Today, Starlines stands as the most trusted name in Eastern European bus transportation. But we're not resting on our laurels—we're building tomorrow's transportation network.",
+      title: t('about.industryLeadershipTitle'),
+      description: t('about.leadershipDescription'),
       icon: Award,
-      impact: "300+ routes, 2M+ satisfied customers"
+      impact: t('about.leadershipImpact')
     }
   ];
 
   const companyFacts = [
     {
-      fact: "Our buses travel the equivalent of 15 trips around the Earth every day",
+      fact: t('about.earthTrips'),
       icon: Globe
     },
     {
-      fact: "We've served coffee to over 500,000 passengers in our premium lounges",
+      fact: t('about.coffeeServed'),
       icon: Star
     },
     {
-      fact: "Our drivers speak 8 different languages collectively",
+      fact: t('about.languagesSpoken'),
       icon: Users
     },
     {
-      fact: "We've helped reunite 2,000+ families through our affordable travel options",
+      fact: t('about.familiesReunited'),
       icon: Heart
     }
   ];
@@ -160,29 +163,25 @@ const About = () => {
           <div className="text-center max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
               <Star className="h-4 w-4" />
-              <span className="text-sm font-medium">Our Story</span>
+              <span className="text-sm font-medium">{t('about.ourStory')}</span>
             </div>
             
             <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
-              Connecting Dreams,{" "}
+              {t('about.connectingDreams')}{" "}
               <span className="text-accent-foreground bg-accent px-4 py-2 rounded-2xl inline-block transform rotate-1">
-                One Journey at a Time
+                {t('about.oneJourneyAtTime')}
               </span>
             </h1>
             
             <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
-              For over 15 years, Starlines has been more than just a bus company. 
-              We're the bridge between people and possibilities, connecting communities 
-              across Eastern Europe with reliability, comfort, and care.
+              {t('about.heroDescription')}
             </p>
 
             {/* Mission Statement */}
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold mb-3">Our Mission</h2>
+              <h2 className="text-2xl font-bold mb-3">{t('about.mission')}</h2>
               <p className="text-lg text-white/90">
-                "To democratize quality transportation by making safe, comfortable, and 
-                reliable bus travel accessible to everyone in Eastern Europe, while 
-                building bridges between communities and fostering sustainable growth."
+                {t('about.missionStatement')}
               </p>
             </div>
           </div>
@@ -223,11 +222,10 @@ const About = () => {
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              What Drives Us
+              {t('about.whatDrivesUs')}
             </h2>
             <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
-              Our values aren't just words on a wall—they're the principles that guide 
-              every decision we make and every action we take.
+              {t('about.valuesDescription')}
             </p>
           </div>
           
@@ -259,11 +257,10 @@ const About = () => {
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              The Minds Behind the Magic
+              {t('about.mindsBehindheMagic')}
             </h2>
             <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
-              Meet the passionate leaders who turn our vision into reality, 
-              driving innovation and excellence in everything we do.
+              {t('about.teamDescription')}
             </p>
           </div>
           
@@ -306,11 +303,10 @@ const About = () => {
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Our Journey Through Time
+              {t('about.journeyThroughTime')}
             </h2>
             <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
-              Every milestone tells a story of growth, innovation, and unwavering 
-              commitment to our passengers and communities.
+              {t('about.timelineDescription')}
             </p>
           </div>
           
@@ -363,10 +359,10 @@ const About = () => {
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-foreground mb-4">
-              Did You Know?
+              {t('about.didYouKnow')}
             </h2>
             <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
-              Some fascinating facts about Starlines that make us unique
+              {t('about.factsDescription')}
             </p>
           </div>
           
@@ -396,16 +392,15 @@ const About = () => {
       <div className="py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
         <div className="container text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to Be Part of Our Story?
+            {t('about.readyToBePartOfStory')}
           </h2>
           <p className="text-xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
-            Join millions of satisfied travelers who've discovered that with Starlines, 
-            every journey is an adventure waiting to happen.
+            {t('about.ctaDescription')}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button variant="secondary" size="lg" className="text-lg px-8 py-3">
               <Rocket className="h-5 w-5 mr-2" />
-              Start Your Journey
+              {t('about.startYourJourney')}
             </Button>
             <Button 
               variant="outline" 
@@ -413,7 +408,7 @@ const About = () => {
               className="text-lg px-8 py-3 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200"
             >
               <Lightbulb className="h-5 w-5 mr-2" />
-              Learn More
+              {t('about.learnMore')}
             </Button>
           </div>
         </div>

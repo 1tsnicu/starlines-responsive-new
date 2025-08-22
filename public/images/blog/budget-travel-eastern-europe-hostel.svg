@@ -1,0 +1,82 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B0E0E6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="building" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F5DC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="roof" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD853F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0522D;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ground" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#32CD32;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#sky)"/>
+  
+  <!-- Sun -->
+  <circle cx="700" cy="100" r="40" fill="#FFD700" opacity="0.8"/>
+  
+  <!-- Hostel Building -->
+  <rect x="150" y="200" width="500" height="300" fill="url(#building)" stroke="#8B4513" stroke-width="3"/>
+  
+  <!-- Hostel Roof -->
+  <polygon points="150,200 400,150 650,200" fill="url(#roof)" stroke="#8B4513" stroke-width="3"/>
+  
+  <!-- Hostel Windows -->
+  <rect x="180" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="260" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="340" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="420" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="500" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="580" y="230" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  
+  <!-- Second Floor Windows -->
+  <rect x="180" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="260" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="340" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="420" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="500" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="580" y="330" width="60" height="80" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  
+  <!-- Hostel Door -->
+  <rect x="380" y="400" width="80" height="100" fill="#8B4513" stroke="#654321" stroke-width="3"/>
+  <rect x="390" y="410" width="60" height="80" fill="#DEB887"/>
+  
+  <!-- Hostel Sign -->
+  <rect x="360" y="120" width="80" height="30" fill="#FFD700" stroke="#FF8C00" stroke-width="2"/>
+  <text x="400" y="140" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#8B0000" font-weight="bold">
+    HOSTEL
+  </text>
+  
+  <!-- Price Sign -->
+  <rect x="370" y="160" width="60" height="25" fill="#32CD32" stroke="#228B22" stroke-width="2"/>
+  <text x="400" y="177" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#FFFFFF" font-weight="bold">
+    €15/NOAPTE
+  </text>
+  
+  <!-- Ground -->
+  <rect x="0" y="500" width="800" height="100" fill="url(#ground)"/>
+  
+  <!-- Path to Hostel -->
+  <rect x="380" y="500" width="80" height="100" fill="#DEB887" stroke="#8B4513" stroke-width="2"/>
+  
+  <!-- Backpacker -->
+  <circle cx="400" cy="450" r="15" fill="#FFB6C1"/> <!-- Head -->
+  <rect x="385" y="465" width="30" height="40" fill="#4169E1"/> <!-- Body -->
+  <rect x="375" y="505" width="10" height="25" fill="#8B4513"/> <!-- Left Leg -->
+  <rect x="415" y="505" width="10" height="25" fill="#8B4513"/> <!-- Right Leg -->
+  <rect x="390" y="470" width="20" height="15" fill="#FFD700"/> <!-- Backpack -->
+  
+  <!-- Text -->
+  <text x="400" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="22" fill="#2F4F4F" font-weight="bold">
+    Călătorie cu Buget Mic - Hostel Modern
+  </text>
+</svg>

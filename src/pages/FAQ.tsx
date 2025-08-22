@@ -5,128 +5,130 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
-// Mock FAQ data
+// Mock FAQ data with translation keys
 const faqData = [
   {
-    category: "Booking & Tickets",
+    category: 'faq.category.bookingTickets',
     icon: Ticket,
     questions: [
       {
-        question: "How do I book a bus ticket?",
-        answer: "You can book tickets through our website, mobile app, or by calling our customer service. Simply enter your departure and destination cities, select your travel date, choose your preferred route, and complete the payment process."
+        question: 'faq.booking.howToBook.question',
+        answer: 'faq.booking.howToBook.answer'
       },
       {
-        question: "Can I change or cancel my ticket?",
-        answer: "Yes, you can modify or cancel your ticket up to 2 hours before departure. Changes are subject to availability and may incur additional fees. Cancellations made more than 24 hours before departure are usually refundable."
+        question: 'faq.booking.changeCancel.question',
+        answer: 'faq.booking.changeCancel.answer'
       },
       {
-        question: "What payment methods do you accept?",
-        answer: "We accept all major credit cards (Visa, MasterCard, American Express), debit cards, and digital wallets like PayPal. We also support bank transfers for advance bookings."
+        question: 'faq.booking.paymentMethods.question',
+        answer: 'faq.booking.paymentMethods.answer'
       },
       {
-        question: "Do I need to print my ticket?",
-        answer: "No, you don't need to print your ticket. You can show the digital ticket on your mobile device, or we can send you an SMS with your booking reference. However, printing is recommended as a backup."
+        question: 'faq.booking.printTicket.question',
+        answer: 'faq.booking.printTicket.answer'
       }
     ]
   },
   {
-    category: "Travel & Routes",
+    category: 'faq.category.travelRoutes',
     icon: Bus,
     questions: [
       {
-        question: "How early should I arrive at the bus station?",
-        answer: "We recommend arriving at least 30 minutes before departure for domestic routes and 45 minutes for international routes. This allows time for check-in, baggage handling, and boarding procedures."
+        question: 'faq.travel.arriveEarly.question',
+        answer: 'faq.travel.arriveEarly.answer'
       },
       {
-        question: "What happens if I miss my bus?",
-        answer: "If you miss your bus, contact our customer service immediately. Depending on availability and your ticket type, we may be able to rebook you on the next available departure, though additional fees may apply."
+        question: 'faq.travel.missBus.question',
+        answer: 'faq.travel.missBus.answer'
       },
       {
-        question: "Are there luggage restrictions?",
-        answer: "Each passenger is allowed one carry-on bag (max 10kg) and one checked bag (max 20kg). Additional luggage can be transported for an extra fee. Oversized items should be arranged in advance."
+        question: 'faq.travel.luggageRestrictions.question',
+        answer: 'faq.travel.luggageRestrictions.answer'
       },
       {
-        question: "Can I bring pets on board?",
-        answer: "Small pets in carriers are allowed on most routes, but must be pre-booked. Service animals travel free of charge. Please check specific route policies as some international routes may have restrictions."
+        question: 'faq.travel.pets.question',
+        answer: 'faq.travel.pets.answer'
       }
     ]
   },
   {
-    category: "Schedules & Timetables",
+    category: 'faq.category.schedulesTimetables',
     icon: Clock,
     questions: [
       {
-        question: "How often do buses run?",
-        answer: "Frequency varies by route. Popular routes like Chișinău-București may have multiple daily departures, while less frequent routes may run once or twice daily. Check our timetable for specific schedules."
+        question: 'faq.schedules.frequency.question',
+        answer: 'faq.schedules.frequency.answer'
       },
       {
-        question: "Are schedules different on weekends and holidays?",
-        answer: "Yes, some routes have reduced frequency on weekends and holidays. We recommend checking our holiday schedule or contacting customer service for the most up-to-date information."
+        question: 'faq.schedules.weekendsHolidays.question',
+        answer: 'faq.schedules.weekendsHolidays.answer'
       },
       {
-        question: "How long do journeys typically take?",
-        answer: "Journey times vary by distance and route. For example, Chișinău to București takes approximately 8-10 hours, while shorter domestic routes may take 2-4 hours. Check individual route details for exact times."
+        question: 'faq.schedules.journeyTime.question',
+        answer: 'faq.schedules.journeyTime.answer'
       }
     ]
   },
   {
-    category: "Safety & Security",
+    category: 'faq.category.safetySecurity',
     icon: Shield,
     questions: [
       {
-        question: "What safety measures are in place?",
-        answer: "All our buses are regularly inspected and maintained. Drivers are professionally trained and licensed. We have 24/7 monitoring and emergency response systems. Seat belts are available on all seats."
+        question: 'faq.safety.measures.question',
+        answer: 'faq.safety.measures.answer'
       },
       {
-        question: "Is travel insurance included?",
-        answer: "Basic travel insurance is included with all tickets. This covers medical emergencies and trip cancellations. Additional comprehensive insurance can be purchased during booking for enhanced coverage."
+        question: 'faq.safety.insurance.question',
+        answer: 'faq.safety.insurance.answer'
       },
       {
-        question: "What should I do in case of an emergency?",
-        answer: "In case of emergency, contact our 24/7 emergency hotline immediately. All buses are equipped with emergency exits and first aid kits. Drivers are trained in emergency procedures and can contact emergency services."
+        question: 'faq.safety.emergency.question',
+        answer: 'faq.safety.emergency.answer'
       }
     ]
   },
   {
-    category: "Customer Service",
+    category: 'faq.category.customerService',
     icon: HelpCircle,
     questions: [
       {
-        question: "How can I contact customer service?",
-        answer: "You can reach us through multiple channels: 24/7 phone support, live chat on our website, email support, or through our mobile app. We also have customer service desks at major bus stations."
+        question: 'faq.service.contact.question',
+        answer: 'faq.service.contact.answer'
       },
       {
-        question: "What are your customer service hours?",
-        answer: "Our customer service is available 24/7 for urgent matters. General inquiries are handled from 6:00 AM to 10:00 PM daily. Emergency support is always available."
+        question: 'faq.service.hours.question',
+        answer: 'faq.service.hours.answer'
       },
       {
-        question: "How do I file a complaint?",
-        answer: "You can submit complaints through our website's feedback form, email us directly, or speak with a customer service representative. We aim to respond to all complaints within 48 hours."
+        question: 'faq.service.complaints.question',
+        answer: 'faq.service.complaints.answer'
       }
     ]
   },
   {
-    category: "Pricing & Discounts",
+    category: 'faq.category.pricingDiscounts',
     icon: CreditCard,
     questions: [
       {
-        question: "Are there discounts for students or seniors?",
-        answer: "Yes, we offer discounts for students (with valid ID), seniors (65+), and children under 12. We also have special rates for group bookings of 10 or more passengers."
+        question: 'faq.pricing.studentDiscounts.question',
+        answer: 'faq.pricing.studentDiscounts.answer'
       },
       {
-        question: "Do you offer loyalty programs?",
-        answer: "Yes, our Starlines Rewards program offers points for every journey, which can be redeemed for discounts on future bookings. Members also get access to exclusive deals and early booking opportunities."
+        question: 'faq.pricing.loyaltyPrograms.question',
+        answer: 'faq.pricing.loyaltyPrograms.answer'
       },
       {
-        question: "Are there seasonal promotions?",
-        answer: "Yes, we regularly run seasonal promotions and special offers. These include summer travel deals, holiday packages, and last-minute discounts. Sign up for our newsletter to stay updated."
+        question: 'faq.pricing.seasonalPromotions.question',
+        answer: 'faq.pricing.seasonalPromotions.answer'
       }
     ]
   }
 ];
 
 const FAQ = () => {
+  const { t } = useLocalization();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -134,8 +136,8 @@ const FAQ = () => {
   const filteredFAQ = faqData.map(category => ({
     ...category,
     questions: category.questions.filter(q =>
-      q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      q.answer.toLowerCase().includes(searchQuery.toLowerCase())
+      t(q.question).toLowerCase().includes(searchQuery.toLowerCase()) ||
+      t(q.answer).toLowerCase().includes(searchQuery.toLowerCase())
     )
   })).filter(category => category.questions.length > 0);
 
@@ -159,11 +161,10 @@ const FAQ = () => {
         <div className="container py-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Frequently Asked Questions
+              {t('faq.title')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Find answers to the most common questions about booking, traveling, and using our services. 
-              Can't find what you're looking for? Contact our support team.
+              {t('faq.subtitle')}
             </p>
           </div>
         </div>
@@ -179,7 +180,7 @@ const FAQ = () => {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search questions and answers..."
+                    placeholder={t('faq.searchPlaceholder')}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10"
@@ -194,10 +195,10 @@ const FAQ = () => {
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
                   className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">{t('faq.allCategories')}</option>
                   {allCategories.map((category) => (
                     <option key={category} value={category}>
-                      {category}
+                      {t(category)}
                     </option>
                   ))}
                 </select>
@@ -211,7 +212,7 @@ const FAQ = () => {
                 onClick={clearFilters}
                 size="sm"
               >
-                Clear Filters
+                {t('faq.clearFilters')}
               </Button>
             </div>
           </CardContent>
@@ -222,7 +223,7 @@ const FAQ = () => {
           <div className="flex items-center gap-2">
             <HelpCircle className="h-4 w-4 text-muted-foreground" />
             <span className="text-muted-foreground">
-              {displayFAQ.reduce((total, cat) => total + cat.questions.length, 0)} questions found
+              {displayFAQ.reduce((total, cat) => total + cat.questions.length, 0)} {displayFAQ.reduce((total, cat) => total + cat.questions.length, 0) === 1 ? t('faq.questionFound') : t('faq.questionsFound')}
             </span>
           </div>
         </div>
@@ -231,13 +232,13 @@ const FAQ = () => {
         {displayFAQ.length === 0 ? (
           <div className="text-center py-12">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              No questions found
+              {t('faq.noQuestionsFound')}
             </h3>
             <p className="text-muted-foreground mb-4">
-              Try adjusting your search criteria or browse all categories
+              {t('faq.tryAdjusting')}
             </p>
             <Button onClick={clearFilters}>
-              Clear All Filters
+              {t('faq.clearAllFilters')}
             </Button>
           </div>
         ) : (
@@ -247,9 +248,9 @@ const FAQ = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
                     <category.icon className="h-6 w-6 text-primary" />
-                    {category.category}
+                    {t(category.category)}
                     <Badge variant="secondary" className="ml-auto">
-                      {category.questions.length} questions
+                      {category.questions.length} {category.questions.length === 1 ? t('faq.questionFound') : t('faq.questionsFound')}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
@@ -258,10 +259,10 @@ const FAQ = () => {
                     {category.questions.map((item, index) => (
                       <AccordionItem key={index} value={`item-${index}`}>
                         <AccordionTrigger className="text-left hover:no-underline">
-                          <span className="font-medium">{item.question}</span>
+                          <span className="font-medium">{t(item.question)}</span>
                         </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground">
-                          {item.answer}
+                          {t(item.answer)}
                         </AccordionContent>
                       </AccordionItem>
                     ))}
@@ -276,17 +277,17 @@ const FAQ = () => {
         <Card className="mt-8 border-primary/20 bg-primary/5">
           <CardContent className="p-6 text-center">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Still have questions?
+              {t('faq.stillHaveQuestions')}
             </h3>
             <p className="text-muted-foreground mb-4">
-              Our customer support team is here to help you 24/7
+              {t('faq.supportDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button variant="default">
-                Contact Support
+                {t('faq.contactSupport')}
               </Button>
               <Button variant="outline">
-                Live Chat
+                {t('faq.liveChat')}
               </Button>
             </div>
           </CardContent>

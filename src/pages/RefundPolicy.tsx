@@ -6,81 +6,81 @@ import { Button } from "@/components/ui/button";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
 const RefundPolicy: React.FC = () => {
-  const { formatPrice } = useLocalization();
+  const { formatPrice, t } = useLocalization();
   const sections = [
     {
       id: "overview",
-      title: "1. Refund Policy Overview",
+      title: t('refunds.section1.title'),
       icon: RotateCcw,
-      content: `This Refund Policy outlines the terms and conditions for cancellations and refunds of bus tickets purchased through Starlines. We aim to provide fair and transparent refund terms while maintaining operational efficiency. Refund eligibility depends on the timing of cancellation and ticket type.`
+      content: t('refunds.section1.content')
     },
     {
       id: "cancellation-timeframes",
-      title: "2. Cancellation Timeframes",
+      title: t('refunds.section2.title'),
       icon: Clock,
-      content: `Refund eligibility is based on when you cancel your booking: More than 24 hours before departure (Full refund minus processing fee), 12-24 hours before departure (75% refund), 2-12 hours before departure (50% refund), Less than 2 hours before departure (No refund), No-show (No refund).`
+      content: t('refunds.section2.content')
     },
     {
       id: "refund-processing",
-      title: "3. Refund Processing",
+      title: t('refunds.section3.title'),
       icon: CreditCard,
-      content: `Approved refunds are processed within 7-10 business days to the original payment method. Processing fees of ${formatPrice(2)}-${formatPrice(5)} may apply depending on the payment method and cancellation timing. Refunds for cash payments are processed as bank transfers or vouchers.`
+      content: t('refunds.section3.content')
     },
     {
       id: "non-refundable",
-      title: "4. Non-Refundable Situations",
+      title: t('refunds.section4.title'),
       icon: AlertTriangle,
-      content: `Certain situations are not eligible for refunds: No-shows without prior notification, cancellations due to passenger misconduct, promotional or discounted tickets (unless specified), tickets purchased with vouchers or credits, force majeure events beyond our control.`
+      content: t('refunds.section4.content')
     },
     {
       id: "exceptions",
-      title: "5. Special Circumstances",
+      title: t('refunds.section5.title'),
       icon: CheckCircle,
-      content: `We may provide exceptions for: Medical emergencies (with valid documentation), Death in family (with death certificate), Military deployment (with official orders), Natural disasters affecting travel, Service cancellations by Starlines (full refund including fees).`
+      content: t('refunds.section5.content')
     },
     {
       id: "process",
-      title: "6. How to Request a Refund",
-      content: `To request a refund: Log into your account and find your booking, click "Cancel Booking" or "Request Refund", provide reason for cancellation, submit required documentation (if applicable), await confirmation email with refund details.`
+      title: t('refunds.section6.title'),
+      content: t('refunds.section6.content')
     }
   ];
 
   const refundScenarios = [
     {
-      scenario: "Standard Cancellation",
+      scenario: t('refunds.standardCancellation'),
       timeframe: "> 24 hours before",
       refundAmount: "100% minus processing fee",
       processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
       color: "text-green-600 bg-green-50"
     },
     {
-      scenario: "Late Cancellation",
+      scenario: t('refunds.lateCancellation'),
       timeframe: "12-24 hours before", 
       refundAmount: "75% of ticket price",
       processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
       color: "text-yellow-600 bg-yellow-50"
     },
     {
-      scenario: "Very Late Cancellation",
+      scenario: t('refunds.veryLateCancellation'),
       timeframe: "2-12 hours before",
       refundAmount: "50% of ticket price", 
       processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
       color: "text-orange-600 bg-orange-50"
     },
     {
-      scenario: "Last Minute / No-Show",
+      scenario: t('refunds.lastMinuteNoShow'),
       timeframe: "< 2 hours before",
-      refundAmount: "No refund",
-      processingFee: "N/A",
+      refundAmount: t('refunds.noRefund'),
+      processingFee: t('refunds.na'),
       color: "text-red-600 bg-red-50"
     }
   ];
 
   const documentationRequired = [
-    { situation: "Medical Emergency", documents: ["Medical certificate", "Doctor's note", "Hospital discharge papers"] },
-    { situation: "Death in Family", documents: ["Death certificate", "Proof of relationship", "Official documentation"] },
-    { situation: "Military Deployment", documents: ["Official deployment orders", "Military ID", "Command authorization"] },
-    { situation: "Natural Disaster", documents: ["News reports", "Official evacuation orders", "Government advisories"] }
+    { situation: t('refunds.medicalEmergency'), documents: [t('refunds.medicalCertificate'), t('refunds.doctorsNote'), t('refunds.hospitalDischargePapers')] },
+    { situation: t('refunds.deathInFamily'), documents: [t('refunds.deathCertificate'), t('refunds.proofOfRelationship'), t('refunds.officialDocumentation')] },
+    { situation: t('refunds.militaryDeployment'), documents: [t('refunds.officialDeploymentOrders'), t('refunds.militaryId'), t('refunds.commandAuthorization')] },
+    { situation: t('refunds.naturalDisaster'), documents: [t('refunds.newsReports'), t('refunds.officialEvacuationOrders'), t('refunds.governmentAdvisories')] }
   ];
 
   return (
@@ -95,20 +95,19 @@ const RefundPolicy: React.FC = () => {
               </div>
             </div>
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Refund & Cancellation Policy
+              {t('refunds.title')}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Understand our refund terms and cancellation procedures. We strive to provide 
-              fair and transparent refund policies for all our passengers.
+              {t('refunds.subtitle')}
             </p>
             <div className="flex items-center justify-center gap-4 mt-4">
               <Badge variant="outline" className="flex items-center gap-1">
                 <Calendar className="h-3 w-3" />
-                Last updated: January 1, 2024
+                {t('refunds.lastUpdated')}
               </Badge>
               <Badge variant="outline" className="flex items-center gap-1">
                 <FileText className="h-3 w-3" />
-                Version 1.2
+                {t('refunds.version')}
               </Badge>
             </div>
           </div>
@@ -119,7 +118,7 @@ const RefundPolicy: React.FC = () => {
         {/* Refund Scenarios */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
-            Refund Schedule
+            {t('refunds.refundSchedule')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {refundScenarios.map((scenario) => (
@@ -130,15 +129,15 @@ const RefundPolicy: React.FC = () => {
                   </div>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <span className="font-medium text-foreground">Timeframe: </span>
+                      <span className="font-medium text-foreground">{t('refunds.timeframe')}: </span>
                       <span className="text-muted-foreground">{scenario.timeframe}</span>
                     </div>
                     <div>
-                      <span className="font-medium text-foreground">Refund: </span>
+                      <span className="font-medium text-foreground">{t('refunds.refund')}: </span>
                       <span className="text-muted-foreground">{scenario.refundAmount}</span>
                     </div>
                     <div>
-                      <span className="font-medium text-foreground">Fee: </span>
+                      <span className="font-medium text-foreground">{t('refunds.fee')}: </span>
                       <span className="text-muted-foreground">{scenario.processingFee}</span>
                     </div>
                   </div>
@@ -153,7 +152,7 @@ const RefundPolicy: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Quick Navigation
+              {t('refunds.quickNavigation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -198,7 +197,7 @@ const RefundPolicy: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Required Documentation for Special Circumstances
+              {t('refunds.requiredDocumentation')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -219,8 +218,7 @@ const RefundPolicy: React.FC = () => {
             </div>
             <div className="mt-6 p-4 bg-muted/50 rounded-lg">
               <p className="text-sm text-muted-foreground">
-                <strong>Note:</strong> All documentation must be official and verifiable. 
-                Photocopies or digital copies are acceptable for initial review, but original documents may be required.
+                {t('refunds.note')}
               </p>
             </div>
           </CardContent>
@@ -231,7 +229,7 @@ const RefundPolicy: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Refund Processing Times
+              {t('refunds.refundProcessingTimes')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -240,22 +238,22 @@ const RefundPolicy: React.FC = () => {
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <CreditCard className="h-6 w-6 text-primary" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Credit Cards</h4>
-                <p className="text-sm text-muted-foreground">3-5 business days</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('refunds.creditCards')}</h4>
+                <p className="text-sm text-muted-foreground">3-5 {t('refunds.businessDays')}</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Clock className="h-6 w-6 text-primary" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Bank Transfers</h4>
-                <p className="text-sm text-muted-foreground">5-7 business days</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('refunds.bankTransfers')}</h4>
+                <p className="text-sm text-muted-foreground">5-7 {t('refunds.businessDays')}</p>
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <FileText className="h-6 w-6 text-primary" />
                 </div>
-                <h4 className="font-semibold text-foreground mb-2">Cash Payments</h4>
-                <p className="text-sm text-muted-foreground">7-10 business days</p>
+                <h4 className="font-semibold text-foreground mb-2">{t('refunds.cashPayments')}</h4>
+                <p className="text-sm text-muted-foreground">7-10 {t('refunds.businessDays')}</p>
               </div>
             </div>
           </CardContent>
@@ -268,25 +266,25 @@ const RefundPolicy: React.FC = () => {
               <Phone className="h-8 w-8 text-primary" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Need Help with Your Refund?
+              {t('refunds.needHelpWithRefund')}
             </h3>
             <p className="text-muted-foreground mb-6">
-              Our customer service team is ready to assist you with cancellations and refund requests.
+              {t('refunds.customerServiceDescription')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-4">
               <Button variant="default">
                 <Phone className="h-4 w-4 mr-2" />
-                Call Customer Service
+                {t('refunds.callCustomerService')}
               </Button>
               <Button variant="outline">
                 <FileText className="h-4 w-4 mr-2" />
-                Submit Refund Request
+                {t('refunds.submitRefundRequest')}
               </Button>
             </div>
             <div className="text-sm text-muted-foreground">
-              <p>Phone: <span className="font-medium text-primary">+373 22 123 456</span></p>
-              <p>Email: <span className="font-medium text-primary">refunds@starlines.md</span></p>
-              <p>Hours: Monday-Friday 8:00 AM - 8:00 PM</p>
+              <p>{t('refunds.phone')}: <span className="font-medium text-primary">{t('refunds.phoneNumber')}</span></p>
+              <p>{t('refunds.email')}: <span className="font-medium text-primary">{t('refunds.emailAddress')}</span></p>
+              <p>{t('refunds.hours')}</p>
             </div>
           </CardContent>
         </Card>

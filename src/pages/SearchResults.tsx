@@ -11,8 +11,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Separator } from "@/components/ui/separator";
 import { searchRoutes, Route } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const SearchResults = () => {
+  const { t } = useLocalization();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [results, setResults] = useState<Route[]>([]);
@@ -132,7 +134,7 @@ const SearchResults = () => {
   const FilterSidebar = () => (
     <div className="space-y-6 p-6 bg-white border border-border rounded-lg">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Filters</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t('search.filters')}</h2>
         <Button 
           variant="ghost" 
           size="sm"
@@ -145,7 +147,7 @@ const SearchResults = () => {
 
       {/* Departure Time */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Departure Time</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.departureTime')}</h3>
         <div className="px-2">
           <Slider
             value={filters.departureTime}
@@ -164,7 +166,7 @@ const SearchResults = () => {
 
       {/* Duration */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Duration (hours)</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.duration')}</h3>
         <div className="px-2">
           <Slider
             value={filters.duration}
@@ -183,7 +185,7 @@ const SearchResults = () => {
 
       {/* Price */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Price (€)</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.price')}</h3>
         <div className="px-2">
           <Slider
             value={filters.price}
@@ -202,7 +204,7 @@ const SearchResults = () => {
 
       {/* Amenities */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Amenities</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.amenities')}</h3>
         <div className="space-y-2">
           {["WiFi", "USB", "WC", "AC", "Entertainment"].map((amenity) => (
             <div key={amenity} className="flex items-center space-x-2">
@@ -221,13 +223,13 @@ const SearchResults = () => {
 
       {/* Operator */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Operator</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.operator')}</h3>
         <Select value={filters.operator} onValueChange={(value) => handleFilterChange("operator", value)}>
           <SelectTrigger>
-            <SelectValue placeholder="All operators" />
+            <SelectValue placeholder={t('search.allOperators')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All operators</SelectItem>
+            <SelectItem value="all">{t('search.allOperators')}</SelectItem>
             <SelectItem value="Starlines Express">Starlines Express</SelectItem>
             <SelectItem value="Starlines Premium">Starlines Premium</SelectItem>
           </SelectContent>
@@ -236,12 +238,12 @@ const SearchResults = () => {
 
       {/* Stops */}
       <div>
-        <h3 className="font-semibold text-foreground mb-3">Stops</h3>
+        <h3 className="font-semibold text-foreground mb-3">{t('search.stops')}</h3>
         <div className="space-y-2">
           {[
-            { value: "any", label: "Any number of stops" },
-            { value: "direct", label: "Direct routes only" },
-            { value: "max1", label: "Max 1 stop" }
+            { value: "any", label: t('search.anyStops') },
+            { value: "direct", label: t('search.directOnly') },
+            { value: "max1", label: t('search.max1Stop') }
           ].map((option) => (
             <div key={option.value} className="flex items-center space-x-2">
               <Checkbox
@@ -270,7 +272,7 @@ const SearchResults = () => {
           stops: "any"
         })}
       >
-        Reset Filters
+        {t('search.resetFilters')}
       </Button>
     </div>
   );
@@ -298,7 +300,7 @@ const SearchResults = () => {
                 {from} → {to}
               </h1>
               <p className="text-foreground/70">
-                {date} • {passengers} {parseInt(passengers) === 1 ? "passenger" : "passengers"}
+                {date} • {passengers} {parseInt(passengers) === 1 ? t('search.passenger') : t('search.passengers')}
               </p>
             </div>
             
@@ -308,7 +310,7 @@ const SearchResults = () => {
                 <SheetTrigger asChild>
                   <Button variant="outline" className="md:hidden">
                     <Filter className="h-4 w-4 mr-2" />
-                    Filters
+                    {t('search.filters')}
                     {filters.amenities.length > 0 && (
                       <Badge variant="secondary" className="ml-2">
                         {filters.amenities.length}
@@ -318,7 +320,7 @@ const SearchResults = () => {
                 </SheetTrigger>
                 <SheetContent side="left" className="w-80">
                   <SheetHeader>
-                    <SheetTitle>Filters</SheetTitle>
+                    <SheetTitle>{t('search.filters')}</SheetTitle>
                   </SheetHeader>
                   <div className="mt-6">
                     <FilterSidebar />
@@ -332,11 +334,11 @@ const SearchResults = () => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recommended">Recommended</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="duration">Duration</SelectItem>
-                  <SelectItem value="rating">Rating</SelectItem>
+                  <SelectItem value="recommended">{t('search.recommended')}</SelectItem>
+                  <SelectItem value="price-low">{t('search.priceLowToHigh')}</SelectItem>
+                  <SelectItem value="price-high">{t('search.priceHighToLow')}</SelectItem>
+                  <SelectItem value="duration">{t('search.duration')}</SelectItem>
+                  <SelectItem value="rating">{t('search.rating')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -356,17 +358,17 @@ const SearchResults = () => {
           <div className="lg:col-span-3">
             <div className="flex items-center justify-between mb-6">
               <p className="text-foreground/70">
-                {sortedResults.length} {sortedResults.length === 1 ? "route" : "routes"} found
+                {sortedResults.length} {sortedResults.length === 1 ? t('search.routeFound') : t('search.routesFound')}
               </p>
             </div>
 
             {sortedResults.length === 0 ? (
               <div className="text-center py-12">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  No routes found
+                  {t('search.noRoutesFound')}
                 </h3>
                 <p className="text-foreground/70 mb-4">
-                  Try adjusting your filters or search criteria
+                  {t('search.tryAdjusting')}
                 </p>
                 <Button onClick={() => setFilters({
                   departureTime: [0, 24],
@@ -376,7 +378,7 @@ const SearchResults = () => {
                   operator: "all",
                   stops: "any"
                 })}>
-                  Reset Filters
+                  {t('search.resetFilters')}
                 </Button>
               </div>
             ) : (
@@ -403,7 +405,7 @@ const SearchResults = () => {
                             </div>
                           </div>
                           <div className="text-sm text-foreground/70 text-center">
-                            {route.duration} • {route.stops} {route.stops === 1 ? "stop" : "stops"}
+                            {route.duration} • {route.stops} {route.stops === 1 ? t('search.stops') : t('search.stops')}
                           </div>
                         </div>
 
@@ -442,7 +444,7 @@ const SearchResults = () => {
                         {/* Price & CTA */}
                         <div className="md:col-span-2 text-right">
                           <div className="mb-2">
-                            <span className="text-xs text-foreground/70">From</span>
+                            <span className="text-xs text-foreground/70">{t('search.from')}</span>
                             <div className="text-2xl font-bold text-primary">
                               €{route.price}
                             </div>
@@ -452,7 +454,7 @@ const SearchResults = () => {
                             className="w-full"
                             onClick={() => handleSelectRoute(route)}
                           >
-                            Select
+                            {t('search.select')}
                           </Button>
                         </div>
                       </div>

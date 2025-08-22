@@ -100,7 +100,7 @@ const Footer = () => {
           {footerSections.map((section) => (
             <div key={section.title}>
               <h4 className="font-semibold mb-4 text-background">{section.title}</h4>
-              <ul className="space-y-2">
+            <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.name}>
                     <Link
@@ -111,17 +111,17 @@ const Footer = () => {
                     </Link>
                   </li>
                 ))}
-              </ul>
-            </div>
+            </ul>
+          </div>
           ))}
         </div>
-      </div>
+          </div>
 
       {/* Contact Bar */}
       <div className="border-t border-background/20 bg-foreground/95">
         <div className="container py-4">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            {/* Contact Info */}
+          {/* Contact Info */}
             <div className="flex flex-col sm:flex-row items-center gap-6 text-sm text-background/70">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
@@ -136,17 +136,17 @@ const Footer = () => {
                 <span>{t('index.workingHours')}</span>
               </div>
             </div>
-
+            
             {/* Quick Actions */}
             <div className="flex items-center gap-3">
               <Link to="/search">
                 <Button size="sm" variant="secondary" className="bg-background text-foreground hover:bg-background/90">
-                  {t('index.bookNow')}
+                  {t('index.readyBookNow')}
                 </Button>
               </Link>
               <Link to="/contacts">
-                <Button size="sm" variant="outline" className="border-background/30 text-background hover:bg-background hover:text-foreground">
-                  {t('contact.title')}
+                <Button size="sm" variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-foreground font-medium">
+                  {t('contacts.title')}
                 </Button>
               </Link>
             </div>
@@ -162,8 +162,8 @@ const Footer = () => {
               <span>&copy; {currentYear} Starlines. {t('footer.rights')}</span>
               <span>•</span>
               <span>{t('hero.subtitle')}</span>
-            </div>
-            
+        </div>
+        
             <div className="flex items-center gap-4">
               <Link to="/legal/terms" className="hover:text-background transition-colors">
                 {t('legal.terms')}

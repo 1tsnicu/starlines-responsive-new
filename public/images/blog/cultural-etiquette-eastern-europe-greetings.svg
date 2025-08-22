@@ -1,0 +1,114 @@
+<svg width="800" height="600" viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B0E0E6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ground" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90EE90;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#32CD32;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="building" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5F5DC;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DEB887;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#sky)"/>
+  
+  <!-- Sun -->
+  <circle cx="700" cy="100" r="40" fill="#FFD700" opacity="0.8"/>
+  
+  <!-- Traditional Building -->
+  <rect x="100" y="200" width="600" height="200" fill="url(#building)" stroke="#8B4513" stroke-width="3"/>
+  <polygon points="100,200 400,150 700,200" fill="#DEB887" stroke="#8B4513" stroke-width="3"/>
+  
+  <!-- Building Windows -->
+  <rect x="150" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="250" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="350" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="450" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="550" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  <rect x="650" y="230" width="80" height="60" fill="#87CEEB" stroke="#4682B4" stroke-width="2"/>
+  
+  <!-- Building Door -->
+  <rect x="380" y="320" width="80" height="80" fill="#8B4513" stroke="#654321" stroke-width="3"/>
+  <rect x="390" y="330" width="60" height="60" fill="#DEB887"/>
+  
+  <!-- Ground -->
+  <rect x="0" y="400" width="800" height="200" fill="url(#ground)"/>
+  
+  <!-- People Greeting -->
+  <!-- Person 1 (Romanian) -->
+  <circle cx="250" cy="450" r="20" fill="#FFB6C1"/> <!-- Head -->
+  <rect x="235" y="470" width="30" height="50" fill="#4169E1"/> <!-- Body -->
+  <rect x="225" y="520" width="12" height="30" fill="#8B4513"/> <!-- Left Leg -->
+  <rect x="263" y="520" width="12" height="30" fill="#8B4513"/> <!-- Right Leg -->
+  <rect x="230" y="475" width="20" height="15" fill="#FFD700"/> <!-- Traditional Belt -->
+  
+  <!-- Person 1 Arms -->
+  <rect x="215" y="475" width="20" height="8" fill="#FFB6C1" rx="4"/> <!-- Left Arm -->
+  <rect x="265" y="475" width="20" height="8" fill="#FFB6C1" rx="4"/> <!-- Right Arm -->
+  
+  <!-- Person 2 (Polish) -->
+  <circle cx="550" cy="450" r="20" fill="#FFB6C1"/> <!-- Head -->
+  <rect x="535" y="470" width="30" height="50" fill="#FF69B4"/> <!-- Body -->
+  <rect x="525" y="520" width="12" height="30" fill="#8B4513"/> <!-- Left Leg -->
+  <rect x="563" y="520" width="12" height="30" fill="#8B4513"/> <!-- Right Leg -->
+  <rect x="530" y="475" width="20" height="15" fill="#FFD700"/> <!-- Traditional Belt -->
+  
+  <!-- Person 2 Arms -->
+  <rect x="515" y="475" width="20" height="8" fill="#FFB6C1" rx="4"/> <!-- Left Arm -->
+  <rect x="565" y="475" width="20" height="8" fill="#FFB6C1" rx="4"/> <!-- Right Arm -->
+  
+  <!-- Greeting Gesture -->
+  <!-- Handshake -->
+  <ellipse cx="400" cy="480" rx="25" ry="15" fill="#FFB6C1" opacity="0.8"/>
+  <ellipse cx="400" cy="480" rx="20" ry="10" fill="#FFB6C1" opacity="0.9"/>
+  
+  <!-- Cultural Symbols -->
+  <!-- Romanian Flag Colors -->
+  <rect x="150" y="100" width="60" height="40" fill="#002B7F"/> <!-- Blue -->
+  <rect x="210" y="100" width="60" height="40" fill="#FCD116"/> <!-- Yellow -->
+  <rect x="270" y="100" width="60" height="40" fill="#CE1126"/> <!-- Red -->
+  
+  <!-- Polish Flag Colors -->
+  <rect x="490" y="100" width="60" height="40" fill="#FFFFFF"/> <!-- White -->
+  <rect x="550" y="100" width="60" height="40" fill="#DC143C"/> <!-- Red -->
+  
+  <!-- Traditional Elements -->
+  <!-- Bread and Salt (Slavic Tradition) -->
+  <ellipse cx="400" cy="350" rx="30" ry="20" fill="#F4A460" stroke="#DEB887" stroke-width="2"/>
+  <rect x="395" y="330" width="10" height="20" fill="#FFFFFF" stroke="#C0C0C0" stroke-width="1"/>
+  
+  <!-- Traditional Hat (Romanian) -->
+  <ellipse cx="250" cy="430" rx="25" ry="8" fill="#8B4513" opacity="0.7"/>
+  
+  <!-- Traditional Hat (Polish) -->
+  <ellipse cx="550" cy="430" rx="25" ry="8" fill="#8B4513" opacity="0.7"/>
+  
+  <!-- Cultural Text Bubbles -->
+  <!-- Romanian Greeting -->
+  <ellipse cx="250" cy="380" rx="40" ry="25" fill="#FFFFFF" stroke="#87CEEB" stroke-width="2"/>
+  <text x="250" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#000000">
+    Bună ziua!
+  </text>
+  
+  <!-- Polish Greeting -->
+  <ellipse cx="550" cy="380" rx="40" ry="25" fill="#FFFFFF" stroke="#87CEEB" stroke-width="2"/>
+  <text x="550" y="385" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#000000">
+    Dzień dobry!
+  </text>
+  
+  <!-- Connection Line -->
+  <line x1="290" y1="480" x2="510" y2="480" stroke="#FFD700" stroke-width="3" stroke-dasharray="5,5"/>
+  
+  <!-- Text -->
+  <text x="400" y="580" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#2F4F4F" font-weight="bold">
+    Eticheta Culturală în Europa de Est
+  </text>
+  <text x="400" y="600" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#2F4F4F">
+    Saluturi și Interacțiuni Culturale
+  </text>
+</svg>

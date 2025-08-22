@@ -17,61 +17,63 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 const QuickLinks = () => {
+  const { t } = useLocalization();
   const quickLinks = [
     {
-      title: "Search Routes",
-      description: "Find and book your perfect bus journey",
+      title: t('header.bookings'),
+      description: t('index.searchRoutesDesc'),
       icon: Search,
       href: "/search-results",
       color: "from-blue-500 to-blue-600"
     },
     {
-      title: "Transport Routes",
-      description: "View all available routes and destinations",
+      title: t('header.routes'),
+      description: t('index.transportRoutesDesc'),
       icon: Route,
       href: "/transport-routes",
       color: "from-green-500 to-green-600"
     },
     {
-      title: "Timetable",
-      description: "Check bus schedules and departure times",
+      title: t('header.timetable'),
+      description: t('index.timetableDesc'),
       icon: Clock,
       href: "/timetable",
       color: "from-purple-500 to-purple-600"
     },
     {
-      title: "My Tickets",
-      description: "Access and manage your bookings",
+      title: t('header.myTickets'),
+      description: t('index.myTicketsDesc'),
       icon: Ticket,
       href: "/my-tickets",
       color: "from-orange-500 to-orange-600"
     },
     {
-      title: "Blog",
-      description: "Travel tips, news and destination guides",
+      title: t('blog.title'),
+      description: t('index.blogDesc'),
       icon: FileText,
       href: "/blog",
       color: "from-pink-500 to-pink-600"
     },
     {
-      title: "About Us",
-      description: "Learn about Starlines and our mission",
+      title: t('about.title'),
+      description: t('index.aboutDesc'),
       icon: Users,
       href: "/about",
       color: "from-indigo-500 to-indigo-600"
     },
     {
-      title: "Contact",
-      description: "Get in touch with our support team",
+      title: t('contact.title'),
+      description: t('index.contactDesc'),
       icon: Mail,
       href: "/contacts",
       color: "from-red-500 to-red-600"
     },
     {
-      title: "Admin Panel",
-      description: "Route management and administration",
+      title: t('admin.title'),
+      description: t('admin.subtitle'),
       icon: Settings,
       href: "/admin/routes",
       color: "from-gray-500 to-gray-600"
@@ -101,14 +103,13 @@ const QuickLinks = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
             <Star className="h-4 w-4" />
-            <span className="text-sm font-medium">Quick Access</span>
+            <span className="text-sm font-medium">{t('index.quickAccess')}</span>
           </div>
           <h2 className="text-4xl font-bold text-foreground mb-4">
-            Everything You Need
+            {t('index.everythingYouNeed')}
           </h2>
           <p className="text-lg text-foreground/70 max-w-2xl mx-auto">
-            Quick access to all the tools and information you need for a seamless 
-            travel experience with Starlines.
+            {t('index.quickAccessDesc')}
           </p>
         </div>
 
@@ -161,8 +162,8 @@ const QuickLinks = () => {
                 <Search className="h-5 w-5 text-primary" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-foreground">Can't Find What You Need?</h3>
-                <p className="text-sm text-foreground/70">Use our search or contact support</p>
+                <h3 className="font-semibold text-foreground">{t('index.cantFindWhatYouNeed')}</h3>
+                <p className="text-sm text-foreground/70">{t('index.useSearchOrContact')}</p>
               </div>
             </div>
             
@@ -173,8 +174,8 @@ const QuickLinks = () => {
                 <Phone className="h-5 w-5 text-accent" />
               </div>
               <div className="text-left">
-                <h3 className="font-semibold text-foreground">24/7 Support</h3>
-                <p className="text-sm text-foreground/70">Always here to help you</p>
+                <h3 className="font-semibold text-foreground">{t('features.support')}</h3>
+                <p className="text-sm text-foreground/70">{t('features.supportDesc')}</p>
               </div>
             </div>
           </div>
