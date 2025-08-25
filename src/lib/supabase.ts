@@ -1,23 +1,155 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
+const supabaseUrl = 'https://vrxwhyvyodvxovpbenpr.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyeHdoeXZ5b2R2eG92cGJlbnByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDUxNDYsImV4cCI6MjA3MTY4MTE0Nn0.04QxU-lZspdz-PybBJAd3h26av9tPViscHPwaT0xEns'
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
 
-// Types for our database
-export interface User {
-  id: string
-  email: string
-  first_name: string
-  last_name: string
-  created_at: string
-  updated_at: string
-}
-
-export interface AuthUser {
-  id: string
-  email: string
-  first_name: string
-  last_name: string
+// Database types
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          first_name: string
+          last_name: string
+          phone: string
+          created_at: string
+          updated_at: string
+          is_admin: boolean
+          avatar_url: string | null
+        }
+        Insert: {
+          id: string
+          email: string
+          first_name: string
+          last_name: string
+          phone: string
+          created_at?: string
+          updated_at?: string
+          is_admin?: boolean
+          avatar_url?: string | null
+        }
+        Update: {
+          id?: string
+          email?: string
+          first_name?: string
+          last_name?: string
+          phone?: string
+          created_at?: string
+          updated_at?: string
+          is_admin?: boolean
+          avatar_url?: string | null
+        }
+      }
+      bookings: {
+        Row: {
+          id: string
+          user_id: string
+          route_id: string
+          fare_type: string
+          passengers: number
+          total_price: number
+          currency: string
+          status: string
+          created_at: string
+          updated_at: string
+          departure_date: string
+          return_date: string | null
+          payment_status: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          route_id: string
+          fare_type: string
+          passengers: number
+          total_price: number
+          currency: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+          departure_date: string
+          return_date?: string | null
+          payment_status?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          route_id?: string
+          fare_type?: string
+          passengers?: number
+          total_price?: number
+          currency?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+          departure_date?: string
+          return_date?: string | null
+          payment_status?: string
+        }
+      }
+      routes: {
+        Row: {
+          id: string
+          from_city: string
+          to_city: string
+          operator: string
+          departure_time: string
+          arrival_time: string
+          duration: string
+          price_economy: number
+          price_premium: number
+          price_business: number
+          amenities: string[]
+          frequency: string
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          from_city: string
+          to_city: string
+          operator: string
+          departure_time: string
+          arrival_time: string
+          duration: string
+          price_economy: number
+          price_premium: number
+          price_business: number
+          amenities: string[]
+          frequency: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          from_city?: string
+          to_city?: string
+          operator?: string
+          departure_time?: string
+          arrival_time?: string
+          duration?: string
+          price_economy?: number
+          price_premium?: number
+          price_business?: number
+          amenities?: string[]
+          frequency?: string
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+    }
+  }
 }

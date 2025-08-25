@@ -50,21 +50,21 @@ const RefundPolicy: React.FC = () => {
       scenario: t('refunds.standardCancellation'),
       timeframe: "> 24 hours before",
       refundAmount: "100% minus processing fee",
-      processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
+      processingFee: `${formatPrice(2, undefined, 'EUR')}-${formatPrice(5, undefined, 'EUR')}`,
       color: "text-green-600 bg-green-50"
     },
     {
       scenario: t('refunds.lateCancellation'),
       timeframe: "12-24 hours before", 
       refundAmount: "75% of ticket price",
-      processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
+      processingFee: `${formatPrice(2, undefined, 'EUR')}-${formatPrice(5, undefined, 'EUR')}`,
       color: "text-yellow-600 bg-yellow-50"
     },
     {
       scenario: t('refunds.veryLateCancellation'),
       timeframe: "2-12 hours before",
       refundAmount: "50% of ticket price", 
-      processingFee: `${formatPrice(2)}-${formatPrice(5)}`,
+      processingFee: `${formatPrice(2, undefined, 'EUR')}-${formatPrice(5, undefined, 'EUR')}`,
       color: "text-orange-600 bg-orange-50"
     },
     {

@@ -294,6 +294,7 @@ const Checkout = () => {
     }
   };
 
+  const { convertCurrency } = useLocalization();
   const totalPrice = (fare.price * passengers) + 2.50 - promoDiscount;
 
   const renderStepContent = () => {
@@ -574,7 +575,7 @@ const Checkout = () => {
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t('checkout.review.priceBreakdown.farePerPerson')}</span>
-                    <span>{formatPrice(fare.price)}</span>
+                    <span>{formatPrice(fare.price, undefined, 'EUR')}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t('checkout.review.priceBreakdown.passengers')}</span>
@@ -582,20 +583,20 @@ const Checkout = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">{t('checkout.review.priceBreakdown.serviceFee')}</span>
-                    <span>{formatPrice(2.50)}</span>
+                    <span>{formatPrice(2.50, undefined, 'EUR')}</span>
                   </div>
                   
                   {promoDiscount > 0 && (
                     <div className="flex items-center justify-between text-success">
                       <span>{t('checkout.review.promoCode.discount')}</span>
-                      <span>-{formatPrice(promoDiscount)}</span>
+                      <span>-{formatPrice(promoDiscount, undefined, 'EUR')}</span>
                     </div>
                   )}
                   
                   <Separator />
                   <div className="flex items-center justify-between text-lg font-bold">
                     <span>{t('checkout.review.priceBreakdown.total')}</span>
-                    <span className="text-primary">{formatPrice(totalPrice)}</span>
+                    <span className="text-primary">{formatPrice(totalPrice, undefined, 'EUR')}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -677,7 +678,7 @@ const Checkout = () => {
                     <span>{t('checkout.payment.secure')}</span>
                   </div>
                   <div className="text-2xl font-bold text-primary">
-                    {formatPrice(totalPrice)}
+                    {formatPrice(totalPrice, undefined, 'EUR')}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {t('checkout.payment.totalAmount')}

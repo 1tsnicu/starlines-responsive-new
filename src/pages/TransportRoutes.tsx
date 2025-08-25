@@ -419,10 +419,10 @@ const TransportRoutes: React.FC = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">Any price</SelectItem>
-                          <SelectItem value="50">Above €50</SelectItem>
-                          <SelectItem value="75">Above €75</SelectItem>
-                          <SelectItem value="100">Above €100</SelectItem>
-                          <SelectItem value="150">Above €150</SelectItem>
+                                          <SelectItem value="50">Above {formatPrice(50, undefined, 'EUR')}</SelectItem>
+                <SelectItem value="75">Above {formatPrice(75, undefined, 'EUR')}</SelectItem>
+                <SelectItem value="100">Above {formatPrice(100, undefined, 'EUR')}</SelectItem>
+                <SelectItem value="150">Above {formatPrice(150, undefined, 'EUR')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -530,7 +530,7 @@ const TransportRoutes: React.FC = () => {
                           <div className="space-y-1 mb-3">
                             <div className="text-xs text-foreground/60">from</div>
                             <div className="text-3xl font-bold text-primary">
-                              {formatPrice(route.price.economy)}
+                              {formatPrice(route.price.economy, undefined, 'EUR')}
                             </div>
                             <div className="text-xs text-foreground/60">Economy</div>
                           </div>

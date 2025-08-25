@@ -111,7 +111,7 @@ const SearchForm = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
           {/* From City */}
-          <div className="lg:col-span-3 space-y-2">
+          <div className="lg:col-span-4 space-y-2">
             <Label htmlFor="from" className="text-sm font-medium">
               {t('search.from')}
             </Label>
@@ -119,10 +119,11 @@ const SearchForm = () => {
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="from"
-                placeholder="Departure city"
+                placeholder={t('search.fromPlaceholder')}
                 value={fromCity}
                 onChange={(e) => setFromCity(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-10 h-12 text-black placeholder:text-gray-500"
+                style={{ color: '#0B1220' }}
               />
             </div>
           </div>
@@ -131,17 +132,19 @@ const SearchForm = () => {
           <div className="lg:col-span-1 flex justify-center">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={handleSwapCities}
-              className="h-10 w-10 rounded-full border border-border hover:bg-muted"
+              className="h-10 w-10 rounded-full border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 hover:scale-110 bg-white"
+              title={t('search.swapCities')}
+              style={{ color: '#0B1220' }}
             >
-              <ArrowLeftRight className="h-4 w-4" />
+              <ArrowLeftRight className="h-4 w-4" style={{ color: '#0B1220' }} />
             </Button>
           </div>
 
           {/* To City */}
-          <div className="lg:col-span-3 space-y-2">
+          <div className="lg:col-span-4 space-y-2">
             <Label htmlFor="to" className="text-sm font-medium">
               {t('search.to')}
             </Label>
@@ -149,16 +152,17 @@ const SearchForm = () => {
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="to"
-                placeholder={t('search.to')}
+                placeholder={t('search.toPlaceholder')}
                 value={toCity}
                 onChange={(e) => setToCity(e.target.value)}
-                className="pl-10 h-12"
+                className="pl-10 h-12 text-black placeholder:text-gray-500"
+                style={{ color: '#0B1220' }}
               />
             </div>
           </div>
 
           {/* Departure Date */}
-          <div className="lg:col-span-2 space-y-2">
+          <div className="lg:col-span-3 space-y-2">
             <Label className="text-sm font-medium">
               {t('search.departure')}
             </Label>
@@ -167,9 +171,10 @@ const SearchForm = () => {
                 <Button
                   variant="outline"
                   className={cn(
-                    "w-full h-12 justify-start text-left font-normal",
-                    !departureDate && "text-muted-foreground"
+                    "w-full h-12 justify-start text-left font-normal text-black",
+                    !departureDate && "text-gray-500"
                   )}
+                  style={{ color: departureDate ? '#0B1220' : '#6B7280' }}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
                   {departureDate ? format(departureDate, "PPP") : t('search.selectDate')}
@@ -189,7 +194,7 @@ const SearchForm = () => {
 
           {/* Return Date (if round trip) */}
           {isRoundTrip && (
-            <div className="lg:col-span-2 space-y-2">
+            <div className="lg:col-span-3 space-y-2">
               <Label className="text-sm font-medium">
                 {t('search.return')}
               </Label>
@@ -198,9 +203,10 @@ const SearchForm = () => {
                   <Button
                     variant="outline"
                     className={cn(
-                      "w-full h-12 justify-start text-left font-normal",
-                      !returnDate && "text-muted-foreground"
+                      "w-full h-12 justify-start text-left font-normal text-black",
+                      !returnDate && "text-gray-500"
                     )}
+                    style={{ color: returnDate ? '#0B1220' : '#6B7280' }}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {returnDate ? format(returnDate, "PPP") : t('search.selectDate')}
@@ -220,12 +226,12 @@ const SearchForm = () => {
           )}
 
           {/* Passengers */}
-          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-1" : "lg:col-span-2")}>
+          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-2" : "lg:col-span-3")}>
             <Label className="text-sm font-medium">
               {t('search.passengers')}
             </Label>
             <Select value={passengers} onValueChange={setPassengers}>
-              <SelectTrigger className="h-12">
+              <SelectTrigger className="h-12 text-black" style={{ color: '#0B1220' }}>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
                   <SelectValue />
@@ -234,7 +240,7 @@ const SearchForm = () => {
               <SelectContent>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
                   <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? "Passenger" : "Passengers"}
+                    {num} {num === 1 ? t('search.passenger') : t('search.passengers')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -242,12 +248,12 @@ const SearchForm = () => {
           </div>
 
           {/* Baggage */}
-          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-1" : "lg:col-span-2")}>
+          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-2" : "lg:col-span-3")}>
             <Label className="text-sm font-medium">
-              Baggage
+              {t('search.baggage')}
             </Label>
             <Select value={baggage} onValueChange={setBaggage}>
-              <SelectTrigger className="h-12">
+              <SelectTrigger className="h-12 text-black" style={{ color: '#0B1220' }}>
                 <div className="flex items-center gap-2">
                   <Briefcase className="h-4 w-4" />
                   <SelectValue />
@@ -256,7 +262,7 @@ const SearchForm = () => {
               <SelectContent>
                 {[0, 1, 2, 3].map((num) => (
                   <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? "Bag" : "Bags"}
+                    {num} {num === 1 ? t('search.bag') : t('search.bags')}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -264,7 +270,7 @@ const SearchForm = () => {
           </div>
 
           {/* Search Button */}
-          <div className={cn("", isRoundTrip ? "lg:col-span-1" : "lg:col-span-1")}>
+          <div className={cn("", isRoundTrip ? "lg:col-span-2" : "lg:col-span-2")}>
             <Button 
               className="w-full h-12 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
               size="lg"

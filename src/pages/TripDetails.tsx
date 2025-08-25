@@ -89,6 +89,7 @@ const TripDetails: React.FC = () => {
   }
 
   // Calculate total price based on selected fare type
+  const { convertCurrency } = useLocalization();
   const totalPrice = route.price[selectedFare as keyof typeof route.price] * passengers;
 
   // Handle checkout navigation
@@ -245,7 +246,7 @@ const TripDetails: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span>{t('tripDetails.oversizedItems')}</span>
-                          <Badge variant="outline">{formatPrice(15)} {t('tripDetails.extra')}</Badge>
+                          <Badge variant="outline">{formatPrice(15, undefined, 'EUR')} {t('tripDetails.extra')}</Badge>
                         </div>
                       </div>
                     </AccordionContent>
@@ -261,7 +262,7 @@ const TripDetails: React.FC = () => {
                         </div>
                         <div className="flex items-center justify-between">
                           <span>{t('tripDetails.cancellationFee')}</span>
-                          <Badge variant="outline">{formatPrice(10)} ({t('tripDetails.before24h')}) / {formatPrice(25)} ({t('tripDetails.sameDay')})</Badge>
+                          <Badge variant="outline">{formatPrice(10, undefined, 'EUR')} ({t('tripDetails.before24h')}) / {formatPrice(25, undefined, 'EUR')} ({t('tripDetails.sameDay')})</Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span>{t('tripDetails.noShow')}</span>
@@ -372,7 +373,7 @@ const TripDetails: React.FC = () => {
                         <div className="flex items-center justify-between mb-2">
                           <div className="font-semibold text-foreground">{fare.name}</div>
                           <div className="text-lg font-bold text-primary">
-                            {formatPrice(fare.price)}
+                            {formatPrice(fare.price, undefined, 'EUR')}
                           </div>
                         </div>
                         <div className="space-y-1">
@@ -423,7 +424,7 @@ const TripDetails: React.FC = () => {
                                     <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('tripDetails.farePerPerson')}</span>
-                      <span>{formatPrice(route.price[selectedFare as keyof typeof route.price])}</span>
+                      <span>{formatPrice(route.price[selectedFare as keyof typeof route.price], undefined, 'EUR')}</span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('tripDetails.numberOfPassengers')}</span>
@@ -431,12 +432,12 @@ const TripDetails: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-muted-foreground">{t('tripDetails.serviceFee')}</span>
-                      <span>{formatPrice(2.50)}</span>
+                      <span>{formatPrice(2.50, undefined, 'EUR')}</span>
                     </div>
                     <Separator />
                     <div className="flex items-center justify-between text-lg font-bold">
                       <span>{t('tripDetails.total')}</span>
-                      <span className="text-primary">€{(totalPrice + 2.50).toFixed(2)}</span>
+                      <span className="text-primary">{formatPrice(totalPrice + 2.50, undefined, 'EUR')}</span>
                     </div>
                   </div>
 

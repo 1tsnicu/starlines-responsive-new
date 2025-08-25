@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PageHeader from "@/components/PageHeader";
+import { useLocalization } from "@/contexts/LocalizationContext";
 
 // Mock routes data for InfoBus-like display
 const mockRoutes = [
@@ -92,6 +93,7 @@ const mockRoutes = [
 ];
 
 const AdminRoutes = () => {
+  const { formatPrice } = useLocalization();
   const [stats, setStats] = useState({
     total: 0,
     visible: 0,
@@ -443,7 +445,7 @@ const AdminRoutes = () => {
                               </div>
                               <div className="flex items-center gap-2">
                                 <Euro className="h-4 w-4 text-foreground/50" />
-                                <span className="font-semibold">€{route.price}</span>
+                                <span className="font-semibold">{formatPrice(route.price, undefined, 'EUR')}</span>
                               </div>
                             </div>
                           </div>
@@ -451,7 +453,7 @@ const AdminRoutes = () => {
                           {/* Price and Actions */}
                           <div className="text-right ml-6">
                             <div className="text-2xl font-bold text-primary mb-2">
-                              €{route.price}
+                              {formatPrice(route.price, undefined, 'EUR')}
                             </div>
                             <div className="flex items-center gap-2 mb-3">
                               <Badge variant="outline" className="text-xs">

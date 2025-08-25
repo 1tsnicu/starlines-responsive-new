@@ -39,6 +39,7 @@ import {
 } from "@/components/ui/select";
 
 import { useLocalization, SUPPORTED_LANGUAGES, SUPPORTED_CURRENCIES } from "@/contexts/LocalizationContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -54,6 +55,7 @@ const Header = () => {
     getCurrencySymbol,
     t 
   } = useLocalization();
+  const { user, profile, signOut, isAdmin } = useAuth();
 
   // Complete navigation structure with ALL pages (no admin)
   const mainNavigation = [
@@ -304,6 +306,87 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
+            {/* Language & Currency Selectors */}
+            <div className="hidden md:flex items-center gap-2">
+              {/* Language Selector */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    {getLanguageFlag(currentLanguage)}
+                    <span className="hidden sm:inline">{getLanguageName(currentLanguage)}</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{t('header.language')}</DropdownMenuLabel>
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code)}>
+                      <div className="flex items-center gap-2">
+                        {getLanguageFlag(lang.code)}
+                        <span>{getLanguageName(lang.code)}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* Currency Selector */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    {getCurrencyFlag(currentCurrency)}
+                    <span className="hidden sm:inline">{currentCurrency}</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{t('header.currency')}</DropdownMenuLabel>
+                  {SUPPORTED_CURRENCIES.map((currency) => (
+                    <DropdownMenuItem key={currency.code} onClick={() => setCurrency(currency.code)}>
+                      <div className="flex items-center gap-2">
+                        {getCurrencyFlag(currency.code)}
+                        <span>{currency.code}</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+
+            {/* Authentication */}
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      {profile?.first_name || user.email}
+                    </span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>{t('auth.profile')}</DropdownMenuLabel>
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/routes">
+                        <Shield className="h-4 w-4 mr-2" />
+                        Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    {t('auth.logout')}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/login">{t('auth.login.button')}</Link>
+              </Button>
+            )}
+
             {/* Mobile Menu Button */}
             <Button
               variant="ghost"

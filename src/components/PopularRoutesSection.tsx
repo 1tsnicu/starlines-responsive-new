@@ -191,7 +191,7 @@ const popularRoutes = [
                   <div className="mb-3">
                     <span className="text-xs text-foreground/70">{t('routes.perPerson')}</span>
                     <div className="text-3xl font-bold text-primary">
-                      {formatPrice(route.price)}
+                      {formatPrice(route.price, undefined, 'EUR')}
                 </div>
               </div>
               

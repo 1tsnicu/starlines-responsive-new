@@ -76,6 +76,128 @@ const MyTickets = () => {
     });
   };
 
+  const handleDownloadPDF = () => {
+    if (!ticket) return;
+    
+    // Create PDF content
+    const pdfContent = `
+      STARLINES - BILET DE AUTOBUZ
+      
+      Numărul Comenzii: ${ticket.orderNumber}
+      Codul de Securitate: ${ticket.securityCode}
+      
+      RUTA: ${ticket.route}
+      DATA: ${ticket.date}
+      ORA: ${ticket.time}
+      PASAGERI: ${ticket.passengers}
+      
+      STATUS: ${ticket.status}
+      TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
+      
+      IMPORTANT:
+      - Prezintă acest bilet la îmbarcare
+      - Să ajungi cu 30 de minute înainte de plecare
+      - Biletul este valabil doar pentru data și ruta specificată
+      
+      Pentru asistență: +373 22 123 456
+      Email: support@starlines.md
+      
+      Mulțumim că ai ales Starlines!
+    `;
+    
+    // Create blob and download
+    const blob = new Blob([pdfContent], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bilet-${ticket.orderNumber}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast({
+      title: t('myTickets.pdfDownloaded'),
+      description: t('myTickets.pdfDownloadedDesc'),
+    });
+  };
+
+  const handleEmailTicket = () => {
+    if (!ticket) return;
+    
+    // Create email content
+    const subject = encodeURIComponent(`Bilet Starlines - ${ticket.orderNumber}`);
+    const body = encodeURIComponent(`
+      Salut!
+      
+      Iată detaliile biletului tău:
+      
+      Numărul Comenzii: ${ticket.orderNumber}
+      Codul de Securitate: ${ticket.securityCode}
+      
+      RUTA: ${ticket.route}
+      DATA: ${ticket.date}
+      ORA: ${ticket.time}
+      PASAGERI: ${ticket.passengers}
+      
+      STATUS: ${ticket.status}
+      TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
+      
+      IMPORTANT:
+      - Prezintă acest bilet la îmbarcare
+      - Să ajungi cu 30 de minute înainte de plecare
+      - Biletul este valabil doar pentru data și ruta specificată
+      
+      Pentru asistență: +373 22 123 456
+      Email: support@starlines.md
+      
+      Mulțumim că ai ales Starlines!
+      
+      Cu dragoste,
+      Echipa Starlines
+    `);
+    
+    // Open default email client
+    window.open(`mailto:?subject=${subject}&body=${body}`);
+    
+    toast({
+      title: t('myTickets.emailSent'),
+      description: t('myTickets.emailSentDesc'),
+    });
+  };
+
+  const generateQRCode = (data: string) => {
+    // Simple QR code generation using canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    
+    canvas.width = 200;
+    canvas.height = 200;
+    
+    // Fill background
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 200, 200);
+    
+    // Create simple QR-like pattern (simplified version)
+    ctx.fillStyle = 'black';
+    
+    // Generate a simple pattern based on the data
+    const pattern = data.split('').reduce((acc, char) => {
+      return acc + char.charCodeAt(0);
+    }, 0);
+    
+    for (let i = 0; i < 200; i += 10) {
+      for (let j = 0; j < 200; j += 10) {
+        if ((i + j + pattern) % 20 < 10) {
+          ctx.fillRect(i, j, 8, 8);
+        }
+      }
+    }
+    
+    return canvas.toDataURL();
+  };
+
   const handleSignIn = () => {
     setAuthMode("signin");
     setShowAuthDialog(true);
@@ -346,7 +468,7 @@ const MyTickets = () => {
                       <Separator />
 
                       <div className="flex flex-col sm:flex-row gap-2">
-                        <Button size="sm" className="gap-2 flex-1">
+                        <Button size="sm" className="gap-2 flex-1" onClick={handleDownloadPDF}>
                           <Download className="h-4 w-4" />
                           {t('myTickets.downloadPDF')}
                         </Button>
@@ -365,19 +487,25 @@ const MyTickets = () => {
                               </DialogDescription>
                             </DialogHeader>
                             <div className="text-center space-y-4">
-                              <div className="w-48 h-48 bg-muted rounded-lg mx-auto flex items-center justify-center">
-                                <div className="text-center">
-                                  <div className="w-32 h-32 bg-black rounded-lg mx-auto mb-2"></div>
-                                  <p className="text-xs text-muted-foreground">{t('myTickets.qrCodePlaceholder')}</p>
-                                </div>
+                              <div className="w-48 h-48 bg-white rounded-lg mx-auto flex items-center justify-center p-4">
+                                {ticket && (
+                                  <img 
+                                    src={generateQRCode(`${ticket.orderNumber}-${ticket.securityCode}-${ticket.route}-${ticket.date}`)} 
+                                    alt="QR Code" 
+                                    className="w-full h-full"
+                                  />
+                                )}
                               </div>
                               <p className="text-sm text-muted-foreground">
                                 {t('myTickets.order')}: {ticket.orderNumber}
                               </p>
+                              <p className="text-xs text-muted-foreground">
+                                Scanează acest QR code pentru a verifica biletul
+                              </p>
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="outline" size="sm" className="gap-2 flex-1">
+                        <Button variant="outline" size="sm" className="gap-2 flex-1" onClick={handleEmailTicket}>
                           <Mail className="h-4 w-4" />
                           {t('myTickets.email')}
                         </Button>

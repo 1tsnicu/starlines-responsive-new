@@ -39,7 +39,7 @@ interface LocalizationContextType {
   
   // Conversion
   convertCurrency: (amount: number, fromCurrency: string, toCurrency: string) => number;
-  formatPrice: (amount: number, currency?: string) => string;
+  formatPrice: (amount: number, currency?: string, fromCurrency?: string) => string;
   
   // Localization
   t: (key: string) => string;
@@ -50,6 +50,39 @@ const LocalizationContext = createContext<LocalizationContextType | undefined>(u
 // Translations
 const translations = {
   ro: {
+    // Authentication
+    'auth.login.title': 'Conectare',
+    'auth.login.description': 'Conectează-te la contul tău',
+    'auth.login.button': 'Conectare',
+    'auth.signUp.title': 'Creare Cont',
+    'auth.signUp.description': 'Creează un cont nou',
+    'auth.signUp.button': 'Creare Cont',
+    'auth.signUp.success.title': 'Cont Creat cu Succes!',
+    'auth.signUp.success.description': 'Verifică email-ul pentru confirmarea contului',
+    'auth.signUp.success.login': 'Conectare',
+    'auth.email': 'Email',
+    'auth.emailPlaceholder': 'Introdu email-ul tău',
+    'auth.password': 'Parolă',
+    'auth.passwordPlaceholder': 'Introdu parola ta',
+    'auth.confirmPassword': 'Confirmă Parola',
+    'auth.confirmPasswordPlaceholder': 'Confirmă parola ta',
+    'auth.firstName': 'Prenume',
+    'auth.firstNamePlaceholder': 'Introdu prenumele',
+    'auth.lastName': 'Nume',
+    'auth.lastNamePlaceholder': 'Introdu numele',
+    'auth.phone': 'Telefon',
+    'auth.phonePlaceholder': 'Introdu numărul de telefon',
+    'auth.loggingIn': 'Se conectează...',
+    'auth.signingUp': 'Se creează contul...',
+    'auth.noAccount': 'Nu ai cont?',
+    'auth.haveAccount': 'Ai deja cont?',
+    'auth.forgotPassword': 'Ai uitat parola?',
+    'auth.logout': 'Deconectare',
+    'auth.profile': 'Profil',
+    'auth.or': 'Sau',
+    'auth.signInWithGoogle': 'Conectare cu Google',
+    'auth.signUpWithGoogle': 'Înregistrare cu Google',
+
     // Header
     'header.home': 'Acasă',
     'header.bookings': 'Rezervări',
@@ -94,11 +127,16 @@ const translations = {
     
     // Search Form
     'search.from': 'De unde',
+    'search.fromPlaceholder': 'Orașul de plecare',
     'search.to': 'Unde',
+    'search.toPlaceholder': 'Orașul de destinație',
     'search.departure': 'Data plecării',
     'search.return': 'Data întoarcerii',
     'search.passengers': 'Pasageri',
+    'search.passenger': 'Pasager',
     'search.baggage': 'Bagaje',
+    'search.bag': 'Bagaj',
+    'search.bags': 'Bagaje',
     'search.oneWay': 'Dus',
     'search.roundTrip': 'Dus-întors',
     'search.searchTickets': 'Caută Bilete',
@@ -106,6 +144,7 @@ const translations = {
     'search.selectDate': 'Selectează data',
     'search.selectPassengers': 'Selectează numărul de pasageri',
     'search.selectBaggage': 'Selectează bagajele',
+    'search.swapCities': 'Schimbă orașele',
     
     // Index Page
     'index.whatToDo': 'Ce vrei să faci?',
@@ -1242,6 +1281,10 @@ const translations = {
     'myTickets.downloadPDF': 'Descarcă PDF',
     'myTickets.showQR': 'Arată QR',
     'myTickets.email': 'Email',
+    'myTickets.pdfDownloaded': 'PDF Descărcat',
+    'myTickets.pdfDownloadedDesc': 'Biletul a fost descărcat cu succes',
+    'myTickets.emailSent': 'Email Trimis',
+    'myTickets.emailSentDesc': 'Biletul a fost trimis pe email',
     'myTickets.qrCodeTitle': 'Codul QR al Biletului Tău',
     'myTickets.qrCodeDescription': 'Arată acest cod QR șoferului la îmbarcare',
     'myTickets.qrCodePlaceholder': 'Cod QR Placeholder',
@@ -1496,6 +1539,39 @@ const translations = {
     'refunds.emailAddress': 'refunds@starlines.md'
   },
   ru: {
+    // Authentication
+    'auth.login.title': 'Вход',
+    'auth.login.description': 'Войдите в свой аккаунт',
+    'auth.login.button': 'Войти',
+    'auth.signUp.title': 'Создание Аккаунта',
+    'auth.signUp.description': 'Создайте новый аккаунт',
+    'auth.signUp.button': 'Создать Аккаунт',
+    'auth.signUp.success.title': 'Аккаунт Успешно Создан!',
+    'auth.signUp.success.description': 'Проверьте email для подтверждения аккаунта',
+    'auth.signUp.success.login': 'Войти',
+    'auth.email': 'Email',
+    'auth.emailPlaceholder': 'Введите ваш email',
+    'auth.password': 'Пароль',
+    'auth.passwordPlaceholder': 'Введите ваш пароль',
+    'auth.confirmPassword': 'Подтвердите Пароль',
+    'auth.confirmPasswordPlaceholder': 'Подтвердите ваш пароль',
+    'auth.firstName': 'Имя',
+    'auth.firstNamePlaceholder': 'Введите имя',
+    'auth.lastName': 'Фамилия',
+    'auth.lastNamePlaceholder': 'Введите фамилию',
+    'auth.phone': 'Телефон',
+    'auth.phonePlaceholder': 'Введите номер телефона',
+    'auth.loggingIn': 'Вход...',
+    'auth.signingUp': 'Создание аккаунта...',
+    'auth.noAccount': 'Нет аккаунта?',
+    'auth.haveAccount': 'Уже есть аккаунт?',
+    'auth.forgotPassword': 'Забыли пароль?',
+    'auth.logout': 'Выйти',
+    'auth.profile': 'Профиль',
+    'auth.or': 'Или',
+    'auth.signInWithGoogle': 'Войти через Google',
+    'auth.signUpWithGoogle': 'Регистрация через Google',
+
     // Header
     'header.home': 'Главная',
     'header.bookings': 'Бронирования',
@@ -1540,11 +1616,16 @@ const translations = {
     
     // Search Form
     'search.from': 'Откуда',
+    'search.fromPlaceholder': 'Город отправления',
     'search.to': 'Куда',
+    'search.toPlaceholder': 'Город назначения',
     'search.departure': 'Дата отправления',
     'search.return': 'Дата возвращения',
     'search.passengers': 'Пассажиры',
+    'search.passenger': 'Пассажир',
     'search.baggage': 'Багаж',
+    'search.bag': 'Мешок',
+    'search.bags': 'Мешки',
     'search.oneWay': 'В одну сторону',
     'search.roundTrip': 'Туда-обратно',
     'search.searchTickets': 'Найти Билеты',
@@ -1552,6 +1633,7 @@ const translations = {
     'search.selectDate': 'Выберите дату',
     'search.selectPassengers': 'Выберите количество пассажиров',
     'search.selectBaggage': 'Выберите багаж',
+    'search.swapCities': 'Поменять города',
     
     // Index Page
     'index.whatToDo': 'Что вы хотите сделать?',
@@ -2600,6 +2682,10 @@ const translations = {
     'myTickets.downloadPDF': 'Скачать PDF',
     'myTickets.showQR': 'Показать QR',
     'myTickets.email': 'Email',
+    'myTickets.pdfDownloaded': 'PDF Скачан',
+    'myTickets.pdfDownloadedDesc': 'Билет успешно скачан',
+    'myTickets.emailSent': 'Email Отправлен',
+    'myTickets.emailSentDesc': 'Билет отправлен по email',
     'myTickets.qrCodeTitle': 'QR-код Вашего Билета',
     'myTickets.qrCodeDescription': 'Покажите этот QR-код водителю при посадке',
     'myTickets.qrCodePlaceholder': 'QR-код Заглушка',
@@ -2954,6 +3040,39 @@ const translations = {
     'refunds.emailAddress': 'refunds@starlines.md'
   },
   en: {
+    // Authentication
+    'auth.login.title': 'Login',
+    'auth.login.description': 'Sign in to your account',
+    'auth.login.button': 'Sign In',
+    'auth.signUp.title': 'Create Account',
+    'auth.signUp.description': 'Create a new account',
+    'auth.signUp.button': 'Create Account',
+    'auth.signUp.success.title': 'Account Created Successfully!',
+    'auth.signUp.success.description': 'Check your email to confirm your account',
+    'auth.signUp.success.login': 'Sign In',
+    'auth.email': 'Email',
+    'auth.emailPlaceholder': 'Enter your email',
+    'auth.password': 'Password',
+    'auth.passwordPlaceholder': 'Enter your password',
+    'auth.confirmPassword': 'Confirm Password',
+    'auth.confirmPasswordPlaceholder': 'Confirm your password',
+    'auth.firstName': 'First Name',
+    'auth.firstNamePlaceholder': 'Enter first name',
+    'auth.lastName': 'Last Name',
+    'auth.lastNamePlaceholder': 'Enter last name',
+    'auth.phone': 'Phone',
+    'auth.phonePlaceholder': 'Enter phone number',
+    'auth.loggingIn': 'Signing in...',
+    'auth.signingUp': 'Creating account...',
+    'auth.noAccount': "Don't have an account?",
+    'auth.haveAccount': 'Already have an account?',
+    'auth.forgotPassword': 'Forgot password?',
+    'auth.logout': 'Sign Out',
+    'auth.profile': 'Profile',
+    'auth.or': 'Or',
+    'auth.signInWithGoogle': 'Sign in with Google',
+    'auth.signUpWithGoogle': 'Sign up with Google',
+
     // Header
     'header.home': 'Home',
     'header.bookings': 'Bookings',
@@ -2998,11 +3117,16 @@ const translations = {
     
     // Search Form
     'search.from': 'From',
+    'search.fromPlaceholder': 'Departure city',
     'search.to': 'To',
+    'search.toPlaceholder': 'Destination city',
     'search.departure': 'Departure Date',
     'search.return': 'Return Date',
     'search.passengers': 'Passengers',
+    'search.passenger': 'Passenger',
     'search.baggage': 'Baggage',
+    'search.bag': 'Bag',
+    'search.bags': 'Bags',
     'search.oneWay': 'One Way',
     'search.roundTrip': 'Round Trip',
     'search.searchTickets': 'Search Tickets',
@@ -3010,6 +3134,7 @@ const translations = {
     'search.selectDate': 'Select date',
     'search.selectPassengers': 'Select number of passengers',
     'search.selectBaggage': 'Select baggage',
+    'search.swapCities': 'Swap cities',
     
     // Index Page
     'index.whatToDo': 'What do you want to do?',
@@ -3337,6 +3462,10 @@ const translations = {
     'myTickets.downloadPDF': 'Download PDF',
     'myTickets.showQR': 'Show QR',
     'myTickets.email': 'Email',
+    'myTickets.pdfDownloaded': 'PDF Downloaded',
+    'myTickets.pdfDownloadedDesc': 'Ticket has been downloaded successfully',
+    'myTickets.emailSent': 'Email Sent',
+    'myTickets.emailSentDesc': 'Ticket has been sent via email',
     'myTickets.qrCodeTitle': 'Your Ticket QR Code',
     'myTickets.qrCodeDescription': 'Show this QR code to the driver when boarding',
     'myTickets.qrCodePlaceholder': 'QR Code Placeholder',
@@ -4468,22 +4597,28 @@ export const LocalizationProvider: React.FC<{ children: ReactNode }> = ({ childr
     return rate ? amount * rate : amount;
   };
 
-  const formatPrice = (amount: number, currency?: string): string => {
+  const formatPrice = (amount: number, currency?: string, fromCurrency?: string): string => {
     const curr = currency || currentCurrency;
     const symbol = getCurrencySymbol(curr);
+    
+    // Convert amount if fromCurrency is different from current currency
+    let convertedAmount = amount;
+    if (fromCurrency && fromCurrency !== curr) {
+      convertedAmount = convertCurrency(amount, fromCurrency, curr);
+    }
     
     // Format based on currency
     switch (curr) {
       case 'EUR':
-        return `${symbol}${amount.toFixed(2)}`;
+        return `${symbol}${convertedAmount.toFixed(2)}`;
       case 'USD':
-        return `${symbol}${amount.toFixed(2)}`;
+        return `${symbol}${convertedAmount.toFixed(2)}`;
       case 'MDL':
-        return `${amount.toFixed(2)} ${symbol}`;
+        return `${convertedAmount.toFixed(2)} ${symbol}`;
       case 'RON':
-        return `${amount.toFixed(2)} ${symbol}`;
+        return `${convertedAmount.toFixed(2)} ${symbol}`;
       default:
-        return `${symbol}${amount.toFixed(2)}`;
+        return `${symbol}${convertedAmount.toFixed(2)}`;
     }
   };
 

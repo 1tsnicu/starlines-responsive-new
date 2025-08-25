@@ -1,164 +1,183 @@
-# 🚀 Configurarea Supabase pentru Starlines UI
+# 🚀 **Configurarea Supabase pentru Starlines Routes**
 
-## 📋 Pași de Configurare
+## 📋 **Pași de Configurare**
 
-### 1. Creează un Proiect Supabase
-1. Mergi la [supabase.com](https://supabase.com)
-2. Creează un cont nou sau conectează-te
-3. Creează un proiect nou
-4. Alege o regiune aproape de utilizatorii tăi
+### **1. Accesare Supabase Dashboard**
+- Mergi la [supabase.com](https://supabase.com)
+- Conectează-te la contul tău
+- Accesează proiectul: `vrxwhyvyodvxovpbenpr`
 
-### 2. Obține Credențialele
-1. În dashboard-ul proiectului, mergi la **Settings** → **API**
-2. Copiază:
-   - **Project URL** (ex: `https://abc123.supabase.co`)
-   - **anon public** key
+### **2. Configurarea Bazei de Date**
+1. **Deschide SQL Editor** din meniul din stânga
+2. **Copiază și rulează** conținutul din `supabase-setup.sql`
+3. **Verifică** că tabelele au fost create:
+   - `profiles` - profilurile utilizatorilor
+   - `bookings` - rezervările
+   - `routes` - rutele de transport
 
-### 3. Configurează Variabilele de Mediu
-Creează un fișier `.env` în rădăcina proiectului:
+### **3. Configurarea Autentificării**
+1. **Authentication > Settings** din meniul din stânga
+2. **Enable Email Auth** dacă nu este activat
+3. **Configure Email Templates** (opțional)
 
-```bash
-# Supabase Configuration
-VITE_SUPABASE_URL=https://your-project.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
+### **4. Configurarea RLS (Row Level Security)**
+- RLS este deja configurat prin scriptul SQL
+- Utilizatorii pot vedea doar propriile date
+- Adminii pot vedea toate datele
 
-### 4. Creează Tabelul Users
-În **SQL Editor** din Supabase, rulează:
+## 🗄️ **Structura Bazei de Date**
 
+### **Tabela `profiles`**
 ```sql
--- Creează tabelul pentru profilul utilizatorilor
-CREATE TABLE users (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
-  email TEXT UNIQUE NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Activează RLS (Row Level Security)
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-
--- Creează policy pentru utilizatorii autentificați să-și vadă propriul profil
-CREATE POLICY "Users can view own profile" ON users
-  FOR SELECT USING (auth.uid() = id);
-
--- Creează policy pentru utilizatorii să-și creeze propriul profil
-CREATE POLICY "Users can insert own profile" ON users
-  FOR INSERT WITH CHECK (auth.uid() = id);
-
--- Creează policy pentru utilizatorii să-și actualizeze propriul profil
-CREATE POLICY "Users can update own profile" ON users
-  FOR UPDATE USING (auth.uid() = id);
-
--- Creează trigger pentru actualizarea updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
-
-CREATE TRIGGER update_users_updated_at
-  BEFORE UPDATE ON users
-  FOR EACH ROW
-  EXECUTE FUNCTION update_updated_at_column();
+- id (UUID) - referință la auth.users
+- email (TEXT) - email-ul utilizatorului
+- first_name (TEXT) - prenumele
+- last_name (TEXT) - numele
+- phone (TEXT) - numărul de telefon
+- is_admin (BOOLEAN) - dacă este admin
+- created_at, updated_at (TIMESTAMP)
 ```
 
-### 5. Configurează Autentificarea
-1. În **Authentication** → **Settings**
-2. Activează **Email confirmations** dacă dorești
-3. Configurează **Site URL** cu domeniul tău
-4. Adaugă **Redirect URLs** pentru aplicația ta
+### **Tabela `bookings`**
+```sql
+- id (UUID) - ID-ul rezervării
+- user_id (UUID) - referință la profiles
+- route_id (TEXT) - ID-ul rutei
+- fare_type (TEXT) - tipul tarifului
+- passengers (INTEGER) - numărul de pasageri
+- total_price (DECIMAL) - prețul total
+- currency (TEXT) - moneda
+- status (TEXT) - statusul rezervării
+- departure_date, return_date (DATE)
+```
 
-### 6. Testează Integrarea
-1. Rulează `npm run dev`
-2. Mergi la pagina **My Tickets**
-3. Încearcă să creezi un cont nou
-4. Verifică în **Authentication** → **Users** din Supabase
+### **Tabela `routes`**
+```sql
+- id (UUID) - ID-ul rutei
+- from_city, to_city (TEXT) - orașele
+- operator (TEXT) - operatorul
+- departure_time, arrival_time (TIME)
+- duration (TEXT) - durata
+- price_economy, price_premium, price_business (DECIMAL)
+- amenities (TEXT[]) - facilitățile
+- is_active (BOOLEAN) - dacă ruta este activă
+```
 
-## 🔧 Structura Bazei de Date
+## 🔐 **Politici de Securitate (RLS)**
 
-### Tabelul `users`
-- `id` - UUID (cheie primară, referință la auth.users)
-- `email` - TEXT (unic, obligatoriu)
-- `first_name` - TEXT (obligatoriu)
-- `last_name` - TEXT (obligatoriu)
-- `created_at` - TIMESTAMP (automat)
-- `updated_at` - TIMESTAMP (automat)
+### **Profiles**
+- Utilizatorii pot vedea și edita doar propriul profil
+- Adminii pot vedea toate profilele
 
-## 🚨 Securitate
+### **Bookings**
+- Utilizatorii pot vedea doar propriile rezervări
+- Adminii pot vedea toate rezervările
 
-### RLS (Row Level Security)
-- Utilizatorii pot vedea doar propriul profil
-- Nu pot accesa datele altor utilizatori
-- Autentificarea este gestionată de Supabase Auth
+### **Routes**
+- Toată lumea poate vedea rutele active
+- Doar adminii pot crea/edita/șterge rute
 
-### Autentificare
-- Parolele sunt hash-uite automat
-- Sesiunile sunt gestionate de Supabase
-- JWT tokens pentru autentificare
+## 👥 **Crearea Primului Admin**
 
-## 📱 Funcționalități Implementate
+### **Metoda 1: Prin Aplicație**
+1. Creează un cont normal prin `/signup`
+2. Conectează-te la baza de date
+3. Execută:
+```sql
+UPDATE public.profiles 
+SET is_admin = TRUE 
+WHERE email = 'emailul_tau@example.com';
+```
 
-### ✅ Autentificare
-- Înregistrare utilizator nou
-- Conectare utilizator existent
+### **Metoda 2: Prin Supabase Dashboard**
+1. **Authentication > Users**
+2. Creează un utilizator nou
+3. **Table Editor > profiles**
+4. Adaugă un rând cu `is_admin = TRUE`
+
+## 🧪 **Testarea Autentificării**
+
+### **1. Testare Înregistrare**
+- Mergi la `/signup`
+- Completează formularul
+- Verifică că contul este creat în `profiles`
+
+### **2. Testare Conectare**
+- Mergi la `/login`
+- Conectează-te cu contul creat
+- Verifică că ești redirecționat corect
+
+### **3. Testare Admin**
+- Conectează-te cu un cont admin
+- Verifică că vezi link-ul "Admin Panel" în header
+- Accesează `/admin/routes`
+
+## 🔧 **Configurarea de Producție**
+
+### **1. Variabile de Mediu**
+```env
+VITE_SUPABASE_URL=https://vrxwhyvyodvxovpbenpr.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+### **2. Securitate**
+- Activează **2FA** pentru conturile admin
+- Configurează **rate limiting**
+- Monitorizează **audit logs**
+
+### **3. Backup**
+- Configurează **backup automat** în Supabase
+- Exportă datele periodic
+
+## 📱 **Funcționalități Implementate**
+
+### **✅ Autentificare**
+- Înregistrare utilizatori noi
+- Conectare utilizatori existenți
+- Gestionare sesiuni
 - Deconectare
-- Resetare parolă (opțional)
 
-### ✅ Persistența Datelor
-- Datele rămân salvate între sesiuni
-- Sincronizare automată cu baza de date
-- Gestionarea stării de autentificare
+### **✅ Profil Utilizator**
+- Informații personale
+- Actualizare profil
+- Avatar (opțional)
 
-### ✅ Interfața Utilizator
-- Formulare de înregistrare/conectare
-- Afișarea informațiilor utilizatorului
-- Mesaje de eroare și succes
-- Loading states
+### **✅ Sistem Admin**
+- Acces la toate datele
+- Gestionare rute
+- Gestionare utilizatori
+- Panel administrativ
 
-## 🔍 Debugging
+### **✅ Securitate**
+- Row Level Security (RLS)
+- Politici de acces
+- Validare date
+- Protecție CSRF
 
-### Verifică Console-ul Browser
-- Erori de conectare la Supabase
-- Probleme cu autentificarea
-- Erori de validare
+## 🚨 **Troubleshooting**
 
-### Verifică Supabase Dashboard
-- **Authentication** → **Users** - utilizatori creați
-- **Logs** → **API** - cereri API
-- **Database** → **Tables** - date în tabel
+### **Eroare: "Invalid JWT"**
+- Verifică cheia anonimă
+- Verifică URL-ul Supabase
+- Verifică configurația RLS
 
-### Verifică Network Tab
-- Cereri către Supabase
-- Status codes
-- Response data
+### **Eroare: "Permission denied"**
+- Verifică politicile RLS
+- Verifică dacă utilizatorul este autentificat
+- Verifică dacă utilizatorul are permisiunile necesare
 
-## 🚀 Următorii Pași
+### **Eroare: "Table not found"**
+- Rulează din nou scriptul SQL
+- Verifică că tabelele au fost create
+- Verifică numele tabelelor
 
-### Extinderea Funcționalității
-1. **Profil Utilizator** - editare informații
-2. **Istoric Bilete** - salvare bilete în baza de date
-3. **Preferințe** - setări utilizator
-4. **Notificări** - email/SMS pentru bilete
+## 📞 **Suport**
 
-### Optimizări
-1. **Caching** - React Query pentru date
-2. **Offline Support** - PWA capabilities
-3. **Real-time** - subscriptions Supabase
-4. **Analytics** - tracking utilizatori
-
-## 📞 Suport
-
-Dacă întâmpini probleme:
-1. Verifică console-ul browser
-2. Verifică logs-urile Supabase
-3. Consultă [documentația Supabase](https://supabase.com/docs)
-4. Creează un issue în proiect
+Pentru probleme tehnice:
+1. Verifică **Supabase Status**
+2. Consultează **Supabase Docs**
+3. Contactează **echipa de dezvoltare**
 
 ---
 
-**Notă**: Asigură-te că nu expui niciodată cheia `service_role` în frontend. Folosește doar `anon` key pentru aplicația client.
+**🎯 Obiectiv:** Aplicația Starlines Routes este acum conectată la Supabase cu autentificare completă și sistem de administrare!

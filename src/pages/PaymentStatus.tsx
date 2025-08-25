@@ -92,7 +92,7 @@ const PaymentStatus: React.FC = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Total Paid</span>
-                  <span className="font-bold text-primary">{formatPrice(45.00)}</span>
+                  <span className="font-bold text-primary">{formatPrice(45.00, undefined, 'EUR')}</span>
                 </div>
               </CardContent>
             </Card>

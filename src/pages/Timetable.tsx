@@ -11,7 +11,7 @@ import { useLocalization } from "@/contexts/LocalizationContext";
 import { useNavigate } from "react-router-dom";
 
 const Timetable = () => {
-  const { t } = useLocalization();
+  const { t, formatPrice } = useLocalization();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedOperator, setSelectedOperator] = useState<string>("all");
@@ -177,7 +177,7 @@ const Timetable = () => {
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-primary mb-1">
-                            €{route.price}
+                            {formatPrice(Number(route.price), undefined, 'EUR')}
                           </div>
                           <Button size="sm" variant="outline" onClick={() => handleBookRoute(route)}>
                             {t('timetable.book')}
@@ -257,7 +257,7 @@ const Timetable = () => {
                   <div className="mb-2">
                     <span className="text-xs text-muted-foreground">{t('timetable.from')}</span>
                     <div className="text-2xl font-bold text-primary">
-                      €{route.price}
+                      {formatPrice(Number(route.price), undefined, 'EUR')}
                     </div>
                   </div>
                   <Button size="sm" className="w-full" onClick={() => handleBookRoute(route)}>

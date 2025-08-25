@@ -1,16 +1,31 @@
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
-import { supabase, AuthUser } from '@/lib/supabase'
-import { useToast } from '@/hooks/use-toast'
+import { supabase } from '@/lib/supabase'
+import { useNavigate } from 'react-router-dom'
+
+interface Profile {
+  id: string
+  email: string
+  first_name: string
+  last_name: string
+  phone: string
+  created_at: string
+  updated_at: string
+  is_admin: boolean
+  avatar_url: string | null
+}
 
 interface AuthContextType {
-  user: AuthUser | null
+  user: User | null
+  profile: Profile | null
   session: Session | null
   loading: boolean
-  signUp: (email: string, password: string, firstName: string, lastName: string) => Promise<{ error: AuthError | null }>
+  signUp: (email: string, password: string, firstName: string, lastName: string, phone: string) => Promise<{ error: AuthError | null }>
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signOut: () => Promise<void>
-  resetPassword: (email: string) => Promise<{ error: AuthError | null }>
+  updateProfile: (updates: Partial<Profile>) => Promise<{ error: AuthError | null }>
+  isAdmin: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -24,21 +39,23 @@ export const useAuth = () => {
 }
 
 interface AuthProviderProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null)
+  const navigate = useNavigate()
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
-  const { toast } = useToast()
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      setUser(session?.user ?? null)
       if (session?.user) {
-        fetchUserProfile(session.user.id)
+        fetchProfile(session.user.id)
       }
       setLoading(false)
     })
@@ -48,44 +65,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session)
+      setUser(session?.user ?? null)
+      
       if (session?.user) {
-        await fetchUserProfile(session.user.id)
+        await fetchProfile(session.user.id)
       } else {
-        setUser(null)
+        setProfile(null)
       }
+      
       setLoading(false)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  const fetchUserProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .from('users')
+        .from('profiles')
         .select('*')
         .eq('id', userId)
         .single()
 
       if (error) {
-        console.error('Error fetching user profile:', error)
+        console.error('Error fetching profile:', error)
         return
       }
 
-      if (data) {
-        setUser({
-          id: data.id,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
-        })
-      }
+      setProfile(data)
     } catch (error) {
-      console.error('Error fetching user profile:', error)
+      console.error('Error fetching profile:', error)
     }
   }
 
-  const signUp = async (email: string, password: string, firstName: string, lastName: string) => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    firstName: string, 
+    lastName: string, 
+    phone: string
+  ): Promise<{ error: AuthError | null }> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -94,29 +113,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           data: {
             first_name: firstName,
             last_name: lastName,
-          },
-        },
+            phone: phone
+          }
+        }
       })
 
       if (error) {
         return { error }
       }
+      
+      // Redirect to home page after successful login
+      navigate('/')
 
       if (data.user) {
-        // Create user profile in users table
+        // Create profile in profiles table
         const { error: profileError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: data.user.id,
-              email: data.user.email!,
-              first_name: firstName,
-              last_name: lastName,
-            },
-          ])
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: email,
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
+            is_admin: false,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
 
         if (profileError) {
-          console.error('Error creating user profile:', profileError)
+          console.error('Error creating profile:', profileError)
+          return { error: { message: profileError.message, status: 400 } as AuthError }
         }
       }
 
@@ -127,11 +153,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password,
+        password
       })
 
       return { error }
@@ -141,38 +167,76 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  const signOut = async () => {
+  const signInWithGoogle = async (): Promise<{ error: AuthError | null }> => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
+      })
+
+      return { error }
+    } catch (error) {
+      console.error('Google sign in error:', error)
+      return { error: error as AuthError }
+    }
+  }
+
+  const signOut = async (): Promise<void> => {
     try {
       await supabase.auth.signOut()
-      setUser(null)
-      setSession(null)
     } catch (error) {
       console.error('Sign out error:', error)
     }
   }
 
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      })
+  const updateProfile = async (updates: Partial<Profile>): Promise<{ error: AuthError | null }> => {
+    if (!user) {
+      return { error: { message: 'No user logged in', status: 401 } as AuthError }
+    }
 
-      return { error }
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id)
+
+      if (error) {
+        return { error: { message: error.message, status: 400 } as AuthError }
+      }
+
+      // Refresh profile
+      await fetchProfile(user.id)
+
+      return { error: null }
     } catch (error) {
-      console.error('Reset password error:', error)
+      console.error('Update profile error:', error)
       return { error: error as AuthError }
     }
   }
 
-  const value = {
+  const isAdmin = profile?.is_admin || false
+
+  const value: AuthContextType = {
     user,
+    profile,
     session,
     loading,
     signUp,
     signIn,
+    signInWithGoogle,
     signOut,
-    resetPassword,
+    updateProfile,
+    isAdmin
   }
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  )
 }

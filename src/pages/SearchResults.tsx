@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
 const SearchResults = () => {
-  const { t } = useLocalization();
+  const { t, formatPrice } = useLocalization();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [results, setResults] = useState<Route[]>([]);
@@ -196,8 +196,8 @@ const SearchResults = () => {
             className="w-full"
           />
           <div className="flex justify-between text-sm text-foreground mt-2">
-            <span>€{filters.price[0]}</span>
-            <span>€{filters.price[1]}</span>
+            <span>{formatPrice(filters.price[0], undefined, 'EUR')}</span>
+            <span>{formatPrice(filters.price[1], undefined, 'EUR')}</span>
           </div>
         </div>
       </div>
@@ -446,7 +446,7 @@ const SearchResults = () => {
                           <div className="mb-2">
                             <span className="text-xs text-foreground/70">{t('search.from')}</span>
                             <div className="text-2xl font-bold text-primary">
-                              €{route.price}
+                              {formatPrice(route.price, undefined, 'EUR')}
                             </div>
                           </div>
                           <Button 

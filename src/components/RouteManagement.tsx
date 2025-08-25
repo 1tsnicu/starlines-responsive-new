@@ -332,15 +332,15 @@ const RouteManagement: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 text-sm">
               <div className="bg-muted/50 rounded p-2 text-center">
                 <div className="font-medium text-foreground">Economy</div>
-                <div className="text-primary font-bold">{formatPrice(route.price.economy)}</div>
+                <div className="text-primary font-bold">{formatPrice(route.price.economy, undefined, 'EUR')}</div>
               </div>
               <div className="bg-muted/50 rounded p-2 text-center">
                 <div className="font-medium text-foreground">Premium</div>
-                <div className="text-primary font-bold">{formatPrice(route.price.premium)}</div>
+                <div className="text-primary font-bold">{formatPrice(route.price.premium, undefined, 'EUR')}</div>
               </div>
               <div className="bg-muted/50 rounded p-2 text-center">
                 <div className="font-medium text-foreground">Business</div>
-                <div className="text-primary font-bold">{formatPrice(route.price.business)}</div>
+                <div className="text-primary font-bold">{formatPrice(route.price.business, undefined, 'EUR')}</div>
               </div>
             </div>
           </div>
@@ -356,40 +356,40 @@ const RouteManagement: React.FC = () => {
               <div className="space-y-1 text-xs">
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Base Price:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.basePrice)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.basePrice, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Distance Cost:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.distanceCost)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.distanceCost, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Fuel Surcharge:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.fuelSurcharge)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.fuelSurcharge, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Market Adjustment:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.marketAdjustment)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.marketAdjustment, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Seasonality:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.seasonalityAdjustment)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.seasonalityAdjustment, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Competition:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.competitionAdjustment)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.competitionAdjustment, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Amenities:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.amenitiesCost)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.amenitiesCost, undefined, 'EUR')}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-foreground/70">Operator Fee:</span>
-                  <span className="font-medium">{formatPrice(route.pricingBreakdown.operatorFee)}</span>
+                  <span className="font-medium">{formatPrice(route.pricingBreakdown.operatorFee, undefined, 'EUR')}</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-bold text-primary">
                   <span>Total:</span>
-                  <span>{formatPrice(route.pricingBreakdown.total)}</span>
+                  <span>{formatPrice(route.pricingBreakdown.total, undefined, 'EUR')}</span>
                 </div>
               </div>
             </div>
