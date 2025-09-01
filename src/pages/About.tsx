@@ -159,28 +159,28 @@ const About = () => {
           <div className="absolute top-1/2 left-1/2 w-40 h-40 bg-white/5 rounded-full blur-2xl" />
         </div>
 
-        <div className="container py-20 relative z-10">
+        <div className="container py-12 sm:py-16 lg:py-20 relative z-10 px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <Star className="h-4 w-4" />
-              <span className="text-sm font-medium">{t('about.ourStory')}</span>
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 sm:px-4 py-2 rounded-full mb-4 sm:mb-6">
+              <Star className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">{t('about.ourStory')}</span>
             </div>
             
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 leading-tight px-2">
               {t('about.connectingDreams')}{" "}
-              <span className="text-accent-foreground bg-accent px-4 py-2 rounded-2xl inline-block transform rotate-1">
+              <span className="text-accent-foreground bg-accent px-2 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-2xl inline-block transform rotate-1 text-2xl sm:text-3xl md:text-4xl lg:text-5xl">
                 {t('about.oneJourneyAtTime')}
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
+            <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-6 sm:mb-8 leading-relaxed px-2">
               {t('about.heroDescription')}
             </p>
 
             {/* Mission Statement */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20 max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold mb-3">{t('about.mission')}</h2>
-              <p className="text-lg text-white/90">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-white/20 max-w-3xl mx-auto">
+              <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3">{t('about.mission')}</h2>
+              <p className="text-base sm:text-lg text-white/90">
                 {t('about.missionStatement')}
               </p>
             </div>
@@ -189,24 +189,24 @@ const About = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="py-16 bg-surface">
-        <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="py-12 sm:py-16 bg-surface">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {stats.map((stat) => {
               const Icon = stat.icon;
               return (
                 <Card key={stat.label} className="text-center border-border hover-lift bg-white">
-                  <CardContent className="p-6">
-                    <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                      <Icon className="h-8 w-8 text-primary" />
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                      <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                     </div>
-                    <div className="text-3xl font-bold text-foreground mb-2">
+                    <div className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">
                       {stat.value}
                     </div>
-                    <div className="text-lg font-semibold text-foreground mb-2">
+                    <div className="text-base sm:text-lg font-semibold text-foreground mb-1 sm:mb-2">
                       {stat.label}
                     </div>
-                    <div className="text-sm text-foreground/70">
+                    <div className="text-xs sm:text-sm text-foreground/70">
                       {stat.description}
                     </div>
                   </CardContent>
@@ -218,27 +218,27 @@ const About = () => {
       </div>
 
       {/* Values Section */}
-      <div className="py-20">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+      <div className="py-12 sm:py-16 lg:py-20">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               {t('about.whatDrivesUs')}
             </h2>
-            <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-3xl mx-auto px-2">
               {t('about.valuesDescription')}
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {values.map((value) => {
               const Icon = value.icon;
               return (
                 <Card key={value.title} className="border-border hover-lift group bg-white">
-                  <CardContent className="p-6">
-                    <div className={`w-16 h-16 bg-gradient-to-br ${value.color} rounded-2xl mx-auto mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <Icon className="h-8 w-8 text-white" />
+                  <CardContent className="p-4 sm:p-6">
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${value.color} rounded-xl sm:rounded-2xl mx-auto mb-3 sm:mb-4 flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-3 text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2 sm:mb-3 text-center">
                       {value.title}
                     </h3>
                     <p className="text-foreground/70 text-sm leading-relaxed">
@@ -253,36 +253,36 @@ const About = () => {
       </div>
 
       {/* Our Team */}
-      <div className="py-20 bg-surface">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+      <div className="py-12 sm:py-16 lg:py-20 bg-surface">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               {t('about.mindsBehindheMagic')}
             </h2>
-            <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-3xl mx-auto px-2">
               {t('about.teamDescription')}
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {team.map((member) => (
               <Card key={member.name} className="border-border hover-lift bg-white">
-                <CardContent className="p-8">
-                  <div className="flex items-start gap-6">
-                    <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center flex-shrink-0">
-                      <div className="text-muted-foreground text-sm">Photo</div>
+                <CardContent className="p-4 sm:p-6 lg:p-8">
+                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-full flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
+                      <div className="text-muted-foreground text-xs sm:text-sm">Photo</div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-foreground mb-1">
+                    <div className="flex-1 text-center sm:text-left">
+                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1">
                         {member.name}
                       </h3>
-                      <p className="text-primary font-medium mb-3">
+                      <p className="text-primary font-medium mb-2 sm:mb-3">
                         {member.position}
                       </p>
-                      <p className="text-foreground/70 text-sm mb-4 leading-relaxed">
+                      <p className="text-foreground/70 text-sm mb-3 sm:mb-4 leading-relaxed">
                         {member.bio}
                       </p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
                         {member.expertise.map((skill) => (
                           <Badge key={skill} variant="outline" className="text-xs">
                             {skill}
@@ -299,18 +299,49 @@ const About = () => {
       </div>
 
       {/* Timeline */}
-      <div className="py-20">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+      <div className="py-12 sm:py-16 lg:py-20">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               {t('about.journeyThroughTime')}
             </h2>
-            <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-3xl mx-auto px-2">
               {t('about.timelineDescription')}
             </p>
           </div>
           
-          <div className="relative">
+          {/* Mobile Timeline */}
+          <div className="block md:hidden space-y-6">
+            {achievements.map((achievement) => {
+              const Icon = achievement.icon;
+              return (
+                <Card key={achievement.year} className="border-border hover-lift bg-white">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                      </div>
+                      <Badge variant="secondary" className="text-xs sm:text-sm font-medium">
+                        {achievement.year}
+                      </Badge>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
+                      {achievement.title}
+                    </h3>
+                    <p className="text-sm text-foreground/70 mb-3 leading-relaxed">
+                      {achievement.description}
+                    </p>
+                    <div className="text-xs text-primary font-medium">
+                      {achievement.impact}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Desktop Timeline */}
+          <div className="hidden md:block relative">
             {/* Timeline line */}
             <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-muted-foreground/20"></div>
             
@@ -355,26 +386,26 @@ const About = () => {
       </div>
 
       {/* Fun Facts */}
-      <div className="py-20 bg-surface">
-        <div className="container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground mb-4">
+      <div className="py-12 sm:py-16 lg:py-20 bg-surface">
+        <div className="container px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
               {t('about.didYouKnow')}
             </h2>
-            <p className="text-lg text-foreground/70 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-foreground/70 max-w-3xl mx-auto px-2">
               {t('about.factsDescription')}
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {companyFacts.map((fact, index) => {
               const Icon = fact.icon;
               return (
                 <Card key={index} className="border-border bg-white">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
-                        <Icon className="h-6 w-6 text-accent" />
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex items-start gap-3 sm:gap-4">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-accent/10 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-accent" />
                       </div>
                       <p className="text-foreground/80 text-sm leading-relaxed">
                         {fact.fact}
@@ -389,25 +420,25 @@ const About = () => {
       </div>
 
       {/* CTA Section */}
-      <div className="py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-        <div className="container text-center">
-          <h2 className="text-4xl font-bold mb-6">
+      <div className="py-12 sm:py-16 lg:py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
+        <div className="container text-center px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6">
             {t('about.readyToBePartOfStory')}
           </h2>
-          <p className="text-xl text-primary-foreground/90 mb-8 max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-primary-foreground/90 mb-6 sm:mb-8 max-w-3xl mx-auto px-2">
             {t('about.ctaDescription')}
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="secondary" size="lg" className="text-lg px-8 py-3">
-              <Rocket className="h-5 w-5 mr-2" />
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Button variant="secondary" size="lg" className="text-base sm:text-lg px-6 sm:px-8 py-3 h-12 sm:h-auto">
+              <Rocket className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               {t('about.startYourJourney')}
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="text-lg px-8 py-3 bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200"
+              className="text-base sm:text-lg px-6 sm:px-8 py-3 h-12 sm:h-auto bg-white/10 backdrop-blur-sm border-white/30 text-white hover:bg-white/20 hover:border-white/50 transition-all duration-200"
             >
-              <Lightbulb className="h-5 w-5 mr-2" />
+              <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               {t('about.learnMore')}
             </Button>
           </div>

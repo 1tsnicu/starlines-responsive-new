@@ -20,7 +20,21 @@ const MyTickets = () => {
   const [activeTab, setActiveTab] = useState("lookup");
   const [orderNumber, setOrderNumber] = useState("");
   const [securityCode, setSecurityCode] = useState("");
-  const [ticket, setTicket] = useState<any>(null);
+  const [ticket, setTicket] = useState<{
+    orderNumber: string;
+    securityCode: string;
+    route: {
+      from: { name: string };
+      to: { name: string };
+      departureTime: string;
+      arrivalTime: string;
+    };
+    departureDate: string;
+    passengers: { name: string; age?: number }[];
+    currency: string;
+    totalPrice: number;
+    status: string;
+  } | null>(null);
   const [loading, setLoading] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -351,65 +365,69 @@ const MyTickets = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-surface border-b border-border">
-        <div className="container py-8">
+        <div className="container py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-2">{t('myTickets.title')}</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t('myTickets.title')}</h1>
+            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('myTickets.subtitle')}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="container py-8">
+      <div className="container py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="lookup" className="flex items-center gap-2">
-              <Search className="h-4 w-4" />
-              {t('myTickets.lookupTab')}
+          <TabsList className="grid w-full grid-cols-2 h-10 sm:h-12">
+            <TabsTrigger value="lookup" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Search className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{t('myTickets.lookupTab')}</span>
+              <span className="sm:hidden">{t('myTickets.lookup')}</span>
             </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-2">
-              <Ticket className="h-4 w-4" />
-              {t('myTickets.accountTab')}
+            <TabsTrigger value="account" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Ticket className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">{t('myTickets.accountTab')}</span>
+              <span className="sm:hidden">{t('myTickets.account')}</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="lookup" className="mt-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <TabsContent value="lookup" className="mt-6 sm:mt-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
               {/* Lookup Form */}
               <Card>
-                <CardHeader>
-                  <CardTitle>{t('myTickets.findTicket')}</CardTitle>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.findTicket')}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                   <div>
-                    <Label htmlFor="orderNumber">{t('myTickets.orderNumber')}</Label>
+                    <Label htmlFor="orderNumber" className="text-sm">{t('myTickets.orderNumber')}</Label>
                     <Input
                       id="orderNumber"
                       placeholder={t('myTickets.orderNumberPlaceholder')}
                       value={orderNumber}
                       onChange={(e) => setOrderNumber(e.target.value)}
+                      className="h-10 sm:h-12 text-sm sm:text-base"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="securityCode">{t('myTickets.securityCode')}</Label>
+                    <Label htmlFor="securityCode" className="text-sm">{t('myTickets.securityCode')}</Label>
                     <Input
                       id="securityCode"
                       placeholder={t('myTickets.securityCodePlaceholder')}
                       value={securityCode}
                       onChange={(e) => setSecurityCode(e.target.value)}
                       type="password"
+                      className="h-10 sm:h-12 text-sm sm:text-base"
                     />
                   </div>
                   <Button 
                     onClick={handleTicketLookup} 
                     disabled={loading}
-                    className="w-full"
+                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
                   >
                     {loading ? t('myTickets.searching') : t('myTickets.findTicketButton')}
                   </Button>
                   
-                  <div className="text-sm text-muted-foreground text-center">
+                  <div className="text-xs sm:text-sm text-muted-foreground text-center space-y-1">
                     <p>{t('myTickets.helpText1')}</p>
                     <p>{t('myTickets.helpText2')}</p>
                   </div>
@@ -420,46 +438,47 @@ const MyTickets = () => {
               <div>
                 {ticket ? (
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center justify-between">
-                        <span>{t('myTickets.ticketDetails')}</span>
+                    <CardHeader className="p-4 sm:p-6">
+                      <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <span className="text-lg sm:text-xl">{t('myTickets.ticketDetails')}</span>
                         {getStatusBadge(ticket.status)}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.orderNumber')}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.orderNumber')}</span>
                           <div className="flex items-center gap-2">
-                            <span className="font-mono font-medium">{ticket.orderNumber}</span>
+                            <span className="font-mono font-medium text-sm">{ticket.orderNumber}</span>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => handleCopyCode(ticket.orderNumber, t('myTickets.orderNumber'))}
+                              className="h-6 w-6 p-0"
                             >
                               <Copy className="h-3 w-3" />
                             </Button>
                           </div>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.route')}</span>
-                          <span className="font-medium">{ticket.route.from.name} → {ticket.route.to.name}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.route')}</span>
+                          <span className="font-medium text-sm">{ticket.route.from.name} → {ticket.route.to.name}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.date')}</span>
-                          <span>{ticket.departureDate}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.date')}</span>
+                          <span className="text-sm">{ticket.departureDate}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.time')}</span>
-                          <span>{ticket.route.departureTime} - {ticket.route.arrivalTime}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.time')}</span>
+                          <span className="text-sm">{ticket.route.departureTime} - {ticket.route.arrivalTime}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.passengers')}</span>
-                          <span>{ticket.passengers.length}</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.passengers')}</span>
+                          <span className="text-sm">{ticket.passengers.length}</span>
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-muted-foreground">{t('myTickets.totalPaid')}</span>
-                          <span className="font-bold text-primary">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                          <span className="text-sm text-muted-foreground">{t('myTickets.totalPaid')}</span>
+                          <span className="font-bold text-primary text-sm sm:text-base">
                             {ticket.currency} {ticket.totalPrice}
                           </span>
                         </div>
@@ -467,57 +486,61 @@ const MyTickets = () => {
 
                       <Separator />
 
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Button size="sm" className="gap-2 flex-1" onClick={handleDownloadPDF}>
-                          <Download className="h-4 w-4" />
+                      <div className="flex flex-col gap-2">
+                        <Button size="sm" className="gap-2 h-10 text-sm" onClick={handleDownloadPDF}>
+                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
                           {t('myTickets.downloadPDF')}
                         </Button>
-                        <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" className="gap-2 flex-1">
-                              <QrCode className="h-4 w-4" />
-                              {t('myTickets.showQR')}
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>{t('myTickets.qrCodeTitle')}</DialogTitle>
-                              <DialogDescription>
-                                {t('myTickets.qrCodeDescription')}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="text-center space-y-4">
-                              <div className="w-48 h-48 bg-white rounded-lg mx-auto flex items-center justify-center p-4">
-                                {ticket && (
-                                  <img 
-                                    src={generateQRCode(`${ticket.orderNumber}-${ticket.securityCode}-${ticket.route}-${ticket.date}`)} 
-                                    alt="QR Code" 
-                                    className="w-full h-full"
-                                  />
-                                )}
+                        <div className="grid grid-cols-2 gap-2">
+                          <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm" className="gap-1 sm:gap-2 h-10 text-xs sm:text-sm">
+                                <QrCode className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="hidden sm:inline">{t('myTickets.showQR')}</span>
+                                <span className="sm:hidden">QR</span>
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-md">
+                              <DialogHeader>
+                                <DialogTitle className="text-lg">{t('myTickets.qrCodeTitle')}</DialogTitle>
+                                <DialogDescription className="text-sm">
+                                  {t('myTickets.qrCodeDescription')}
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="text-center space-y-4">
+                                <div className="w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-lg mx-auto flex items-center justify-center p-4">
+                                  {ticket && (
+                                    <img 
+                                      src={generateQRCode(`${ticket.orderNumber}-${ticket.securityCode}-${ticket.route}-${ticket.date}`)} 
+                                      alt="QR Code" 
+                                      className="w-full h-full"
+                                    />
+                                  )}
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {t('myTickets.order')}: {ticket.orderNumber}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  Scanează acest QR code pentru a verifica biletul
+                                </p>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                {t('myTickets.order')}: {ticket.orderNumber}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                Scanează acest QR code pentru a verifica biletul
-                              </p>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                        <Button variant="outline" size="sm" className="gap-2 flex-1" onClick={handleEmailTicket}>
-                          <Mail className="h-4 w-4" />
-                          {t('myTickets.email')}
-                        </Button>
+                            </DialogContent>
+                          </Dialog>
+                          <Button variant="outline" size="sm" className="gap-1 sm:gap-2 h-10 text-xs sm:text-sm" onClick={handleEmailTicket}>
+                            <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
+                            <span className="hidden sm:inline">{t('myTickets.email')}</span>
+                            <span className="sm:hidden">Email</span>
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
                 ) : (
                   <Card className="h-full">
-                    <CardContent className="flex items-center justify-center h-64">
+                    <CardContent className="flex items-center justify-center h-48 sm:h-64 p-4">
                       <div className="text-center text-muted-foreground">
-                        <Ticket className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                        <p>{t('myTickets.enterOrderDetails')}</p>
+                        <Ticket className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-sm">{t('myTickets.enterOrderDetails')}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -526,36 +549,36 @@ const MyTickets = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="account" className="mt-8">
-            <div className="space-y-6">
+          <TabsContent value="account" className="mt-6 sm:mt-8">
+            <div className="space-y-4 sm:space-y-6">
               {/* Account Info */}
               <Card>
-                <CardHeader>
-                  <CardTitle>{t('myTickets.accountInformation')}</CardTitle>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.accountInformation')}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-4 sm:p-6 pt-0">
                   {!isAuthenticated ? (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Ticket className="h-8 w-8 text-muted-foreground" />
+                    <div className="text-center py-6 sm:py-8">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Ticket className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                       </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                         {t('myTickets.signInMessage')}
                       </h3>
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-sm text-muted-foreground mb-4">
                         {t('myTickets.createAccountMessage')}
                       </p>
-                      <div className="flex gap-3 justify-center">
-                        <Button onClick={handleSignIn}>{t('myTickets.signIn')}</Button>
-                        <Button variant="outline" onClick={handleCreateAccount}>{t('myTickets.createAccount')}</Button>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Button onClick={handleSignIn} className="h-10 text-sm">{t('myTickets.signIn')}</Button>
+                        <Button variant="outline" onClick={handleCreateAccount} className="h-10 text-sm">{t('myTickets.createAccount')}</Button>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Ticket className="h-8 w-8 text-primary" />
+                    <div className="text-center py-6 sm:py-8">
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Ticket className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
                       </div>
-                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                         {t('myTickets.welcomeMessage')}
                       </h3>
                       {user && (
@@ -568,11 +591,11 @@ const MyTickets = () => {
                           </p>
                         </div>
                       )}
-                      <p className="text-muted-foreground mb-4">
+                      <p className="text-sm text-muted-foreground mb-4">
                         {t('myTickets.accountActive')}
                       </p>
-                      <div className="flex gap-3 justify-center">
-                        <Button variant="outline" onClick={handleSignOut}>
+                      <div className="flex justify-center">
+                        <Button variant="outline" onClick={handleSignOut} className="h-10 text-sm">
                           {t('myTickets.signOut')}
                         </Button>
                       </div>
@@ -583,20 +606,20 @@ const MyTickets = () => {
 
               {/* Recent Bookings */}
               <Card>
-                <CardHeader>
-                  <CardTitle>{t('myTickets.recentBookings')}</CardTitle>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.recentBookings')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="space-y-3 sm:space-y-4">
                     {mockTickets.map((ticket) => (
-                      <div key={ticket.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <Bus className="h-6 w-6 text-primary" />
+                      <div key={ticket.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-border rounded-lg gap-3 sm:gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Bus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
                           </div>
-                          <div>
-                            <h4 className="font-medium text-foreground">{ticket.route}</h4>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-foreground text-sm sm:text-base truncate">{ticket.route}</h4>
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                               <span className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
                                 {ticket.date}
@@ -612,12 +635,12 @@ const MyTickets = () => {
                             </div>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="mb-2">{getStatusBadge(ticket.status)}</div>
-                          <div className="text-sm text-muted-foreground">
+                        <div className="flex items-center justify-between sm:flex-col sm:items-end sm:justify-center gap-2">
+                          <div className="order-2 sm:order-1">{getStatusBadge(ticket.status)}</div>
+                          <div className="text-sm text-muted-foreground order-1 sm:order-2">
                             {ticket.currency} {ticket.totalPrice}
                           </div>
-                          <Button variant="ghost" size="sm" className="mt-2">
+                          <Button variant="ghost" size="sm" className="order-3 h-8 w-8 p-0">
                             <ArrowRight className="h-4 w-4" />
                           </Button>
                         </div>
@@ -629,26 +652,26 @@ const MyTickets = () => {
 
               {/* Quick Actions */}
               <Card>
-                <CardHeader>
-                  <CardTitle>{t('myTickets.quickActions')}</CardTitle>
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.quickActions')}</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Button variant="outline" className="h-auto p-4 flex-col gap-2">
-                      <Download className="h-6 w-6" />
-                      <span>{t('myTickets.downloadAllTickets')}</span>
+                <CardContent className="p-4 sm:p-6 pt-0">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
+                      <Download className="h-4 w-4 sm:h-6 sm:w-6" />
+                      <span className="text-center leading-tight">{t('myTickets.downloadAllTickets')}</span>
                     </Button>
-                    <Button variant="outline" className="h-auto p-4 flex-col gap-2">
-                      <Mail className="h-6 w-6" />
-                      <span>{t('myTickets.emailAllTickets')}</span>
+                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
+                      <Mail className="h-4 w-4 sm:h-6 sm:w-6" />
+                      <span className="text-center leading-tight">{t('myTickets.emailAllTickets')}</span>
                     </Button>
-                    <Button variant="outline" className="h-auto p-4 flex-col gap-2">
-                      <Calendar className="h-6 w-6" />
-                      <span>{t('myTickets.viewCalendar')}</span>
+                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
+                      <Calendar className="h-4 w-4 sm:h-6 sm:w-6" />
+                      <span className="text-center leading-tight">{t('myTickets.viewCalendar')}</span>
                     </Button>
-                    <Button variant="outline" className="h-auto p-4 flex-col gap-2">
-                      <ArrowRight className="h-6 w-6" />
-                      <span>{t('myTickets.bookNewTrip')}</span>
+                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
+                      <ArrowRight className="h-4 w-4 sm:h-6 sm:w-6" />
+                      <span className="text-center leading-tight">{t('myTickets.bookNewTrip')}</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -660,12 +683,12 @@ const MyTickets = () => {
 
       {/* Authentication Dialog */}
       <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="sm:max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
+            <DialogTitle className="text-lg sm:text-xl">
               {authMode === "signin" ? t('myTickets.signIn') : t('myTickets.createAccount')}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-sm">
               {authMode === "signin" 
                 ? t('myTickets.signInDescription') 
                 : t('myTickets.signUpDescription')
@@ -673,26 +696,28 @@ const MyTickets = () => {
             </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={handleAuthSubmit} className="space-y-4">
+          <form onSubmit={handleAuthSubmit} className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
             {authMode === "signup" && (
               <>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">{t('myTickets.firstName')}</Label>
+                    <Label htmlFor="firstName" className="text-sm">{t('myTickets.firstName')}</Label>
                     <Input
                       id="firstName"
                       value={authForm.firstName}
                       onChange={(e) => setAuthForm({...authForm, firstName: e.target.value})}
                       required
+                      className="h-10 text-sm"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">{t('myTickets.lastName')}</Label>
+                    <Label htmlFor="lastName" className="text-sm">{t('myTickets.lastName')}</Label>
                     <Input
                       id="lastName"
                       value={authForm.lastName}
                       onChange={(e) => setAuthForm({...authForm, lastName: e.target.value})}
                       required
+                      className="h-10 text-sm"
                     />
                   </div>
                 </div>
@@ -700,44 +725,47 @@ const MyTickets = () => {
             )}
             
             <div>
-              <Label htmlFor="email">{t('myTickets.email')}</Label>
+              <Label htmlFor="email" className="text-sm">{t('myTickets.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={authForm.email}
                 onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
                 required
+                className="h-10 text-sm"
               />
             </div>
             
             <div>
-              <Label htmlFor="password">{t('myTickets.password')}</Label>
+              <Label htmlFor="password" className="text-sm">{t('myTickets.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={authForm.password}
                 onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
                 required
+                className="h-10 text-sm"
               />
             </div>
             
             {authMode === "signup" && (
               <div>
-                <Label htmlFor="confirmPassword">{t('myTickets.confirmPassword')}</Label>
+                <Label htmlFor="confirmPassword" className="text-sm">{t('myTickets.confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={authForm.confirmPassword}
                   onChange={(e) => setAuthForm({...authForm, confirmPassword: e.target.value})}
                   required
+                  className="h-10 text-sm"
                 />
               </div>
             )}
             
-            <div className="flex gap-3 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button 
                 type="submit" 
-                className="flex-1" 
+                className="flex-1 h-10 text-sm" 
                 disabled={formLoading}
               >
                 {formLoading ? t('myTickets.processing') : (
@@ -749,6 +777,7 @@ const MyTickets = () => {
                 variant="outline" 
                 onClick={() => setShowAuthDialog(false)}
                 disabled={formLoading}
+                className="h-10 text-sm"
               >
                 {t('myTickets.cancel')}
               </Button>

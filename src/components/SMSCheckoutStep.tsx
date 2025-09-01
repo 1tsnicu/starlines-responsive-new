@@ -102,13 +102,15 @@ export function SMSCheckoutStep({
 
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Phone className="h-5 w-5" />
-          Verificare Număr de Telefon
-          {isRequired && <Badge variant="secondary">Obligatoriu</Badge>}
+      <CardHeader className="pb-4 sm:pb-6">
+        <CardTitle className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span className="text-base sm:text-lg">Verificare Număr de Telefon</span>
+          </div>
+          {isRequired && <Badge variant="secondary" className="self-start sm:self-center">Obligatoriu</Badge>}
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm sm:text-base">
           {step === 'phone' && 'Introduceți numărul de telefon pentru verificare prin SMS'}
           {step === 'code' && 'Introduceți codul de verificare primit prin SMS'}
           {step === 'verified' && 'Numărul de telefon a fost verificat cu succes'}
@@ -119,7 +121,7 @@ export function SMSCheckoutStep({
         {step === 'phone' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">Număr de telefon</Label>
+              <Label htmlFor="phone" className="text-sm sm:text-base">Număr de telefon</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -127,8 +129,9 @@ export function SMSCheckoutStep({
                 value={phoneNumber}
                 onChange={(e) => onPhoneChange(e.target.value)}
                 disabled={isLoading}
+                className="text-base sm:text-sm"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Veți primi un cod de verificare prin SMS
               </p>
             </div>
@@ -136,7 +139,7 @@ export function SMSCheckoutStep({
             {remainingAttempts < 5 && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
+                <AlertDescription className="text-xs sm:text-sm">
                   Încercări rămase: {remainingAttempts}/5
                 </AlertDescription>
               </Alert>
@@ -145,22 +148,22 @@ export function SMSCheckoutStep({
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button 
                 onClick={handleSendCode} 
                 disabled={isLoading || !phoneNumber}
-                className="flex-1"
+                className="flex-1 h-11 sm:h-10"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Trimite Cod SMS
+                <span className="text-sm sm:text-base">Trimite Cod SMS</span>
               </Button>
               {!isRequired && (
-                <Button variant="outline" onClick={handleSkip}>
-                  Omite
+                <Button variant="outline" onClick={handleSkip} className="h-11 sm:h-10 sm:w-auto">
+                  <span className="text-sm sm:text-base">Omite</span>
                 </Button>
               )}
             </div>
@@ -171,7 +174,7 @@ export function SMSCheckoutStep({
         {step === 'code' && (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="code">Cod de verificare</Label>
+              <Label htmlFor="code" className="text-sm sm:text-base">Cod de verificare</Label>
               <Input
                 id="code"
                 placeholder="XXXX"
@@ -179,8 +182,9 @@ export function SMSCheckoutStep({
                 onChange={(e) => setVerificationCode(e.target.value)}
                 disabled={isLoading}
                 maxLength={6}
+                className="text-center text-lg sm:text-base tracking-widest"
               />
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center">
                 Codul a fost trimis la numărul {phoneNumber}
               </p>
             </div>
@@ -188,18 +192,18 @@ export function SMSCheckoutStep({
             {error && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
               </Alert>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <Button 
                 onClick={handleVerifyCode}
                 disabled={isLoading || !verificationCode}
-                className="flex-1"
+                className="flex-1 h-11 sm:h-10"
               >
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Verifică Cod
+                <span className="text-sm sm:text-base">Verifică Cod</span>
               </Button>
               <Button 
                 variant="outline" 
@@ -208,8 +212,9 @@ export function SMSCheckoutStep({
                   setVerificationCode('');
                   setError(null);
                 }}
+                className="h-11 sm:h-10 sm:w-auto"
               >
-                Înapoi
+                <span className="text-sm sm:text-base">Înapoi</span>
               </Button>
             </div>
 
@@ -217,26 +222,26 @@ export function SMSCheckoutStep({
               variant="ghost" 
               onClick={handleSendCode}
               disabled={isLoading || remainingAttempts <= 0}
-              className="w-full"
+              className="w-full h-11 sm:h-10"
             >
-              Retrimite cod SMS
+              <span className="text-sm sm:text-base">Retrimite cod SMS</span>
             </Button>
           </div>
         )}
 
         {/* Verification Complete */}
         {step === 'verified' && (
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-4 py-4 sm:py-6">
             <div className="flex justify-center">
-              <CheckCircle className="h-12 w-12 text-green-500" />
+              <CheckCircle className="h-12 w-12 sm:h-16 sm:w-16 text-green-500" />
             </div>
             <div>
-              <h3 className="font-medium text-green-800">Verificare Completă!</h3>
-              <p className="text-sm text-green-600">
+              <h3 className="text-base sm:text-lg font-medium text-green-800">Verificare Completă!</h3>
+              <p className="text-sm sm:text-base text-green-600 mt-1">
                 Numărul {phoneNumber} a fost verificat cu succes
               </p>
             </div>
-            <Badge variant="outline" className="bg-green-50 text-green-700">
+            <Badge variant="outline" className="bg-green-50 text-green-700 text-xs sm:text-sm">
               Verificat prin SMS
             </Badge>
           </div>

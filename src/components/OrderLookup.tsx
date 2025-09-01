@@ -97,7 +97,7 @@ export function OrderLookup({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <div className="flex-1">
               <Label htmlFor="orderId" className="sr-only">ID Comandă</Label>
               <Input
@@ -107,11 +107,13 @@ export function OrderLookup({
                 onChange={(e) => setOrderId(e.target.value)}
                 disabled={isLoading}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="text-base sm:text-sm"
               />
             </div>
-            <Button onClick={handleSearch} disabled={isLoading || !orderId}>
+            <Button onClick={handleSearch} disabled={isLoading || !orderId} className="w-full sm:w-auto">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 mr-2 sm:mr-0" />
+              <span className="sm:hidden">Caută</span>
             </Button>
           </div>
 
@@ -140,63 +142,63 @@ export function OrderLookup({
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Data Plecare</div>
-                  <div className="font-medium">{order.routes.route[0]?.date_from}</div>
+                  <div className="font-medium text-sm sm:text-base">{order.routes.route[0]?.date_from}</div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Total</div>
-                  <div className="font-medium">{order.currency} {order.price}</div>
+                  <div className="font-medium text-sm sm:text-base">{order.currency} {order.price}</div>
                 </div>
-                <div>
+                <div className="sm:col-span-2 lg:col-span-1">
                   <div className="text-sm font-medium text-muted-foreground">Pasageri</div>
-                  <div className="font-medium">{order.routes.route[0]?.passengers.passenger.length || 0}</div>
+                  <div className="font-medium text-sm sm:text-base">{order.routes.route[0]?.passengers.passenger.length || 0}</div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <Button
               variant="outline"
-              className="justify-start"
+              className="justify-start h-auto p-3 sm:p-4"
               onClick={() => copyToClipboard(order.order_id.toString(), 'order-id')}
             >
               {copiedItem === 'order-id' ? (
-                <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 text-green-500 flex-shrink-0" />
               ) : (
-                <Copy className="mr-2 h-4 w-4" />
+                <Copy className="mr-2 h-4 w-4 flex-shrink-0" />
               )}
-              Copiază ID Comandă
+              <span className="text-xs sm:text-sm">Copiază ID Comandă</span>
             </Button>
             
             {order.url && (
               <Button
                 variant="outline"
-                className="justify-start"
+                className="justify-start h-auto p-3 sm:p-4"
                 onClick={() => window.open(order.url, '_blank')}
               >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Link Plată
+                <ExternalLink className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="text-xs sm:text-sm">Link Plată</span>
               </Button>
             )}
             
             <Button
               variant="outline"
-              className="justify-start"
+              className="justify-start h-auto p-3 sm:p-4 sm:col-span-2 lg:col-span-1"
               onClick={() => copyToClipboard(
                 `${order.routes.route[0]?.station_from} → ${order.routes.route[0]?.station_to} | ${order.routes.route[0]?.date_from}`,
                 'route-info'
               )}
             >
               {copiedItem === 'route-info' ? (
-                <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
+                <CheckCircle className="mr-2 h-4 w-4 text-green-500 flex-shrink-0" />
               ) : (
-                <Copy className="mr-2 h-4 w-4" />
+                <Copy className="mr-2 h-4 w-4 flex-shrink-0" />
               )}
-              Copiază Ruta
+              <span className="text-xs sm:text-sm">Copiază Ruta</span>
             </Button>
           </div>
 
