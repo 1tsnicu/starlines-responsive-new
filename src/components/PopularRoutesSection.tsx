@@ -110,7 +110,15 @@ const popularRoutes = [
               <div className="absolute top-4 right-4 z-10">
                 <Badge 
                   variant="secondary" 
-                  className="bg-white/90 backdrop-blur-sm border border-border/20"
+                  className={`
+                    backdrop-blur-sm border shadow-sm font-medium text-xs px-2 py-1
+                    ${route.popularity === "Very Popular" 
+                      ? "bg-red-500/90 text-white border-red-400" 
+                      : route.popularity === "Premium Route"
+                      ? "bg-purple-500/90 text-white border-purple-400"
+                      : "bg-green-500/90 text-white border-green-400"
+                    }
+                  `}
                 >
                   {route.popularity}
                 </Badge>
@@ -211,21 +219,24 @@ const popularRoutes = [
         
         {/* Bottom CTA */}
         <div className="text-center">
-          <div className="inline-flex items-center gap-4 bg-white/90 backdrop-blur-sm px-8 py-6 rounded-3xl shadow-lg border border-border/20">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                <Zap className="h-6 w-6 text-primary" />
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 bg-white/90 backdrop-blur-sm px-4 sm:px-6 lg:px-8 py-4 sm:py-6 rounded-2xl sm:rounded-3xl shadow-lg border border-border/20 max-w-2xl mx-auto">
+            <div className="flex items-center gap-3 text-center sm:text-left">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
-              <div className="text-left">
-                <h3 className="font-semibold text-foreground">{t('routes.readyToExplore')}</h3>
-                <p className="text-sm text-foreground/70">{t('routes.findPerfectRoute')}</p>
+              <div>
+                <h3 className="font-semibold text-foreground text-sm sm:text-base">{t('routes.readyToExplore')}</h3>
+                <p className="text-xs sm:text-sm text-foreground/70">{t('routes.findPerfectRoute')}</p>
               </div>
             </div>
             
-            <Button size="lg" className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90">
-              <MapPin className="h-4 w-4 mr-2" />
+            <Button 
+              size="sm" 
+              className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 w-full sm:w-auto sm:size-lg text-sm sm:text-base h-10 sm:h-12"
+            >
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               {t('routes.browseAll')}
-          </Button>
+            </Button>
           </div>
         </div>
       </div>

@@ -16,24 +16,23 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const MyTickets = () => {
   const { t } = useLocalization();
-  const { user, signIn, signUp, signOut, loading: authLoading } = useAuth();
+  const { user, profile, signIn, signUp, signOut, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("lookup");
   const [orderNumber, setOrderNumber] = useState("");
   const [securityCode, setSecurityCode] = useState("");
   const [ticket, setTicket] = useState<{
     orderNumber: string;
-    securityCode: string;
+    status: string;
     route: {
       from: { name: string };
       to: { name: string };
       departureTime: string;
       arrivalTime: string;
     };
+    passengers: { firstName: string; lastName: string; seat: string }[];
     departureDate: string;
-    passengers: { name: string; age?: number }[];
-    currency: string;
     totalPrice: number;
-    status: string;
+    currency: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [qrDialogOpen, setQrDialogOpen] = useState(false);
@@ -98,12 +97,12 @@ const MyTickets = () => {
       STARLINES - BILET DE AUTOBUZ
       
       Numărul Comenzii: ${ticket.orderNumber}
-      Codul de Securitate: ${ticket.securityCode}
+      Codul de Securitate: ${securityCode}
       
-      RUTA: ${ticket.route}
-      DATA: ${ticket.date}
-      ORA: ${ticket.time}
-      PASAGERI: ${ticket.passengers}
+      RUTA: ${ticket.route.from.name} → ${ticket.route.to.name}
+      DATA: ${ticket.departureDate}
+      ORA: ${ticket.route.departureTime} - ${ticket.route.arrivalTime}
+      PASAGERI: ${ticket.passengers.map(p => `${p.firstName} ${p.lastName} (${p.seat})`).join(', ')}
       
       STATUS: ${ticket.status}
       TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
@@ -147,12 +146,12 @@ const MyTickets = () => {
       Iată detaliile biletului tău:
       
       Numărul Comenzii: ${ticket.orderNumber}
-      Codul de Securitate: ${ticket.securityCode}
+      Codul de Securitate: ${securityCode}
       
-      RUTA: ${ticket.route}
-      DATA: ${ticket.date}
-      ORA: ${ticket.time}
-      PASAGERI: ${ticket.passengers}
+      RUTA: ${ticket.route.from.name} → ${ticket.route.to.name}
+      DATA: ${ticket.departureDate}
+      ORA: ${ticket.route.departureTime} - ${ticket.route.arrivalTime}
+      PASAGERI: ${ticket.passengers.map(p => `${p.firstName} ${p.lastName} (${p.seat})`).join(', ')}
       
       STATUS: ${ticket.status}
       TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
@@ -263,7 +262,7 @@ const MyTickets = () => {
           return;
         }
 
-        const { error } = await signUp(authForm.email, authForm.password, authForm.firstName, authForm.lastName);
+        const { error } = await signUp(authForm.email, authForm.password, authForm.firstName, authForm.lastName, "");
         
         if (error) {
           toast({
@@ -511,7 +510,7 @@ const MyTickets = () => {
                                 <div className="w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-lg mx-auto flex items-center justify-center p-4">
                                   {ticket && (
                                     <img 
-                                      src={generateQRCode(`${ticket.orderNumber}-${ticket.securityCode}-${ticket.route}-${ticket.date}`)} 
+                                      src={generateQRCode(`${ticket.orderNumber}-${securityCode}-${ticket.route.from.name}-${ticket.route.to.name}-${ticket.departureDate}`)} 
                                       alt="QR Code" 
                                       className="w-full h-full"
                                     />
@@ -581,13 +580,13 @@ const MyTickets = () => {
                       <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
                         {t('myTickets.welcomeMessage')}
                       </h3>
-                      {user && (
+                      {(user && profile) && (
                         <div className="mb-4">
                           <p className="text-sm text-muted-foreground">
-                            {user.first_name} {user.last_name}
+                            {profile.first_name} {profile.last_name}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {user.email}
+                            {profile.email}
                           </p>
                         </div>
                       )}
