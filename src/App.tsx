@@ -6,6 +6,7 @@ import { LocalizationProvider } from "@/contexts/LocalizationContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Pages
 import Index from "@/pages/Index";
@@ -62,6 +63,7 @@ function App() {
       <Router>
         <AuthProvider>
           <TooltipProvider>
+            <ScrollToTop />
             <div className="min-h-screen flex flex-col">
               <Header />
               <main className="flex-1">
