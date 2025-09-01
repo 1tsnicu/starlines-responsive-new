@@ -70,7 +70,7 @@ export interface AuditEvent {
   resourceType?: string;
   resourceId?: string;
   action?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
   metadata: {
     requestId?: string;
     correlationId?: string;
@@ -115,7 +115,7 @@ export class AuditLogger {
   public log(
     eventType: AuditEventType,
     severity: AuditSeverity,
-    details: Record<string, any>,
+    details: Record<string, unknown>,
     context?: Partial<AuditContext>,
     resourceType?: string,
     resourceId?: string,
@@ -162,23 +162,23 @@ export class AuditLogger {
     this.notifyListeners(event);
     
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env?.DEV) {
       console.log(`[AUDIT] ${eventType}:`, event);
     }
     
     // Send to external monitoring service in production
-    if (process.env.NODE_ENV === 'production') {
+    if (import.meta.env?.PROD) {
       this.sendToMonitoringService(event);
     }
   }
 
   // Log authentication events
   public logAuthEvent(
-    eventType: AuditEventType.LOGIN | AuditEventType.LOGOUT | AuditEventType.LOGIN_FAILED,
+    eventType: AuditEventType.USER_LOGIN | AuditEventType.USER_LOGOUT | AuditEventType.USER_LOGIN_FAILED,
     userEmail: string,
-    details: Record<string, any> = {}
+    details: Record<string, unknown> = {}
   ): void {
-    const severity = eventType === AuditEventType.LOGIN_FAILED ? AuditSeverity.MEDIUM : AuditSeverity.INFO;
+    const severity = eventType === AuditEventType.USER_LOGIN_FAILED ? AuditSeverity.MEDIUM : AuditSeverity.INFO;
     
     this.log(eventType, severity, {
       ...details,
@@ -191,7 +191,7 @@ export class AuditLogger {
   public logRouteEvent(
     eventType: AuditEventType.ROUTE_CREATED | AuditEventType.ROUTE_UPDATED | AuditEventType.ROUTE_DELETED | AuditEventType.ROUTE_VISIBILITY_CHANGED,
     routeId: string,
-    routeDetails: Record<string, any>,
+    routeDetails: Record<string, unknown>,
     action?: string
   ): void {
     const severity = eventType === AuditEventType.ROUTE_DELETED ? AuditSeverity.MEDIUM : AuditSeverity.INFO;
@@ -206,7 +206,7 @@ export class AuditLogger {
   // Log security events
   public logSecurityEvent(
     eventType: AuditEventType.SUSPICIOUS_ACTIVITY | AuditEventType.RATE_LIMIT_EXCEEDED | AuditEventType.INVALID_TOKEN | AuditEventType.CSRF_VIOLATION | AuditEventType.XSS_ATTEMPT | AuditEventType.SQL_INJECTION_ATTEMPT,
-    details: Record<string, any>
+    details: Record<string, unknown>
   ): void {
     const severity = this.getSecurityEventSeverity(eventType);
     
@@ -222,7 +222,7 @@ export class AuditLogger {
     eventType: AuditEventType.DATA_EXPORTED | AuditEventType.DATA_IMPORTED | AuditEventType.BULK_DATA_ACCESS | AuditEventType.SENSITIVE_DATA_ACCESS,
     resourceType: string,
     resourceId: string,
-    details: Record<string, any>
+    details: Record<string, unknown>
   ): void {
     const severity = eventType === AuditEventType.SENSITIVE_DATA_ACCESS ? AuditSeverity.HIGH : AuditSeverity.INFO;
     
@@ -390,7 +390,7 @@ export class AuditLogger {
     return sessionId;
   }
 
-  private sanitizeDetails(details: Record<string, any>): Record<string, any> {
+  private sanitizeDetails(details: Record<string, unknown>): Record<string, unknown> {
     const sanitized = { ...details };
     
     // Remove sensitive information
@@ -400,7 +400,7 @@ export class AuditLogger {
     delete sanitized.apiKey;
     
     // Sanitize email addresses (keep domain, mask local part)
-    if (sanitized.email) {
+    if (sanitized.email && typeof sanitized.email === 'string') {
       const [local, domain] = sanitized.email.split('@');
       if (local && domain) {
         sanitized.email = `${local.charAt(0)}***@${domain}`;
@@ -408,14 +408,14 @@ export class AuditLogger {
     }
     
     // Sanitize phone numbers
-    if (sanitized.phone) {
+    if (sanitized.phone && typeof sanitized.phone === 'string') {
       sanitized.phone = sanitized.phone.replace(/\d(?=\d{4})/g, '*');
     }
     
     return sanitized;
   }
 
-  private sanitizeRouteDetails(details: Record<string, any>): Record<string, any> {
+  private sanitizeRouteDetails(details: Record<string, unknown>): Record<string, unknown> {
     const sanitized = { ...details };
     
     // Remove sensitive route information if needed
@@ -511,12 +511,12 @@ export const auditLogger = AuditLogger.getInstance();
 // Utility functions for common audit operations
 export const auditUtils = {
   // Log route creation
-  logRouteCreated: (routeId: string, routeDetails: Record<string, any>) => {
+  logRouteCreated: (routeId: string, routeDetails: Record<string, unknown>) => {
     auditLogger.logRouteEvent(AuditEventType.ROUTE_CREATED, routeId, routeDetails, "create");
   },
 
   // Log route update
-  logRouteUpdated: (routeId: string, routeDetails: Record<string, any>, changes: Record<string, any>) => {
+  logRouteUpdated: (routeId: string, routeDetails: Record<string, unknown>, changes: Record<string, unknown>) => {
     auditLogger.logRouteEvent(AuditEventType.ROUTE_UPDATED, routeId, {
       ...routeDetails,
       changes
@@ -524,7 +524,7 @@ export const auditUtils = {
   },
 
   // Log route deletion
-  logRouteDeleted: (routeId: string, routeDetails: Record<string, any>) => {
+  logRouteDeleted: (routeId: string, routeDetails: Record<string, unknown>) => {
     auditLogger.logRouteEvent(AuditEventType.ROUTE_DELETED, routeId, routeDetails, "delete");
   },
 
@@ -537,12 +537,12 @@ export const auditUtils = {
   },
 
   // Log security violation
-  logSecurityViolation: (eventType: AuditEventType, details: Record<string, any>) => {
+  logSecurityViolation: (eventType: AuditEventType.SUSPICIOUS_ACTIVITY | AuditEventType.RATE_LIMIT_EXCEEDED | AuditEventType.INVALID_TOKEN | AuditEventType.CSRF_VIOLATION | AuditEventType.XSS_ATTEMPT | AuditEventType.SQL_INJECTION_ATTEMPT, details: Record<string, unknown>) => {
     auditLogger.logSecurityEvent(eventType, details);
   },
 
   // Log data access
-  logDataAccess: (eventType: AuditEventType, resourceType: string, resourceId: string, details: Record<string, any>) => {
+  logDataAccess: (eventType: AuditEventType.DATA_EXPORTED | AuditEventType.DATA_IMPORTED | AuditEventType.BULK_DATA_ACCESS | AuditEventType.SENSITIVE_DATA_ACCESS, resourceType: string, resourceId: string, details: Record<string, unknown>) => {
     auditLogger.logDataAccessEvent(eventType, resourceType, resourceId, details);
   }
 };

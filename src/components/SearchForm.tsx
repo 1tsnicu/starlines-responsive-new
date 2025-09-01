@@ -11,12 +11,32 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import { BussystemAutocomplete } from "@/components/BussystemAutocomplete";
+import { BussPoint } from "@/lib/bussystem";
 
-const SearchForm = () => {
+// Define the search params interface
+export interface SearchFormParams {
+  fromPointId?: string;
+  toPointId?: string;
+  date?: string;
+  passengers?: string;
+  baggage?: string;
+  returnDate?: string;
+}
+
+// Define props interface
+interface SearchFormProps {
+  onSearch?: (params: SearchFormParams) => void;
+  showResults?: boolean;
+}
+
+const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
   const { t } = useLocalization();
   const navigate = useNavigate();
   const [fromCity, setFromCity] = useState("");
   const [toCity, setToCity] = useState("");
+  const [fromPoint, setFromPoint] = useState<BussPoint | null>(null);
+  const [toPoint, setToPoint] = useState<BussPoint | null>(null);
   const [departureDate, setDepartureDate] = useState<Date>();
   const [returnDate, setReturnDate] = useState<Date>();
   const [passengers, setPassengers] = useState("1");
@@ -24,9 +44,22 @@ const SearchForm = () => {
   const [isRoundTrip, setIsRoundTrip] = useState(false);
 
   const handleSwapCities = () => {
-    const temp = fromCity;
+    const tempCity = fromCity;
+    const tempPoint = fromPoint;
     setFromCity(toCity);
-    setToCity(temp);
+    setFromPoint(toPoint);
+    setToCity(tempCity);
+    setToPoint(tempPoint);
+  };
+
+  const handleFromPointSelect = (point: BussPoint) => {
+    setFromPoint(point);
+    setFromCity(point.point_ru_name || point.point_latin_name || point.point_name || '');
+  };
+
+  const handleToPointSelect = (point: BussPoint) => {
+    setToPoint(point);
+    setToCity(point.point_ru_name || point.point_latin_name || point.point_name || '');
   };
 
   const handleSearch = () => {
@@ -34,7 +67,23 @@ const SearchForm = () => {
       return; // Could add validation feedback here
     }
 
-    const searchParams = new URLSearchParams({
+    const searchParams = {
+      fromPointId: fromPoint?.point_id,
+      toPointId: toPoint?.point_id,
+      date: format(departureDate, "yyyy-MM-dd"),
+      passengers: passengers,
+      baggage: baggage,
+      ...(isRoundTrip && returnDate && { returnDate: format(returnDate, "yyyy-MM-dd") })
+    };
+
+    // If onSearch callback is provided, use it
+    if (onSearch) {
+      onSearch(searchParams);
+      return;
+    }
+
+    // Otherwise use default navigation behavior
+    const urlSearchParams = new URLSearchParams({
       from: fromCity,
       to: toCity,
       date: format(departureDate, "yyyy-MM-dd"),
@@ -42,11 +91,19 @@ const SearchForm = () => {
       baggage: baggage
     });
 
-    if (isRoundTrip && returnDate) {
-      searchParams.append("returnDate", format(returnDate, "yyyy-MM-dd"));
+    // Add point IDs if available for integration with Bussystem API
+    if (fromPoint?.point_id) {
+      urlSearchParams.append("fromPointId", fromPoint.point_id);
+    }
+    if (toPoint?.point_id) {
+      urlSearchParams.append("toPointId", toPoint.point_id);
     }
 
-    navigate(`/search?${searchParams.toString()}`);
+    if (isRoundTrip && returnDate) {
+      urlSearchParams.append("returnDate", format(returnDate, "yyyy-MM-dd"));
+    }
+
+    navigate(`/search?${urlSearchParams.toString()}`);
   };
 
   const quickRoutes = [
@@ -59,6 +116,9 @@ const SearchForm = () => {
   const handleQuickRoute = (route: { from: string; to: string }) => {
     setFromCity(route.from);
     setToCity(route.to);
+    // Reset the selected points when using quick routes
+    setFromPoint(null);
+    setToPoint(null);
   };
 
   return (
@@ -115,17 +175,12 @@ const SearchForm = () => {
             <Label htmlFor="from" className="text-sm font-medium">
               {t('search.from')}
             </Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="from"
-                placeholder={t('search.fromPlaceholder')}
-                value={fromCity}
-                onChange={(e) => setFromCity(e.target.value)}
-                className="pl-10 h-12 text-black placeholder:text-gray-500"
-                style={{ color: '#0B1220' }}
-              />
-            </div>
+            <BussystemAutocomplete
+              placeholder={t('search.fromPlaceholder')}
+              value={fromCity}
+              onSelect={handleFromPointSelect}
+              className="w-full"
+            />
           </div>
 
           {/* Swap Button */}
@@ -148,17 +203,12 @@ const SearchForm = () => {
             <Label htmlFor="to" className="text-sm font-medium">
               {t('search.to')}
             </Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="to"
-                placeholder={t('search.toPlaceholder')}
-                value={toCity}
-                onChange={(e) => setToCity(e.target.value)}
-                className="pl-10 h-12 text-black placeholder:text-gray-500"
-                style={{ color: '#0B1220' }}
-              />
-            </div>
+            <BussystemAutocomplete
+              placeholder={t('search.toPlaceholder')}
+              value={toCity}
+              onSelect={handleToPointSelect}
+              className="w-full"
+            />
           </div>
 
           {/* Departure Date */}

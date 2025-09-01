@@ -239,7 +239,21 @@ export const getPaymentStatus = async (orderId: string): Promise<string> => {
 };
 
 // Mock ticket lookup
-export const lookupTicket = async (orderNumber: string, securityCode: string): Promise<any> => {
+export interface TicketLookupResult {
+  orderNumber: string;
+  status: string;
+  route: Route;
+  passengers: Array<{
+    firstName: string;
+    lastName: string;
+    seat: string;
+  }>;
+  departureDate: string;
+  totalPrice: number;
+  currency: string;
+}
+
+export const lookupTicket = async (orderNumber: string, securityCode: string): Promise<TicketLookupResult> => {
   await new Promise(resolve => setTimeout(resolve, 500));
   
   // Mock ticket data
@@ -968,5 +982,861 @@ export const infoBusAPI = {
   }> => {
     await new Promise(resolve => setTimeout(resolve, 200));
     return paymentProcessor.getRevenueBreakdown();
+  }
+};
+
+// Bussystem API Mock Functions
+// These provide compatibility with the real Bussystem API
+
+// Types for compatibility with bussystem.ts
+export interface BussystemPassenger {
+  first_name: string;
+  last_name: string;
+  seat_number: string;
+  seat_no?: string;
+  price: number;
+  phone?: string;
+  document_type?: string;
+  document_number?: string;
+  birth_date?: string;
+  gender?: string;
+}
+
+export interface BussystemOrderInfo {
+  order_id: string;
+  security?: string;
+  lock_min?: number;
+  status?: string;
+  price?: number;
+  currency?: string;
+  passengers?: BussystemPassenger[];
+}
+
+export interface BussystemTicketInfo {
+  ticket_id?: string;
+  order_id?: string;
+  status?: string;
+  price?: number;
+  currency?: string;
+  passenger_info?: BussystemPassenger;
+}
+
+export interface BussystemPoint {
+  point_id: string;
+  point_ru_name: string | null;
+  point_ua_name: string | null;
+  point_latin_name: string | null;
+  point_name: string | null;
+  country_name: string | null;
+  country_kod: string | null;
+  country_id: string | null;
+  point_name_detail: string | null;
+  priority: string | null;
+}
+
+export interface BussystemRoute {
+  trans: "bus" | "train" | string;
+  interval_id: string;
+  route_name: string;
+  has_plan: 0 | 1;
+  carrier?: string;
+  comfort?: string;
+  rating?: string;
+  reviews?: string;
+  logo?: string;
+  timetable_id?: string;
+  request_get_free_seats?: 0 | 1;
+  request_get_discount?: 0 | 1;
+  request_get_baggage?: 0 | 1;
+  day_open?: string;
+  need_orderdata?: 0 | 1;
+  can_cyrillic_orderdata?: 0 | 1;
+  need_birth?: 0 | 1;
+  need_doc?: 0 | 1;
+  need_doc_expire_date?: 0 | 1;
+  need_citizenship?: 0 | 1;
+  need_gender?: 0 | 1;
+  need_middlename?: 0 | 1;
+  lock_order?: "0" | "1";
+  lock_min?: string;
+  reserve_min?: string;
+  max_seats?: string;
+  start_sale_day?: string;
+  stop_sale_hours?: number;
+  cancel_free_min?: string;
+  date_from: string;
+  time_from: string;
+  point_from: string;
+  station_from?: string;
+  station_from_lat?: string;
+  station_from_lon?: string;
+  platform_from?: string;
+  date_to: string;
+  time_to: string;
+  point_to: string;
+  station_to?: string;
+  station_to_lat?: string;
+  station_to_lon?: string;
+  platform_to?: string;
+  time_in_way?: string;
+  price_one_way?: string;
+  price_one_way_max?: string;
+  price_two_way?: string;
+  currency?: string;
+  bonus_eur?: string;
+  discounts?: Array<{
+    discount_id: string;
+    discount_name: string;
+    discount_price: number;
+  }>;
+  free_seats?: Array<number | string>;
+  luggage?: string;
+  route_info?: string;
+  cancel_hours_info?: Array<{
+    hours_after_depar: string;
+    hours_before_depar: string;
+    cancel_rate: string;
+    money_back: string;
+  }>;
+  trips?: Array<{
+    interval_id: string;
+    route_name: string;
+    carrier?: string;
+  }>;
+}
+
+// Mock Bussystem API implementation
+export const mockBussystemAPI = {
+  // Get points for autocomplete
+  getPoints: async (params: {
+    autocomplete?: string;
+    lang?: string;
+    session?: string;
+  }): Promise<BussystemPoint[]> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    const mockPoints: BussystemPoint[] = [
+      {
+        point_id: "1",
+        point_name: "Chișinău",
+        point_ru_name: "Кишинев",
+        point_ua_name: "Кишинів",
+        point_latin_name: "Chisinau",
+        country_name: "Moldova",
+        country_kod: "MD",
+        country_id: "1",
+        point_name_detail: "Central Bus Station",
+        priority: "1"
+      },
+      {
+        point_id: "2",
+        point_name: "București",
+        point_ru_name: "Бухарест",
+        point_ua_name: "Бухарест",
+        point_latin_name: "Bucharest",
+        country_name: "Romania",
+        country_kod: "RO",
+        country_id: "2",
+        point_name_detail: "Gara de Nord",
+        priority: "2"
+      },
+      {
+        point_id: "3",
+        point_name: "Berlin",
+        point_ru_name: "Берлин",
+        point_ua_name: "Берлін",
+        point_latin_name: "Berlin",
+        country_name: "Germany",
+        country_kod: "DE",
+        country_id: "3",
+        point_name_detail: "ZOB",
+        priority: "3"
+      }
+    ];
+
+    if (params.autocomplete) {
+      const query = params.autocomplete.toLowerCase();
+      return mockPoints.filter(point => 
+        point.point_name?.toLowerCase().includes(query) ||
+        point.point_ru_name?.toLowerCase().includes(query) ||
+        point.point_latin_name?.toLowerCase().includes(query)
+      );
+    }
+
+    return mockPoints;
+  },
+
+  // Get routes between points
+  getRoutes: async (params: {
+    date: string;
+    id_from: string;
+    id_to: string;
+    station_id_from?: string;
+    trans?: "bus" | "train";
+    change?: "auto" | "no";
+    currency?: string;
+    lang?: string;
+    v?: string;
+    session?: string;
+  }): Promise<BussystemRoute[]> => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const mockRoutes: BussystemRoute[] = [
+      {
+        trans: "bus",
+        interval_id: "12345",
+        route_name: "Chișinău - Berlin",
+        has_plan: 1,
+        carrier: "MoldovaExpress",
+        comfort: "wifi,220v,conditioner,music,tv",
+        rating: "4.6",
+        reviews: "93",
+        logo: "333.png",
+        request_get_free_seats: 1,
+        request_get_discount: 0, // Use discounts from this response
+        request_get_baggage: 1,
+        need_orderdata: 1,
+        can_cyrillic_orderdata: 1,
+        need_birth: 1,
+        need_doc: 1,
+        need_doc_expire_date: 1,
+        need_citizenship: 1,
+        need_gender: 1,
+        need_middlename: 0,
+        lock_order: "1",
+        lock_min: "30",
+        reserve_min: "0",
+        max_seats: "10",
+        start_sale_day: "180",
+        stop_sale_hours: 0,
+        cancel_free_min: "5",
+        date_from: params.date,
+        time_from: "08:00:00",
+        point_from: "Chișinău",
+        date_to: params.date.replace(/(\d{4}-\d{2}-\d{2})/, (match) => {
+          const date = new Date(match);
+          date.setDate(date.getDate() + 1);
+          return date.toISOString().split('T')[0];
+        }),
+        time_to: "22:00:00",
+        point_to: "Berlin",
+        time_in_way: "14:00",
+        price_one_way: "75",
+        price_one_way_max: "95",
+        currency: "EUR",
+        free_seats: [1, 2, 3, 5, 7, 8, 10, 12, 15, 18, 20, 22, 25, 28, 30],
+        luggage: "1 bag up to 20kg included",
+        route_info: "Direct route with one stop in Budapest",
+        // Include discounts directly in get_routes response when request_get_discount = 0
+        discounts: [
+          {
+            discount_id: "3100",
+            discount_name: "Reducere studenți",
+            discount_price: 64
+          },
+          {
+            discount_id: "3101", 
+            discount_name: "Reducere pensionari",
+            discount_price: 67
+          }
+        ]
+      }
+    ];
+
+    return mockRoutes;
+  },
+
+  // Get free seats for a route
+  getFreeSeats: async (params: {
+    interval_id: string;
+    date?: string;
+    currency?: string;
+    lang?: string;
+    v?: string;
+    session?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    return {
+      trips: [
+        {
+          bustype_id: "bus_type_123",
+          has_plan: 1 as 0 | 1,
+          free_seat: [
+            { seat_number: 1, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 2, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 3, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 4, seat_free: 0 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 5, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 6, seat_free: 0 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 7, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 8, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 9, seat_free: 0 as 0 | 1, seat_price: 75, seat_curency: "EUR" },
+            { seat_number: 10, seat_free: 1 as 0 | 1, seat_price: 75, seat_curency: "EUR" }
+          ],
+          trip_name: "Chișinău → Berlin"
+        }
+      ]
+    };
+  },
+
+  // Create new order
+  // Create new order with complete payload support
+  newOrder: async (payload: {
+    login: string;
+    password: string;
+    promocode_name?: string;
+    date: string[];           // pe trips
+    interval_id: string[];    // pe trips
+    seat: string[][];         // pe trips (array de stringuri per pasager)
+    name?: string[];          // pe pasageri
+    surname?: string[];       // pe pasageri
+    birth_date?: string[];    // pe pasageri (YYYY-MM-DD)
+    discount_id?: Array<Record<string, string>>; // pe trips
+    baggage?: Record<string, string[]>; // tripIndex (string) -> array per pasager
+    phone?: string;
+    email?: string;
+    currency?: string;
+    lang?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Calculate prices based on trips and passengers
+    const passengerCount = payload.seat[0]?.length || 0;
+    const tripCount = payload.date.length;
+    const basePrice = 75; // EUR per passenger per trip
+    
+    let totalPrice = passengerCount * tripCount * basePrice;
+    
+    // Apply discounts
+    if (payload.discount_id) {
+      payload.discount_id.forEach((tripDiscounts) => {
+        Object.keys(tripDiscounts).forEach(() => {
+          totalPrice -= 10; // Mock discount of 10 EUR per discounted passenger
+        });
+      });
+    }
+    
+    // Add baggage costs
+    if (payload.baggage) {
+      Object.values(payload.baggage).forEach(tripBaggage => {
+        tripBaggage.forEach(passengerBaggage => {
+          if (passengerBaggage) {
+            const baggageItems = passengerBaggage.split(',');
+            totalPrice += baggageItems.length * 15; // Mock 15 EUR per baggage item
+          }
+        });
+      });
+    }
+    
+    // Apply promocode discount
+    let promocodeDiscount = 0;
+    if (payload.promocode_name === "PROMO77ENDLESS") {
+      promocodeDiscount = Math.round(totalPrice * 0.15); // 15% discount
+      totalPrice -= promocodeDiscount;
+    }
+
+    const response = {
+      order_id: Date.now(),
+      reservation_until: new Date(Date.now() + 30 * 60 * 1000).toISOString().replace('T', ' ').substring(0, 19),
+      reservation_until_min: "30",
+      security: `SEC_${Math.random().toString(36).substr(2, 9)}`,
+      status: "reserve_ok",
+      price_total: totalPrice,
+      currency: payload.currency || "EUR",
+      ...(payload.promocode_name ? {
+        promocode_info: {
+          promocode_valid: 1 as 0 | 1,
+          promocode_name: payload.promocode_name,
+          price_promocode: promocodeDiscount
+        }
+      } : {})
+    };
+
+    // Add trip details (mock structure for "0", "1" trip objects)
+    payload.interval_id.forEach((intervalId, tripIndex) => {
+      (response as Record<string, unknown>)[String(tripIndex)] = {
+        interval_id: intervalId,
+        date: payload.date[tripIndex],
+        passengers: payload.seat[tripIndex].map((seat, passengerIndex) => ({
+          name: payload.name?.[passengerIndex] || `Passenger${passengerIndex + 1}`,
+          surname: payload.surname?.[passengerIndex] || `Surname${passengerIndex + 1}`,
+          seat: seat,
+          price: basePrice,
+          discount_id: payload.discount_id?.[tripIndex]?.[String(passengerIndex)] || null,
+          baggage: payload.baggage?.[String(tripIndex)]?.[passengerIndex] || null
+        }))
+      };
+    });
+
+    return response;
+  },
+
+  // Buy ticket - Complete buy_ticket endpoint with ticket extraction
+  buyTicket: async (params: { order_id: number; lang?: string; v?: string }) => {
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate payment processing
+
+    // Generate mock response based on order_id
+    const basePrice = 150;
+    const numPassengers = 3; // Based on our demo
+    const totalPrice = basePrice * numPassengers * 0.9; // With some discount
+
+    const response = {
+      order_id: params.order_id,
+      price_total: Math.round(totalPrice * 100) / 100,
+      currency: "EUR",
+      link: `https://bussystem.com/print/order/${params.order_id}?security=abc123`,
+      
+      // Passenger tickets (objects "0", "1", "2")
+      "0": {
+        passenger_id: 1,
+        transaction_id: `txn_${Date.now()}_1`,
+        ticket_id: `ticket_${params.order_id}_1`,
+        security: `sec_${Date.now()}_1`,
+        price: Math.round((basePrice * 0.9) * 100) / 100,
+        currency: "EUR",
+        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_1?security=sec_${Date.now()}_1`,
+        baggage: [
+          {
+            baggage_title: "Bagaj mic",
+            price: 15,
+            currency: "EUR"
+          }
+        ]
+      },
+      "1": {
+        passenger_id: 2,
+        transaction_id: `txn_${Date.now()}_2`,
+        ticket_id: `ticket_${params.order_id}_2`,
+        security: `sec_${Date.now()}_2`,
+        price: Math.round((basePrice * 0.85) * 100) / 100, // With additional discount
+        currency: "EUR",
+        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_2?security=sec_${Date.now()}_2`,
+        baggage: [
+          {
+            baggage_title: "Bagaj mic",
+            price: 15,
+            currency: "EUR"
+          },
+          {
+            baggage_title: "Bagaj mediu",
+            price: 25,
+            currency: "EUR"
+          }
+        ]
+      },
+      "2": {
+        passenger_id: 3,
+        transaction_id: `txn_${Date.now()}_3`,
+        ticket_id: `ticket_${params.order_id}_3`,
+        security: `sec_${Date.now()}_3`,
+        price: Math.round((basePrice * 0.95) * 100) / 100,
+        currency: "EUR",
+        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_3?security=sec_${Date.now()}_3`,
+        baggage: [
+          {
+            baggage_title: "Bagaj mare",
+            price: 35,
+            currency: "EUR"
+          }
+        ]
+      }
+    };
+
+    return response;
+  },
+
+  // Reserve ticket
+  reserveTicket: async (params: {
+    order_id: string;
+    session?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    return {
+      status: "reserved",
+      message: "Ticket reserved successfully"
+    };
+  },
+
+  // Get order details
+  getOrder: async (params: {
+    order_id: string;
+    session?: string;
+  }): Promise<BussystemOrderInfo> => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    return {
+      order_id: params.order_id,
+      security: "SEC_123456789",
+      status: "confirmed",
+      price: 75,
+      currency: "EUR",
+      passengers: [
+        {
+          first_name: "John",
+          last_name: "Doe",
+          seat_number: "12",
+          price: 75
+        }
+      ]
+    };
+  },
+
+  // Ping API
+  ping: async () => {
+    await new Promise(resolve => setTimeout(resolve, 100));
+    return { status: "ok", message: "Mock API is working" };
+  },
+
+  // Get routes for return journey
+  getRoutesReturn: async (params: {
+    date: string;
+    id_from: string;
+    id_to: string;
+    station_id_from?: string;
+    station_id_to?: string;
+    interval_id: string | string[];
+    trans?: "bus" | "train";
+    change?: "auto" | "no";
+    currency?: string;
+    lang?: string;
+    v?: string;
+    session?: string;
+  }): Promise<BussystemRoute[]> => {
+    await new Promise(resolve => setTimeout(resolve, 600));
+
+    const mockReturnRoutes: BussystemRoute[] = [
+      {
+        trans: "bus",
+        interval_id: "54321",
+        route_name: "Berlin - Chișinău",
+        has_plan: 1,
+        carrier: "MoldovaExpress",
+        comfort: "wifi,220v,conditioner,music,tv",
+        rating: "4.6",
+        reviews: "93",
+        logo: "333.png",
+        request_get_free_seats: 1,
+        request_get_discount: 1, // Must call get_discount.php
+        request_get_baggage: 1,
+        need_orderdata: 1,
+        can_cyrillic_orderdata: 1,
+        need_birth: 1,
+        need_doc: 1,
+        need_doc_expire_date: 1,
+        need_citizenship: 1,
+        need_gender: 1,
+        need_middlename: 0,
+        lock_order: "1",
+        lock_min: "30",
+        reserve_min: "0",
+        max_seats: "10",
+        start_sale_day: "180",
+        stop_sale_hours: 0,
+        cancel_free_min: "5",
+        date_from: params.date,
+        time_from: "09:00:00",
+        point_from: "Berlin",
+        date_to: params.date.replace(/(\d{4}-\d{2}-\d{2})/, (match) => {
+          const date = new Date(match);
+          date.setDate(date.getDate() + 1);
+          return date.toISOString().split('T')[0];
+        }),
+        time_to: "23:00:00",
+        point_to: "Chișinău",
+        time_in_way: "14:00",
+        price_one_way: "75",
+        price_one_way_max: "95",
+        currency: "EUR",
+        free_seats: [2, 4, 6, 8, 11, 13, 16, 19, 21, 23, 26, 29],
+        luggage: "1 bag up to 20kg included",
+        route_info: "Return direct route with one stop in Budapest"
+      }
+    ];
+
+    return mockReturnRoutes;
+  },
+
+  // Get seat plan for visual representation
+  getPlan: async (params: {
+    bustype_id: string;
+    position?: string;
+    v?: string;
+    session?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Mock seat plan - simulate different bus layouts based on bustype_id
+    const mockPlans: Record<string, {
+      plan_type: string;
+      floors: Array<{
+        number: number;
+        rows: { row: Array<{ seat: string[] }> };
+      }>;
+    }> = {
+      "bus_type_123": {
+        plan_type: "bus_type_123",
+        floors: [
+          {
+            number: 1,
+            rows: {
+              row: [
+                { seat: ["", "1", "2", "", "3", "4"] },      // Row 1: aisle, seat 1, seat 2, aisle, seat 3, seat 4
+                { seat: ["", "5", "6", "", "7", "8"] },      // Row 2
+                { seat: ["", "9", "10", "", "11", "12"] },   // Row 3
+                { seat: ["", "", "", "", "", ""] },          // Empty row (aisle space)
+                { seat: ["", "13", "14", "", "15", "16"] },  // Row 4
+                { seat: ["", "17", "18", "", "19", "20"] },  // Row 5
+                { seat: ["", "21", "22", "", "23", "24"] },  // Row 6
+                { seat: ["", "25", "26", "", "27", "28"] },  // Row 7
+                { seat: ["", "29", "30", "", "", ""] }       // Last row (partial)
+              ]
+            }
+          }
+        ]
+      },
+      "105": {
+        plan_type: "105",
+        floors: [
+          {
+            number: 1,
+            rows: {
+              row: [
+                { seat: ["", "1", "6", "10", "15", "20"] },
+                { seat: ["", "2", "7", "11", "16", "21"] },
+                { seat: ["", "3", "8", "12", "17", "22"] },
+                { seat: ["", "", "", "", "", ""] }, // aisle
+                { seat: ["", "4", "9", "13", "18", "23"] },
+                { seat: ["", "5", "", "14", "19", "24"] }
+              ]
+            }
+          }
+        ]
+      },
+      "217": {
+        plan_type: "217",
+        floors: [
+          {
+            number: 1,
+            rows: {
+              row: [
+                { seat: ["", "1", "2", "", "3", "4", "5"] },
+                { seat: ["", "6", "7", "", "8", "9", "10"] },
+                { seat: ["", "11", "12", "", "13", "14", "15"] },
+                { seat: ["", "", "", "", "", "", ""] }, // aisle
+                { seat: ["", "16", "17", "", "18", "19", "20"] },
+                { seat: ["", "21", "22", "", "23", "24", "25"] },
+                { seat: ["", "26", "27", "", "28", "29", "30"] }
+              ]
+            }
+          }
+        ]
+      }
+    };
+
+    const plan = mockPlans[params.bustype_id] || mockPlans["bus_type_123"];
+    return plan;
+  },
+
+  // Get discounts for a route (when request_get_discount = 1)
+  getDiscounts: async (params: {
+    interval_id: string;
+    currency?: string;
+    lang?: string;
+    v?: string;
+    session?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    // Mock discounts based on route
+    const mockDiscounts: Record<string, Array<{
+      discount_id: string;
+      discount_name: string;
+      discount_price: number;
+      discount_price_max?: number;
+      discount_currency?: string;
+    }>> = {
+      "12345": [ // Standard route
+        {
+          discount_id: "3199",
+          discount_name: "10% Pensionari de la 60 ani",
+          discount_price: 67,
+          discount_price_max: 75,
+          discount_currency: "EUR"
+        },
+        {
+          discount_id: "3200",
+          discount_name: "15% Studenți",
+          discount_price: 64,
+          discount_price_max: 75,
+          discount_currency: "EUR"
+        },
+        {
+          discount_id: "3201",
+          discount_name: "5% Copii 7-14 ani",
+          discount_price: 71,
+          discount_price_max: 75,
+          discount_currency: "EUR"
+        }
+      ],
+      "54321": [ // Return route
+        {
+          discount_id: "3199",
+          discount_name: "10% Pensionari de la 60 ani",
+          discount_price: 67,
+          discount_price_max: 75,
+          discount_currency: "EUR"
+        },
+        {
+          discount_id: "3202",
+          discount_name: "20% Grup familial (3+ persoane)",
+          discount_price: 60,
+          discount_price_max: 75,
+          discount_currency: "EUR"
+        }
+      ]
+    };
+
+    const discounts = mockDiscounts[params.interval_id] || [];
+    
+    return {
+      route_id: params.interval_id,
+      discounts: discounts.length > 0 ? discounts : null
+    };
+  },
+
+  // Get baggage options for a route (when request_get_baggage = 1)
+  getBaggage: async (params: {
+    interval_id: string;
+    station_id_to?: string;
+    currency?: string;
+    lang?: string;
+    v?: string;
+    session?: string;
+  }) => {
+    await new Promise(resolve => setTimeout(resolve, 400));
+
+    // Mock baggage options based on route
+    const mockBaggage: Record<string, Array<{
+      baggage_id: string;
+      baggage_type_id: string;
+      baggage_type: string;
+      baggage_type_abbreviated: string;
+      baggage_title: string;
+      length?: string;
+      width?: string;
+      height?: string;
+      kg?: string;
+      max_in_bus?: string;
+      max_per_person?: string;
+      typ?: "route" | string;
+      price: number;
+      currency: string;
+    }>> = {
+      "12345": [ // Standard route - outbound with basic baggage
+        {
+          baggage_id: "bag_free_1",
+          baggage_type_id: "1",
+          baggage_type: "included_baggage",
+          baggage_type_abbreviated: "БАГАЖ ВКЛЮЧ",
+          baggage_title: "Багаж включен (1 место)",
+          length: "60",
+          width: "40", 
+          height: "25",
+          kg: "20",
+          max_in_bus: "50",
+          max_per_person: "1",
+          typ: "route",
+          price: 0, // Gratuit - nu se trimite la new_order
+          currency: "EUR"
+        },
+        {
+          baggage_id: "bag_small_2",
+          baggage_type_id: "2",
+          baggage_type: "small_baggage", 
+          baggage_type_abbreviated: "БАГАЖ М/М",
+          baggage_title: "Маломерный багаж",
+          length: "40",
+          width: "30",
+          height: "20",
+          kg: "10",
+          max_in_bus: "30",
+          max_per_person: "2",
+          typ: "route",
+          price: 15,
+          currency: "EUR"
+        }
+      ],
+      "54321": [ // Return route - more baggage options
+        {
+          baggage_id: "bag_free_ret",
+          baggage_type_id: "1", 
+          baggage_type: "included_baggage",
+          baggage_type_abbreviated: "БАГАЖ ВКЛЮЧ",
+          baggage_title: "Багаж включен (1 место)",
+          length: "60",
+          width: "40",
+          height: "25", 
+          kg: "20",
+          max_in_bus: "50",
+          max_per_person: "1",
+          typ: "route",
+          price: 0, // Gratuit
+          currency: "EUR"
+        },
+        {
+          baggage_id: "bag_small_ret",
+          baggage_type_id: "2",
+          baggage_type: "small_baggage",
+          baggage_type_abbreviated: "БАГАЖ М/М", 
+          baggage_title: "Маломерный багаж",
+          length: "40",
+          width: "30",
+          height: "20",
+          kg: "10", 
+          max_in_bus: "25",
+          max_per_person: "2",
+          typ: "route",
+          price: 12,
+          currency: "EUR"
+        },
+        {
+          baggage_id: "bag_medium_ret",
+          baggage_type_id: "3",
+          baggage_type: "medium_baggage",
+          baggage_type_abbreviated: "БАГАЖ СР",
+          baggage_title: "Средний багаж",
+          length: "70",
+          width: "50",
+          height: "30",
+          kg: "25",
+          max_in_bus: "15", 
+          max_per_person: "1",
+          typ: "route",
+          price: 25,
+          currency: "EUR"
+        },
+        {
+          baggage_id: "bag_large_ret",
+          baggage_type_id: "4",
+          baggage_type: "large_baggage", 
+          baggage_type_abbreviated: "БАГАЖ Б",
+          baggage_title: "Большой багаж",
+          length: "80",
+          width: "60",
+          height: "40",
+          kg: "35",
+          max_in_bus: "8",
+          max_per_person: "1",
+          typ: "route",
+          price: 45,
+          currency: "EUR"
+        }
+      ]
+    };
+
+    const baggage = mockBaggage[params.interval_id] || [];
+    return baggage;
   }
 };

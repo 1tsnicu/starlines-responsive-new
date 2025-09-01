@@ -119,6 +119,65 @@ const Header = () => {
     }
   ];
 
+  // API Demo pages dropdown
+  const apiDemoPages = [
+    {
+      title: "🚀 Complete API Demo",
+      href: "/api-demo",
+      icon: <Search className="h-4 w-4" />,
+      description: "SMS Validation + Get Order - Complete UI Interface",
+      featured: true
+    },
+    {
+      title: "SMS Validation System",
+      href: "/api-demo",
+      icon: <Phone className="h-4 w-4" />,
+      description: "Test SMS verification workflow with rate limiting"
+    },
+    {
+      title: "Order Lookup System", 
+      href: "/api-demo",
+      icon: <FileText className="h-4 w-4" />,
+      description: "Search and display complete order information"
+    },
+    {
+      title: "Reserve Validation Demo",
+      href: "/reserve-validation-demo",
+      icon: <Shield className="h-4 w-4" />,
+      description: "Test reservation pre-validation with SMS integration"
+    },
+    {
+      title: "Seat Selection Demo",
+      href: "/seats-demo",
+      icon: <MapPin className="h-4 w-4" />,
+      description: "Test seat selection for trains and buses"
+    },
+    {
+      title: "Bus Plan Demo",
+      href: "/plan-demo",
+      icon: <Bus className="h-4 w-4" />,
+      description: "Test bus plan visualization with seat selection"
+    },
+    {
+      title: "New Order Demo",
+      href: "/new-order-demo",
+      icon: <CreditCard className="h-4 w-4" />,
+      description: "Test order creation with timer management"
+    },
+    {
+      title: "Discount Demo",
+      href: "/discount-demo",
+      icon: <Star className="h-4 w-4" />,
+      description: "Test discount validation system"
+    },
+    {
+      title: "Routes Demo",
+      href: "/routes-demo",
+      icon: <Bus className="h-4 w-4" />,
+      description: "Test route search functionality"
+    }
+  ];
+
   // Legal pages dropdown
   const legalPages = [
     {
@@ -288,8 +347,45 @@ const Header = () => {
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
+                <DropdownMenuLabel>API Demos</DropdownMenuLabel>
+                {apiDemoPages.map((item) => (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link to={item.href} className="flex items-center gap-3 p-2">
+                      {item.icon}
+                      <div>
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-xs text-muted-foreground">{item.description}</div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+                <DropdownMenuSeparator />
                 <DropdownMenuLabel>{t('header.legal')}</DropdownMenuLabel>
                 {legalPages.map((item) => (
+                  <DropdownMenuItem key={item.href} asChild>
+                    <Link to={item.href} className="flex items-center gap-3 p-2">
+                      {item.icon}
+                      <div>
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-xs text-muted-foreground">{item.description}</div>
+                      </div>
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* API Demos Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-4 py-2 text-foreground/70 hover:text-foreground hover:bg-muted">
+                  <span className="font-medium">API Demos</span>
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-56">
+                <DropdownMenuLabel>API Testing & Demos</DropdownMenuLabel>
+                {apiDemoPages.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link to={item.href} className="flex items-center gap-3 p-2">
                       {item.icon}
@@ -306,53 +402,6 @@ const Header = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-3">
-            {/* Language & Currency Selectors */}
-            <div className="hidden md:flex items-center gap-2">
-              {/* Language Selector */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    {getLanguageFlag(currentLanguage)}
-                    <span className="hidden sm:inline">{getLanguageName(currentLanguage)}</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>{t('header.language')}</DropdownMenuLabel>
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <DropdownMenuItem key={lang.code} onClick={() => setLanguage(lang.code)}>
-                      <div className="flex items-center gap-2">
-                        {getLanguageFlag(lang.code)}
-                        <span>{getLanguageName(lang.code)}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Currency Selector */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    {getCurrencyFlag(currentCurrency)}
-                    <span className="hidden sm:inline">{currentCurrency}</span>
-                    <ChevronDown className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>{t('header.currency')}</DropdownMenuLabel>
-                  {SUPPORTED_CURRENCIES.map((currency) => (
-                    <DropdownMenuItem key={currency.code} onClick={() => setCurrency(currency.code)}>
-                      <div className="flex items-center gap-2">
-                        {getCurrencyFlag(currency.code)}
-                        <span>{currency.code}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
             {/* Authentication */}
             {user ? (
               <DropdownMenu>
