@@ -45,6 +45,7 @@ import NewOrderDemo from "@/pages/NewOrderDemo";
 import ReserveTicketDemo from "@/pages/ReserveTicketDemo";
 import ReserveValidationDemo from "@/pages/ReserveValidationDemo";
 import { DemoPage } from "@/components/DemoPage";
+import BussystemTestPage from "@/components/BussystemTestPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -103,6 +104,7 @@ function App() {
                   <Route path="/reserve-ticket-demo" element={<ReserveTicketDemo />} />
                   <Route path="/reserve-validation-demo" element={<ReserveValidationDemo />} />
                   <Route path="/api-demo" element={<DemoPage />} />
+                  <Route path="/bussystem-test" element={<BussystemTestPage />} />
                 </Routes>
               </main>
               <Footer />

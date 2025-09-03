@@ -9,6 +9,197 @@ import type { GetBaggageResponse } from '../types/baggage';
 import type { NewOrderPayload, NewOrderResponse } from '../types/newOrder';
 import type { BuyTicketRequest, BuyTicketResponse } from '../types/buy';
 
+// Configuration for Partner Affiliate Integration
+export interface BussystemConfig {
+  // API Configuration
+  baseUrl: string;           // https://test-api.bussystem.eu/server
+  login: string;             // Your test login
+  password: string;          // Your test password
+  
+  // Partner Configuration
+  partnerId: string;         // Your partner=XXXX ID
+  
+  // Booking URLs
+  bookingBaseUrl: string;    // https://booking.bussystem.eu
+  iframeBaseUrl: string;     // https://iframe.bussystem.eu/booking
+  
+  // Options
+  useMockData: boolean;      // true for development, false for real API
+  defaultLang: string;       // "ru", "en", "ro"
+  defaultCurrency: string;   // "EUR", "UAH", "USD"
+}
+
+// Default configuration for testing
+export const defaultBussystemConfig: BussystemConfig = {
+  baseUrl: 'https://test-api.bussystem.eu/server',
+  login: 'you_login',        // Will be replaced with real credentials
+  password: 'you_password',  // Will be replaced with real credentials
+  partnerId: 'XXXX',         // Will be replaced with real partner ID
+  bookingBaseUrl: 'https://booking.bussystem.eu',
+  iframeBaseUrl: 'https://iframe.bussystem.eu/booking',
+  useMockData: true,         // Start with mock data
+  defaultLang: 'ru',
+  defaultCurrency: 'EUR'
+};
+
+// Partner Affiliate specific functions
+export class BussystemPartnerAPI {
+  constructor(private config: BussystemConfig = defaultBussystemConfig) {}
+
+  // Generate booking URL for partner redirect
+  generateBookingUrl(params: {
+    pointFromId?: string;
+    pointToId?: string;
+    date?: string;
+    routeId?: string;
+    orderId?: string;
+    security?: string;
+    passengers?: number;
+    timeFrom?: string;
+    timeTo?: string;
+  }): string {
+    const { bookingBaseUrl, partnerId, defaultLang, defaultCurrency } = this.config;
+    const urlParams = new URLSearchParams();
+    
+    // Always include partner ID
+    urlParams.append('partner', partnerId);
+    urlParams.append('lang', defaultLang);
+    urlParams.append('currency', defaultCurrency);
+    
+    // Add specific parameters
+    if (params.pointFromId) urlParams.append('city_from', params.pointFromId);
+    if (params.pointToId) urlParams.append('city_to', params.pointToId);
+    if (params.date) urlParams.append('date_from', params.date);
+    if (params.routeId) urlParams.append('route_id', params.routeId);
+    if (params.passengers) urlParams.append('passengers', params.passengers.toString());
+    if (params.timeFrom) urlParams.append('time_from', params.timeFrom);
+    if (params.timeTo) urlParams.append('time_to', params.timeTo);
+    
+    // For payment page
+    if (params.orderId && params.security) {
+      return `${bookingBaseUrl}/payment?id=${params.orderId}&code=${params.security}&${urlParams.toString()}`;
+    }
+    
+    // For deeplink
+    if (params.routeId) {
+      return `${bookingBaseUrl}/deeplink?${urlParams.toString()}`;
+    }
+    
+    // For general search
+    return `${bookingBaseUrl}?${urlParams.toString()}`;
+  }
+
+  // Generate iframe URL
+  generateIframeUrl(params: {
+    pointFromId?: string;
+    pointToId?: string;
+    date?: string;
+    orderId?: string;
+    security?: string;
+  }): string {
+    const { iframeBaseUrl, partnerId, defaultLang, defaultCurrency } = this.config;
+    const urlParams = new URLSearchParams();
+    
+    urlParams.append('partner', partnerId);
+    urlParams.append('lang', defaultLang);
+    urlParams.append('currency', defaultCurrency);
+    
+    if (params.pointFromId) urlParams.append('point_from_id', params.pointFromId);
+    if (params.pointToId) urlParams.append('point_to_id', params.pointToId);
+    if (params.date) urlParams.append('date', params.date);
+    if (params.orderId) urlParams.append('order_id', params.orderId);
+    if (params.security) urlParams.append('security', params.security);
+    
+    return `${iframeBaseUrl}?${urlParams.toString()}`;
+  }
+
+  // Modified API call to include partner ID
+  private async makeApiCall<T>(endpoint: string, data: Record<string, unknown>): Promise<T> {
+    if (this.config.useMockData) {
+      // Use existing mock data for development
+      return mockBussystemAPI.makeRequest(endpoint, data);
+    }
+
+    const requestData = {
+      ...data,
+      login: this.config.login,
+      password: this.config.password,
+      partner: this.config.partnerId, // Always include partner ID
+    };
+
+    const response = await fetch(`${this.config.baseUrl}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify(requestData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API call failed: ${response.statusText}`);
+    }
+
+    return response.json();
+  }
+
+  // Partner-specific workflow methods
+  async searchRoutes(params: {
+    pointFromId: string;
+    pointToId: string;
+    date: string;
+  }) {
+    return this.makeApiCall('/curl/get_routes.php', {
+      point_from_id: params.pointFromId,
+      point_to_id: params.pointToId,
+      date_from: params.date,
+      lang: this.config.defaultLang,
+    });
+  }
+
+  async createOrder(orderData: NewOrderPayload) {
+    // For partners, we create order but redirect for payment
+    const result = await this.makeApiCall<NewOrderResponse>('/curl/new_order.php', orderData);
+    
+    // Generate payment URL for redirect
+    if (result.order_id && result.security) {
+      result.payment_url = this.generateBookingUrl({
+        orderId: result.order_id.toString(),
+        security: result.security,
+      });
+    }
+    
+    return result;
+  }
+
+  // Check if order was paid (after user returns from payment)
+  async checkOrderStatus(orderId: string, security: string) {
+    return this.makeApiCall('/curl/get_order.php', {
+      order_id: orderId,
+      security: security,
+    });
+  }
+
+  // Get available seats
+  async getSeats(intervalId: string) {
+    return this.makeApiCall<GetFreeSeatsResponse>('/curl/get_free_seats.php', {
+      interval_id: intervalId,
+      lang: this.config.defaultLang,
+    });
+  }
+
+  // Search points/cities
+  async searchPoints(query: string) {
+    return this.makeApiCall<BussPoint[]>('/curl/get_points.php', {
+      autocomplete: query,
+      lang: this.config.defaultLang,
+    });
+  }
+}
+
+// Create global instance for easy use
+export const bussystemAPI = new BussystemPartnerAPI();
+
 // Types
 type Json = Record<string, unknown>;
 
