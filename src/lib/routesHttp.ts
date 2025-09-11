@@ -9,19 +9,17 @@
  */
 
 import type { GetRoutesRequest, RawGetRoutesResponse, LanguageCode, CurrencyCode } from '@/types/routes';
+import { API_BASE_URL } from './api-config';
 
 // ===============================
 // HTTP Configuration
 // ===============================
 
-const API_BASE_URL = 'https://test-api.bussystem.eu/server';
-const GET_ROUTES_ENDPOINT = '/curl/get_routes.php';
+// Use configured API base URL from api-config
+const GET_ROUTES_ENDPOINT = '/api/backend/routes/search';
 
-// API credentials (use backend proxy in production)
-const API_CREDENTIALS = {
-  login: import.meta.env.VITE_BUSSYSTEM_LOGIN || 'test_login',
-  password: import.meta.env.VITE_BUSSYSTEM_PASSWORD || 'test_password'
-};
+// Backend now owns credentials; keep fields only for backward compatibility (ignored by backend)
+const API_CREDENTIALS = { login: 'backend', password: 'backend' };
 
 // Rate limiting configuration
 const RATE_LIMIT = {
@@ -241,6 +239,7 @@ export async function fetchRoutes(
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
+        // Backend expects: id_from, id_to, date, lang, currency, etc. (no need json=1 but harmless)
         body: JSON.stringify(requestBody)
       });
       
@@ -248,22 +247,7 @@ export async function fetchRoutes(
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      const responseText = await response.text();
-      console.log(`📥 Raw response (${responseText.length} chars):`, 
-                  responseText.substring(0, 200) + '...');
-      
-      let parsedData: unknown;
-      
-      // Try JSON first
-      try {
-        parsedData = JSON.parse(responseText);
-        console.log('✅ Parsed as JSON');
-      } catch (jsonError) {
-        console.log('⚠️  JSON parse failed, trying XML fallback...');
-        // Fallback to XML parsing
-        parsedData = parseXMLResponse(responseText);
-        console.log('✅ Parsed as XML');
-      }
+  const parsedData = await response.json();
       
       // Validate and return
       const validatedResponse = validateResponse(parsedData);

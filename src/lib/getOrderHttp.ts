@@ -14,7 +14,7 @@ import type {
 
 import { GET_ORDER_ERRORS } from '../types/getOrder';
 
-const GET_ORDER_ENDPOINT = '/curl/get_order.php';
+const GET_ORDER_ENDPOINT = import.meta.env.DEV ? '/api/backend/curl/get_order.php' : '/api/backend/curl/get_order.php';
 
 // Cache for order information (short-term caching)
 const orderCache = new Map<string, { data: OrderInfo; timestamp: number }>();
@@ -98,13 +98,9 @@ export async function getOrderInfo(
   }
 
   try {
-    const credentials = {
-      login: import.meta.env.VITE_BUSSYSTEM_LOGIN || 'test_login',
-      password: import.meta.env.VITE_BUSSYSTEM_PASSWORD || 'test_password'
-    };
-
     const request: GetOrderRequest = {
-      ...credentials,
+      login: 'backend',
+      password: 'backend',
       order_id: orderId,
       security,
       lang: 'en'
@@ -114,11 +110,18 @@ export async function getOrderInfo(
     
     logApiRequest(GET_ORDER_ENDPOINT, requestData);
 
-    const response = await apiPost<OrderInfo>(
-      GET_ORDER_ENDPOINT,
-      requestData,
-      { timeout, retries, forceJson: true }
-    );
+    // Use fetch directly because backend already returns JSON
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    const responseRaw = await fetch(GET_ORDER_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(requestData),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+    if (!responseRaw.ok) throw new Error(`HTTP ${responseRaw.status}`);
+    const response = await responseRaw.json() as OrderInfo;
 
     // Cache successful response
     if (response) {

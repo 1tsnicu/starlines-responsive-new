@@ -1123,10 +1123,34 @@ export const mockBussystemAPI = {
         point_ua_name: "Кишинів",
         point_latin_name: "Chisinau",
         country_name: "Moldova",
-        country_kod: "MD",
+        country_kod: "MDA",
         country_id: "1",
         point_name_detail: "Central Bus Station",
         priority: "1"
+      },
+      {
+        point_id: "4",
+        point_name: "Chișinău Aeroportul",
+        point_ru_name: "Кишинев аэропорт",
+        point_ua_name: "Кишинів аеропорт",
+        point_latin_name: "Chisinau Airport",
+        country_name: "Moldova",
+        country_kod: "MDA",
+        country_id: "1",
+        point_name_detail: "International Airport",
+        priority: "2"
+      },
+      {
+        point_id: "5",
+        point_name: "Chișineu-Criș",
+        point_ru_name: "Кишинеу-Криш",
+        point_ua_name: "Кишинеу-Криш",
+        point_latin_name: "Chisineu-Cris",
+        country_name: "România",
+        country_kod: "ROU",
+        country_id: "2",
+        point_name_detail: "Bus Station",
+        priority: "3"
       },
       {
         point_id: "2",
@@ -1139,6 +1163,18 @@ export const mockBussystemAPI = {
         country_id: "2",
         point_name_detail: "Gara de Nord",
         priority: "2"
+      },
+      {
+        point_id: "6",
+        point_name: "Chita",
+        point_ru_name: "Чита",
+        point_ua_name: "Чита",
+        point_latin_name: "Chita",
+        country_name: "Россия",
+        country_kod: "RUS",
+        country_id: "3",
+        point_name_detail: "Central Station",
+        priority: "4"
       },
       {
         point_id: "3",
@@ -1156,11 +1192,19 @@ export const mockBussystemAPI = {
 
     if (params.autocomplete) {
       const query = params.autocomplete.toLowerCase();
-      return mockPoints.filter(point => 
-        point.point_name?.toLowerCase().includes(query) ||
-        point.point_ru_name?.toLowerCase().includes(query) ||
-        point.point_latin_name?.toLowerCase().includes(query)
-      );
+      // Only filter if query has at least 1 character
+      if (query.length >= 1) {
+        return mockPoints.filter(point => 
+          point.point_name?.toLowerCase().startsWith(query) ||
+          point.point_ru_name?.toLowerCase().startsWith(query) ||
+          point.point_latin_name?.toLowerCase().startsWith(query) ||
+          point.point_name?.toLowerCase().includes(query) ||
+          point.point_ru_name?.toLowerCase().includes(query) ||
+          point.point_latin_name?.toLowerCase().includes(query)
+        );
+      }
+      // Return empty array for empty query
+      return [];
     }
 
     return mockPoints;

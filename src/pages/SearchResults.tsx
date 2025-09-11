@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Filter, SortAsc, SortDesc, Clock, MapPin, Star, Wifi, Zap, Bath, Snowflake, X } from "lucide-react";
+import { Filter, SortAsc, SortDesc, Clock, MapPin, Star, Wifi, Zap, Bath, Snowflake, X, Bus, Luggage } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,17 +8,36 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { searchRoutes, Route } from "@/lib/mock-data";
+import { useRouteSearch, RouteSummary } from "@/lib/bussystem";
 import { cn } from "@/lib/utils";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import { BaggageSelection } from "@/components/BaggageSelection";
 
 const SearchResults = () => {
   const { t, formatPrice } = useLocalization();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [results, setResults] = useState<Route[]>([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Get search parameters
+  const from = searchParams.get("from") || "";
+  const to = searchParams.get("to") || "";
+  const date = searchParams.get("date") || "";
+  const passengers = searchParams.get("passengers") || "1";
+  const fromPointId = searchParams.get("fromPointId") || "";
+  const toPointId = searchParams.get("toPointId") || "";
+
+  // Use the real API hook
+  const { data: routes, loading, error } = useRouteSearch({
+    id_from: fromPointId,
+    id_to: toPointId,
+    date: date,
+    trans: "bus",
+    currency: "EUR",
+    lang: "ru"
+  });
+
   const [filters, setFilters] = useState({
     departureTime: [0, 24],
     duration: [0, 30],
@@ -29,27 +48,10 @@ const SearchResults = () => {
   });
   const [sortBy, setSortBy] = useState("recommended");
   const [showFilters, setShowFilters] = useState(false);
-
-  const from = searchParams.get("from") || "";
-  const to = searchParams.get("to") || "";
-  const date = searchParams.get("date") || "";
-  const passengers = searchParams.get("passengers") || "1";
-
-  useEffect(() => {
-    const fetchResults = async () => {
-      setLoading(true);
-      try {
-        const data = await searchRoutes(from, to, date, parseInt(passengers));
-        setResults(data);
-      } catch (error) {
-        console.error("Error fetching results:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchResults();
-  }, [from, to, date, passengers]);
+  
+  // State pentru gestionarea bagajelor
+  const [selectedRoute, setSelectedRoute] = useState<RouteSummary | null>(null);
+  const [showBaggageSelection, setShowBaggageSelection] = useState(false);
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -64,13 +66,43 @@ const SearchResults = () => {
     }));
   };
 
-  const handleSelectRoute = (route: Route) => {
+  const handleSelectRoute = (route: RouteSummary) => {
+    // Verifică dacă ruta suportă bagaje
+    if (route.request_get_baggage === 1) {
+      setSelectedRoute(route);
+      setShowBaggageSelection(true);
+    } else {
+      // Navighează direct la detaliile călătoriei
+      const searchParams = new URLSearchParams({
+        intervalId: route.interval_id,
+        passengers: passengers,
+        from: from,
+        to: to,
+        date: date
+      });
+      navigate(`/trip-details?${searchParams.toString()}`);
+    }
+  };
+
+  const handleContinueWithBaggage = (baggageData?: any) => {
+    if (!selectedRoute) return;
+    
     const searchParams = new URLSearchParams({
-      routeId: route.id,
-      fareId: "1", // Default to first fare type
-      passengers: passengers
+      intervalId: selectedRoute.interval_id,
+      passengers: passengers,
+      from: from,
+      to: to,
+      date: date
     });
-    navigate(`/checkout?${searchParams.toString()}`);
+    
+    // Dacă avem bagaje selectate, le adăugăm în URL
+    if (baggageData) {
+      searchParams.append('baggage', JSON.stringify(baggageData));
+    }
+    
+    navigate(`/trip-details?${searchParams.toString()}`);
+    setShowBaggageSelection(false);
+    setSelectedRoute(null);
   };
 
   const getAmenityIcon = (amenity: string) => {
@@ -83,35 +115,61 @@ const SearchResults = () => {
     }
   };
 
-  // Helper function to convert duration string to minutes
-  const durationToMinutes = (duration: string): number => {
-    const match = duration.match(/(\d+)h\s*(\d+)?m?/);
-    if (match) {
-      const hours = parseInt(match[1]);
-      const minutes = match[2] ? parseInt(match[2]) : 0;
-      return hours * 60 + minutes;
-    }
-    return 0;
+  // Helper function to convert time string to minutes from midnight
+  const timeToMinutes = (timeStr: string | undefined): number => {
+    if (!timeStr || typeof timeStr !== 'string') return 0;
+    const parts = timeStr.split(':');
+    if (parts.length < 2) return 0;
+    const [hours, minutes] = parts.map(Number);
+    return (hours || 0) * 60 + (minutes || 0);
   };
 
-  const filteredResults = results.filter(route => {
+  // Helper function to parse duration "HH:MM" format to minutes
+  const durationToMinutes = (duration: string | undefined): number => {
+    if (!duration || typeof duration !== 'string') return 0;
+    const parts = duration.split(':');
+    if (parts.length < 2) return 0;
+    const [hours, minutes] = parts.map(Number);
+    return (hours || 0) * 60 + (minutes || 0);
+  };
+
+  // Helper function to parse comfort string to amenities array
+  const parseAmenities = (comfort?: string): string[] => {
+    if (!comfort) return [];
+    return comfort.split(',').map(item => item.trim());
+  };
+
+  const filteredResults = routes.filter(route => {
+    // Skip routes with missing essential data
+    if (!route || !route.time_from) {
+      return false;
+    }
+
+    // Filter by departure time
+    const departureMinutes = timeToMinutes(route.time_from);
+    const departureHour = Math.floor(departureMinutes / 60);
+    if (departureHour < filters.departureTime[0] || departureHour > filters.departureTime[1]) return false;
+
+    // Filter by duration
+    const routeDurationMinutes = durationToMinutes(route.time_in_way || "0:00");
+    const routeDurationHours = routeDurationMinutes / 60;
+    if (routeDurationHours < filters.duration[0] || routeDurationHours > filters.duration[1]) return false;
+
+    // Filter by price
+    const price = parseFloat(route.price_one_way || "0");
+    if (price < filters.price[0] || price > filters.price[1]) return false;
+
     // Filter by amenities
     if (filters.amenities.length > 0) {
+      const routeAmenities = parseAmenities(route.comfort);
       const hasAllAmenities = filters.amenities.every(amenity => 
-        route.amenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()))
+        routeAmenities.some(a => a.toLowerCase().includes(amenity.toLowerCase()))
       );
       if (!hasAllAmenities) return false;
     }
 
     // Filter by operator
-    if (filters.operator !== "all" && route.operator !== filters.operator) return false;
-
-    // Filter by stops
-    if (filters.stops === "direct" && route.stops > 0) return false;
-    if (filters.stops === "max1" && route.stops > 1) return false;
-
-    // Filter by price
-    if (route.price < filters.price[0] || route.price > filters.price[1]) return false;
+    if (filters.operator !== "all" && route.carrier !== filters.operator) return false;
 
     return true;
   });
@@ -119,13 +177,13 @@ const SearchResults = () => {
   const sortedResults = [...filteredResults].sort((a, b) => {
     switch (sortBy) {
       case "price-low":
-        return a.price - b.price;
+        return parseFloat(a.price_one_way || "0") - parseFloat(b.price_one_way || "0");
       case "price-high":
-        return b.price - a.price;
+        return parseFloat(b.price_one_way || "0") - parseFloat(a.price_one_way || "0");
       case "duration":
-        return durationToMinutes(a.duration) - durationToMinutes(b.duration);
+        return durationToMinutes(a.time_in_way || "0:00") - durationToMinutes(b.time_in_way || "0:00");
       case "rating":
-        return b.rating - a.rating;
+        return parseFloat(b.rating || "0") - parseFloat(a.rating || "0");
       default:
         return 0;
     }
@@ -362,7 +420,19 @@ const SearchResults = () => {
               </p>
             </div>
 
-            {sortedResults.length === 0 ? (
+            {error ? (
+              <div className="text-center py-12">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  Eroare la căutarea rutelor
+                </h3>
+                <p className="text-foreground/70 mb-4">
+                  {error}
+                </p>
+                <Button onClick={() => window.location.reload()}>
+                  Încearcă din nou
+                </Button>
+              </div>
+            ) : sortedResults.length === 0 ? (
               <div className="text-center py-12">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
                   {t('search.noRoutesFound')}
@@ -384,58 +454,76 @@ const SearchResults = () => {
             ) : (
               <div className="space-y-4">
                 {sortedResults.map((route) => (
-                  <Card key={route.id} className="hover-lift border-border">
+                  <Card key={route.interval_id} className="hover-lift border-border">
                     <CardContent className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                         {/* Route Info */}
                         <div className="md:col-span-4">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="text-2xl font-bold text-primary">
-                              {route.departureTime}
+                              {route.time_from}
                             </div>
                             <div className="flex-1">
                               <div className="w-full h-0.5 bg-muted relative">
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                  <div className="w-2 h-2 bg-primary rounded-full" />
+                                  <Bus className="w-4 h-4 bg-background text-primary" />
                                 </div>
                               </div>
                             </div>
                             <div className="text-2xl font-bold text-primary">
-                              {route.arrivalTime}
+                              {route.time_to}
                             </div>
                           </div>
                           <div className="text-sm text-foreground/70 text-center">
-                            {route.duration} • {route.stops} {route.stops === 1 ? t('search.stops') : t('search.stops')}
+                            {route.time_in_way || 'N/A'} • {route.route_name}
                           </div>
                         </div>
 
                         {/* Route Details */}
                         <div className="md:col-span-4">
                           <h3 className="font-semibold text-foreground mb-1">
-                            {route.from.name} → {route.to.name}
+                            {route.point_from} → {route.point_to}
                           </h3>
                           <div className="flex items-center gap-4 text-sm text-foreground/70">
-                            <span>{route.operator}</span>
-                            <div className="flex items-center gap-1">
-                              <Star className="h-4 w-4 text-warning fill-warning" />
-                              <span>{route.rating}</span>
-                              <span>({route.reviews})</span>
-                            </div>
+                            <span>{route.carrier || 'N/A'}</span>
+                            {route.rating && (
+                              <div className="flex items-center gap-1">
+                                <Star className="h-4 w-4 text-warning fill-warning" />
+                                <span>{route.rating}</span>
+                                {route.reviews && <span>({route.reviews})</span>}
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {route.trans === 'bus' ? 'Autobus' : route.trans}
+                            </Badge>
+                            {route.date_from !== route.date_to && (
+                              <Badge variant="secondary" className="text-xs">
+                                Peste noapte
+                              </Badge>
+                            )}
                           </div>
                         </div>
 
                         {/* Amenities */}
                         <div className="md:col-span-2">
                           <div className="flex flex-wrap gap-1">
-                            {route.amenities.slice(0, 3).map((amenity) => (
+                            {parseAmenities(route.comfort).slice(0, 3).map((amenity) => (
                               <Badge key={amenity} variant="outline" className="text-xs">
                                 {getAmenityIcon(amenity)}
                                 <span className="ml-1">{amenity}</span>
                               </Badge>
                             ))}
-                            {route.amenities.length > 3 && (
+                            {parseAmenities(route.comfort).length > 3 && (
                               <Badge variant="outline" className="text-xs">
-                                +{route.amenities.length - 3}
+                                +{parseAmenities(route.comfort).length - 3}
+                              </Badge>
+                            )}
+                            {route.request_get_baggage === 1 && (
+                              <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                <Luggage className="h-3 w-3 mr-1" />
+                                Bagaje disponibile
                               </Badge>
                             )}
                           </div>
@@ -444,9 +532,9 @@ const SearchResults = () => {
                         {/* Price & CTA */}
                         <div className="md:col-span-2 text-right">
                           <div className="mb-2">
-                            <span className="text-xs text-foreground/70">{t('search.from')}</span>
+                            <span className="text-xs text-foreground/70">de la</span>
                             <div className="text-2xl font-bold text-primary">
-                              {formatPrice(route.price, undefined, 'EUR')}
+                              {formatPrice(parseFloat(route.price_one_way || "0"), undefined, route.currency || 'EUR')}
                             </div>
                           </div>
                           <Button 
@@ -454,7 +542,7 @@ const SearchResults = () => {
                             className="w-full"
                             onClick={() => handleSelectRoute(route)}
                           >
-                            {t('search.select')}
+                            {route.request_get_baggage === 1 ? 'Selectează & Bagaje' : 'Selectează'}
                           </Button>
                         </div>
                       </div>
@@ -466,6 +554,46 @@ const SearchResults = () => {
           </div>
         </div>
       </div>
+
+      {/* Dialog pentru selecția bagajelor */}
+      <Dialog open={showBaggageSelection} onOpenChange={setShowBaggageSelection}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Selectează bagajele pentru {selectedRoute?.point_from} → {selectedRoute?.point_to}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedRoute && (
+            <BaggageSelection
+              intervalId={selectedRoute.interval_id}
+              stationFromId={selectedRoute.station_from}
+              stationToId={selectedRoute.station_to}
+              currency={selectedRoute.currency as any || 'EUR'}
+              passengerCount={parseInt(passengers)}
+              onPayloadReady={(payload) => {
+                console.log('Baggage payload ready:', payload);
+                handleContinueWithBaggage(payload);
+              }}
+            />
+          )}
+          
+          <div className="flex gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowBaggageSelection(false);
+                setSelectedRoute(null);
+              }}
+            >
+              Anulează
+            </Button>
+            <Button onClick={() => handleContinueWithBaggage()}>
+              Continuă fără bagaje
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -27,25 +27,6 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import TransportRoutes from "@/pages/TransportRoutes";
 import AdminRoutes from "@/pages/AdminRoutes";
 import Login from "@/pages/Login";
-import BussystemDemo from "@/pages/BussystemDemo";
-import MockVsRealDemo from "@/pages/MockVsRealDemo";
-import { SeatSelectionDemo } from "@/components/SeatSelectionDemo";
-import DiscountDemo from "@/pages/DiscountDemo";
-import BaggageDemo from "@/pages/BaggageDemo";
-import BookingDemo from "@/pages/BookingDemo";
-import PaymentDemo from "@/pages/PaymentDemo";
-import TicketPrintDemo from "@/pages/TicketPrintDemo";
-import CancellationDemo from "@/pages/CancellationDemo";
-import PointsDemo from "@/pages/PointsDemo";
-import RoutesDemo from "@/pages/RoutesDemo";
-import { GetAllRoutesDemo } from "@/pages/GetAllRoutesDemo";
-import SeatsDemo from "@/pages/SeatsDemo";
-import PlanDemo from "@/pages/PlanDemo";
-import NewOrderDemo from "@/pages/NewOrderDemo";
-import ReserveTicketDemo from "@/pages/ReserveTicketDemo";
-import ReserveValidationDemo from "@/pages/ReserveValidationDemo";
-import { DemoPage } from "@/components/DemoPage";
-import BussystemTestPage from "@/components/BussystemTestPage";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -87,24 +68,6 @@ function App() {
                   <Route path="/transport-routes" element={<TransportRoutes />} />
                   <Route path="/admin/routes" element={<AdminRoutes />} />
                   <Route path="/login" element={<Login />} />
-                  <Route path="/bussystem-demo" element={<BussystemDemo />} />
-                  <Route path="/mock-vs-real-demo" element={<MockVsRealDemo />} />
-                  <Route path="/seat-selection-demo" element={<SeatSelectionDemo />} />
-                  <Route path="/discount-demo" element={<DiscountDemo />} />
-                  <Route path="/baggage-demo" element={<BaggageDemo />} />
-                  <Route path="/booking-demo" element={<BookingDemo />} />
-                  <Route path="/payment-demo" element={<PaymentDemo />} />
-                  <Route path="/ticket-print-demo" element={<TicketPrintDemo />} />
-                  <Route path="/cancellation-demo" element={<CancellationDemo />} />
-                  <Route path="/points-demo" element={<PointsDemo />} />
-                  <Route path="/routes-demo" element={<RoutesDemo />} />
-                  <Route path="/seats-demo" element={<SeatsDemo />} />
-                  <Route path="/plan-demo" element={<PlanDemo />} />
-                  <Route path="/new-order-demo" element={<NewOrderDemo />} />
-                  <Route path="/reserve-ticket-demo" element={<ReserveTicketDemo />} />
-                  <Route path="/reserve-validation-demo" element={<ReserveValidationDemo />} />
-                  <Route path="/api-demo" element={<DemoPage />} />
-                  <Route path="/bussystem-test" element={<BussystemTestPage />} />
                 </Routes>
               </main>
               <Footer />

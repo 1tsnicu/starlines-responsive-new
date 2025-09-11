@@ -8,7 +8,7 @@ import type {
   OrderCreationResult 
 } from '@/types/newOrder';
 
-const NEW_ORDER_ENDPOINT = '/curl/new_order.php';
+const NEW_ORDER_ENDPOINT = import.meta.env.DEV ? '/api/backend/curl/new_order.php' : '/api/backend/curl/new_order.php';
 
 // Rate limiting configuration
 const RATE_LIMIT = {

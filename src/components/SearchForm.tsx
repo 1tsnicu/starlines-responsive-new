@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeftRight, Calendar as CalendarIcon, MapPin, Users, Briefcase } from "lucide-react";
+import { ArrowLeftRight, Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -39,8 +39,9 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
   const [toPoint, setToPoint] = useState<BussPoint | null>(null);
   const [departureDate, setDepartureDate] = useState<Date>();
   const [returnDate, setReturnDate] = useState<Date>();
-  const [passengers, setPassengers] = useState("1");
-  const [baggage, setBaggage] = useState("1");
+  // Removed passenger and baggage state - using defaults
+  const passengers = "1";
+  const baggage = "1";
   const [isRoundTrip, setIsRoundTrip] = useState(false);
 
   const handleSwapCities = () => {
@@ -122,213 +123,198 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <div className="bg-card rounded-2xl shadow-lg p-6 md:p-8 border border-border">
+    <div className="w-full max-w-4xl mx-auto px-4">
+      <div className="bg-gradient-to-br from-teal-400 via-teal-500 to-cyan-600 rounded-3xl shadow-2xl p-8 md:p-10 relative">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 overflow-hidden"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-2xl translate-y-12 -translate-x-12 overflow-hidden"></div>
+        
+        {/* Content with relative positioning */}
+        <div className="relative z-10">
         {/* Trip Type Toggle */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-1 mb-6 bg-white/90 backdrop-blur-sm p-1 rounded-full shadow-lg w-fit">
           <button
             onClick={() => setIsRoundTrip(false)}
             className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all",
+              "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300",
               !isRoundTrip
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-600 hover:text-blue-600"
             )}
           >
-            {t('search.oneWay')}
+            Dus
           </button>
           <button
             onClick={() => setIsRoundTrip(true)}
             className={cn(
-              "px-4 py-2 rounded-full text-sm font-medium transition-all",
+              "px-6 py-2 rounded-full text-sm font-semibold transition-all duration-300",
               isRoundTrip
-                ? "bg-primary text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-600 hover:text-blue-600"
             )}
           >
-            {t('search.roundTrip')}
+            Dus-întors
           </button>
         </div>
 
         {/* Quick Routes Chips */}
         <div className="mb-6">
-          <Label className="text-sm font-medium text-muted-foreground mb-3 block">
-            {t('search.popularRoutes')}
-          </Label>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+            <span className="text-white text-sm font-medium">Rute Populare</span>
+          </div>
           <div className="flex flex-wrap gap-2">
             {quickRoutes.map((route, index) => (
-              <Badge
+              <button
                 key={index}
-                variant="outline"
-                className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                className="bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-white hover:shadow-md transition-all duration-300 hover:scale-105"
                 onClick={() => handleQuickRoute(route)}
               >
                 {route.from} → {route.to}
-              </Badge>
+              </button>
             ))}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
-          {/* From City */}
-          <div className="lg:col-span-4 space-y-2">
-            <Label htmlFor="from" className="text-sm font-medium">
-              {t('search.from')}
-            </Label>
-            <BussystemAutocomplete
-              placeholder={t('search.fromPlaceholder')}
-              value={fromCity}
-              onSelect={handleFromPointSelect}
-              className="w-full"
-            />
-          </div>
-
-          {/* Swap Button */}
-          <div className="lg:col-span-1 flex justify-center">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleSwapCities}
-              className="h-10 w-10 rounded-full border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-all duration-200 hover:scale-110 bg-white"
-              title={t('search.swapCities')}
-              style={{ color: '#0B1220' }}
-            >
-              <ArrowLeftRight className="h-4 w-4" style={{ color: '#0B1220' }} />
-            </Button>
-          </div>
-
-          {/* To City */}
-          <div className="lg:col-span-4 space-y-2">
-            <Label htmlFor="to" className="text-sm font-medium">
-              {t('search.to')}
-            </Label>
-            <BussystemAutocomplete
-              placeholder={t('search.toPlaceholder')}
-              value={toCity}
-              onSelect={handleToPointSelect}
-              className="w-full"
-            />
-          </div>
-
-          {/* Departure Date */}
-          <div className="lg:col-span-3 space-y-2">
-            <Label className="text-sm font-medium">
-              {t('search.departure')}
-            </Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full h-12 justify-start text-left font-normal text-black",
-                    !departureDate && "text-gray-500"
-                  )}
-                  style={{ color: departureDate ? '#0B1220' : '#6B7280' }}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {departureDate ? format(departureDate, "PPP") : t('search.selectDate')}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={departureDate}
-                  onSelect={setDepartureDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
+        <div className="space-y-6">
+          {/* Location Selection Row */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            {/* From City */}
+            <div className="md:col-span-5 space-y-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span className="text-white text-sm font-medium">De unde</span>
+              </div>
+              <div className="relative z-[100]">
+                <BussystemAutocomplete
+                  placeholder="Orașul de plecare"
+                  value={fromCity}
+                  onSelect={handleFromPointSelect}
+                  lang="ru"
+                  trans="bus"
+                  showCountry={true}
+                  showDetails={false}
+                  minLength={1}
+                  className="w-full h-12 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-lg text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-white/50"
                 />
-              </PopoverContent>
-            </Popover>
+              </div>
+            </div>
+
+            {/* Swap Button */}
+            <div className="md:col-span-2 flex justify-center">
+              <button
+                type="button"
+                onClick={handleSwapCities}
+                className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300 hover:scale-110 group flex items-center justify-center"
+                title="Schimbă orașele"
+              >
+                <ArrowLeftRight className="h-5 w-5 text-white group-hover:rotate-180 transition-transform duration-300" />
+              </button>
+            </div>
+
+            {/* To City */}
+            <div className="md:col-span-5 space-y-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
+                <span className="text-white text-sm font-medium">Unde</span>
+              </div>
+              <div className="relative z-[100]">
+                <BussystemAutocomplete
+                  placeholder="Orașul de destinație"
+                  value={toCity}
+                  onSelect={handleToPointSelect}
+                  lang="ru"
+                  trans="bus"
+                  showCountry={true}
+                  showDetails={false}
+                  minLength={1}
+                  className="w-full h-12 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-lg text-gray-700 placeholder:text-gray-400 focus:ring-2 focus:ring-white/50"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Return Date (if round trip) */}
-          {isRoundTrip && (
-            <div className="lg:col-span-3 space-y-2">
-              <Label className="text-sm font-medium">
-                {t('search.return')}
-              </Label>
+          {/* Date and Search Row */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+            {/* Departure Date */}
+            <div className="md:col-span-4 space-y-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                <span className="text-white text-sm font-medium">Data plecării</span>
+              </div>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    className={cn(
-                      "w-full h-12 justify-start text-left font-normal text-black",
-                      !returnDate && "text-gray-500"
-                    )}
-                    style={{ color: returnDate ? '#0B1220' : '#6B7280' }}
+                    className="w-full h-12 justify-start text-left font-medium bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700"
                   >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {returnDate ? format(returnDate, "PPP") : t('search.selectDate')}
+                    <CalendarIcon className="mr-3 h-5 w-5 text-blue-500" />
+                    <span>
+                      {departureDate ? format(departureDate, "dd MMM yyyy", { locale: undefined }) : "Selectează data"}
+                    </span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-2xl z-[9998]" align="start" style={{ zIndex: 9998 }}>
                   <Calendar
                     mode="single"
-                    selected={returnDate}
-                    onSelect={setReturnDate}
-                    disabled={(date) => date < (departureDate || new Date())}
+                    selected={departureDate}
+                    onSelect={setDepartureDate}
+                    disabled={(date) => date < new Date()}
                     initialFocus
+                    className="rounded-2xl"
                   />
                 </PopoverContent>
               </Popover>
             </div>
-          )}
 
-          {/* Passengers */}
-          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-2" : "lg:col-span-3")}>
-            <Label className="text-sm font-medium">
-              {t('search.passengers')}
-            </Label>
-            <Select value={passengers} onValueChange={setPassengers}>
-              <SelectTrigger className="h-12 text-black" style={{ color: '#0B1220' }}>
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <SelectValue />
+            {/* Return Date (if round trip) */}
+            {isRoundTrip && (
+              <div className="md:col-span-4 space-y-2">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                  <span className="text-white text-sm font-medium">Data întoarcerii</span>
                 </div>
-              </SelectTrigger>
-              <SelectContent>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                  <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? t('search.passenger') : t('search.passengers')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 justify-start text-left font-medium bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 text-gray-700"
+                    >
+                      <CalendarIcon className="mr-3 h-5 w-5 text-purple-500" />
+                      <span>
+                        {returnDate ? format(returnDate, "dd MMM yyyy", { locale: undefined }) : "Selectează data"}
+                      </span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white/95 backdrop-blur-sm border-0 rounded-2xl shadow-2xl z-[9998]" align="start" style={{ zIndex: 9998 }}>
+                    <Calendar
+                      mode="single"
+                      selected={returnDate}
+                      onSelect={setReturnDate}
+                      disabled={(date) => date < (departureDate || new Date())}
+                      initialFocus
+                      className="rounded-2xl"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            )}
 
-          {/* Baggage */}
-          <div className={cn("space-y-2", isRoundTrip ? "lg:col-span-2" : "lg:col-span-3")}>
-            <Label className="text-sm font-medium">
-              {t('search.baggage')}
-            </Label>
-            <Select value={baggage} onValueChange={setBaggage}>
-              <SelectTrigger className="h-12 text-black" style={{ color: '#0B1220' }}>
-                <div className="flex items-center gap-2">
-                  <Briefcase className="h-4 w-4" />
-                  <SelectValue />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                {[0, 1, 2, 3].map((num) => (
-                  <SelectItem key={num} value={num.toString()}>
-                    {num} {num === 1 ? t('search.bag') : t('search.bags')}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Search Button */}
+            <div className={cn("md:col-span-4", isRoundTrip ? "" : "md:col-start-9")}>
+              <Button 
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden group"
+                size="lg"
+                onClick={handleSearch}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  Caută Bilete
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                </span>
+              </Button>
+            </div>
           </div>
-
-          {/* Search Button */}
-          <div className={cn("", isRoundTrip ? "lg:col-span-2" : "lg:col-span-2")}>
-            <Button 
-              className="w-full h-12 bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
-              size="lg"
-              onClick={handleSearch}
-            >
-              {t('search.searchTickets')}
-            </Button>
-          </div>
+        </div>
         </div>
       </div>
     </div>

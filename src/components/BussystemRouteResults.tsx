@@ -254,10 +254,25 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
   }
 
   if (error) {
+    const isNoInterval = /interval_no_found/i.test(error);
     return (
       <Alert>
         <AlertDescription>
-          Ошибка при поиске маршрутов: {error}
+          {isNoInterval ? (
+            <div className="space-y-2">
+              <div><strong>Маршруты не найдены для выбранных параметров.</strong></div>
+              <ul className="list-disc pl-5 text-sm space-y-1">
+                <li>Попробуйте другую дату (часто нет рейсов каждый день)</li>
+                <li>Убедитесь что выбраны реальные города через автокомплит (а не пресет ID)</li>
+                <li>Попробуйте язык en вместо ru (редко влияет, но можно)</li>
+                <li>Удалите параметр change=auto (только прямые рейсы) — нужно обновить код если тестируете</li>
+                <li>Если аккаунт ещё не активирован полностью, часть направлений может отсутствовать</li>
+              </ul>
+              <div className="text-xs text-muted-foreground break-all">Техническая ошибка API: interval_no_found</div>
+            </div>
+          ) : (
+            <>Ошибка при поиске маршрутов: {error}</>
+          )}
         </AlertDescription>
       </Alert>
     );

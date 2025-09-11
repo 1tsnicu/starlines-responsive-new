@@ -2,11 +2,8 @@
 // Handles both JSON and XML responses with proper error handling
 
 import type { PointsApiError } from '../types/points';
-
-// Base API configuration
-const API_BASE_URL = import.meta.env.DEV 
-  ? '/api/bussystem'  // Use Vite proxy in development
-  : 'https://test-api.bussystem.eu/server';  // Direct API in production
+import { BussPoint } from './bussystem';
+import { API_BASE_URL } from './api-config';
 
 // Debug logging
 if (import.meta.env.DEV) {
@@ -14,9 +11,10 @@ if (import.meta.env.DEV) {
 }
 
 // API credentials (in production, these should come from backend proxy)
+// Support both legacy VITE_BUSSYSTEM_* and preferred VITE_BUSS_* variables
 const API_CREDENTIALS = {
-  login: import.meta.env.VITE_BUSSYSTEM_LOGIN || 'test_login',
-  password: import.meta.env.VITE_BUSSYSTEM_PASSWORD || 'test_password'
+  login: (import.meta.env as any).VITE_BUSS_LOGIN || (import.meta.env as any).VITE_BUSSYSTEM_LOGIN || 'test_login',
+  password: (import.meta.env as any).VITE_BUSS_PASSWORD || (import.meta.env as any).VITE_BUSSYSTEM_PASSWORD || 'test_password'
 };
 
 export interface ApiRequestOptions {
@@ -40,122 +38,51 @@ export class ApiHttpError extends Error {
 /**
  * Makes a POST request to Bussystem API with automatic JSON/XML handling
  */
-export async function apiPost<T>(
-  path: string, 
-  body: Record<string, unknown>, 
-  options: ApiRequestOptions = {}
-): Promise<T> {
-  const { timeout = 30000, retries = 2, forceJson = true } = options;
-  
-  const url = `${API_BASE_URL}${path}`;
-  const requestBody = {
-    ...API_CREDENTIALS,
-    json: forceJson ? 1 : undefined,
-    ...body
-  };
+export const apiPost = async (endpoint: string, data: any) => {
+  try {
+    // Use configured API base URL
+    const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-  let lastError: Error | null = null;
-  
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeout);
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          'User-Agent': 'Starlight-Routes/1.0'
-        },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new ApiHttpError(
-          `HTTP ${response.status}: ${response.statusText}`,
-          response.status
-        );
-      }
-
-      const responseText = await response.text();
-      
-      // Try to parse as JSON first
-      try {
-        const jsonData = JSON.parse(responseText);
+    if (!response.ok) {
+      // Special fallback for get_points 500 errors - try form data
+      if (endpoint.includes('get_points') && response.status === 500) {
+        console.warn('get_points failed with JSON, trying form-encoded...');
+        const formData = new URLSearchParams();
+        Object.keys(data).forEach(key => {
+          formData.append(key, data[key]);
+        });
         
-        // Check for API-level errors in JSON response
-        if (jsonData.error || (typeof jsonData === 'object' && jsonData.root?.error)) {
-          const errorMsg = jsonData.error || jsonData.root.error;
-          throw new ApiHttpError(
-            `API Error: ${errorMsg}`,
-            response.status,
-            errorMsg
-          );
-        }
+        const retryResponse = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: formData,
+        });
         
-        return jsonData as T;
-      } catch (jsonError) {
-        // If JSON parsing fails, try XML
-        if (responseText.trim().startsWith('<')) {
-          try {
-            const xmlData = await parseXmlResponse<T>(responseText);
-            
-            // Check for XML errors
-            if (typeof xmlData === 'object' && xmlData && 'error' in xmlData) {
-              const errorData = xmlData as { error: string };
-              throw new ApiHttpError(
-                `API Error: ${errorData.error}`,
-                response.status,
-                errorData.error
-              );
-            }
-            
-            return xmlData;
-          } catch (xmlError) {
-            throw new ApiHttpError(
-              'Failed to parse XML response',
-              response.status,
-              'PARSE_ERROR',
-              xmlError instanceof Error ? xmlError : new Error(String(xmlError))
-            );
-          }
-        } else {
-          // Neither JSON nor XML
-          throw new ApiHttpError(
-            'Invalid response format',
-            response.status,
-            'INVALID_FORMAT'
-          );
+        if (!retryResponse.ok) {
+          throw new Error(`HTTP error! status: ${retryResponse.status}`);
         }
-      }
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      
-      if (error instanceof ApiHttpError) {
-        // Don't retry on API errors (auth, etc.)
-        throw error;
+        return await retryResponse.json();
       }
       
-      if (attempt === retries) {
-        break;
-      }
-      
-      // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API request failed:', error);
+    throw error;
   }
-  
-  throw new ApiHttpError(
-    `Request failed after ${retries + 1} attempts`,
-    undefined,
-    'MAX_RETRIES_EXCEEDED',
-    lastError || undefined
-  );
-}
+};
 
 /**
  * Parse XML response to JSON

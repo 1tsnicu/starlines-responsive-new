@@ -271,10 +271,8 @@ export async function getFreeSeats(
     );
   }
   
-  const API_BASE_URL = import.meta.env.DEV 
-    ? '/api/bussystem'  // Use Vite proxy in development
-    : 'https://test-api.bussystem.eu/server';  // Direct API in production
-  const endpoint = `${API_BASE_URL}/curl/get_free_seats.php`;
+  const API_BASE_URL = import.meta.env.DEV ? '/api/backend/curl' : '/api/backend/curl';
+  const endpoint = `${API_BASE_URL}/get_free_seats.php`;
   
   let lastError: GetFreeSeatsError | null = null;
   
@@ -294,8 +292,6 @@ export async function getFreeSeats(
       
       // Prepare request body
       const body: Record<string, unknown> = {
-        login: request.login,
-        password: request.password,
         interval_id: request.interval_id,
         currency: request.currency,
         lang: request.lang

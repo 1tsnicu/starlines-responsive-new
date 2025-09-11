@@ -199,11 +199,8 @@ export async function getPlan(
     };
   }
   
-  const API_BASE_URL = import.meta.env.DEV 
-    ? '/api/bussystem'  // Use Vite proxy in development
-    : 'https://test-api.bussystem.eu/server';  // Direct API in production
-  
-  const endpoint = `${API_BASE_URL}/curl/get_plan.php`;
+  const API_BASE_URL = import.meta.env.DEV ? '/api/backend/curl' : '/api/backend/curl';
+  const endpoint = `${API_BASE_URL}/get_plan.php`;
   
   let lastError: GetPlanError | null = null;
   
@@ -220,8 +217,7 @@ export async function getPlan(
       
       // Prepare request body
       const body: Record<string, unknown> = {
-        login: request.login,
-        password: request.password,
+        // Backend injects credentials; send only required business params
         bustype_id: request.bustype_id,
         position: request.position || 'h',
         v: request.v || 2.0
@@ -250,7 +246,7 @@ export async function getPlan(
         );
       }
       
-      const xmlText = await response.text();
+  const xmlText = await response.text(); // Backend still returns raw API XML
       
       // Check for XML errors first
       const xmlError = parseXMLError(xmlText);

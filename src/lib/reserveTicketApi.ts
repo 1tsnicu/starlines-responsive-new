@@ -16,7 +16,7 @@ import { RESERVE_TICKET_ERRORS } from '../types/reserveTicket';
 
 // Configuration
 const API_CONFIG = {
-  baseURL: import.meta.env?.VITE_BUSS_BASE_URL || 'https://test-api.bussystem.eu/server',
+  baseURL: import.meta.env.DEV ? '/api/backend/curl' : '/api/backend/curl',
   timeout: 15000,
   retryAttempts: 2,
   retryDelay: 1000
@@ -107,18 +107,7 @@ setInterval(() => tracker.cleanup(), 60 * 60 * 1000);
  * Get credentials from environment or config
  */
 function getCredentials(): { login: string; password: string } {
-  const login = import.meta.env?.VITE_BUSS_LOGIN;
-  const password = import.meta.env?.VITE_BUSS_PASSWORD;
-  
-  if (!login || !password) {
-    // Fallback to demo credentials for development
-    return {
-      login: 'infobus-ws',
-      password: 'infobus-ws'
-    };
-  }
-  
-  return { login, password };
+  return { login: 'backend', password: 'backend' }; // backend injects real creds
 }
 
 /**

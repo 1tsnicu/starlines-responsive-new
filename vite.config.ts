@@ -27,6 +27,17 @@ export default defineConfig(({ mode }) => ({
           });
         }
       },
+      // Backward-compatible alias (legacy code expects /api/bussystem)
+      '/api/bussystem': {
+        target: 'https://test-api.bussystem.eu',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/bussystem/, '/server'),
+        secure: true,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      },
       '/api/bussystem-real': {
         target: 'https://bussystem.eu',
         changeOrigin: true,
@@ -37,7 +48,21 @@ export default defineConfig(({ mode }) => ({
           'Content-Type': 'application/json',
         },
       },
+      // Local backend (Node) for secure server-side Bussystem calls
+      '/api/backend': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false,
+      },
     },
+  },
+  define: {
+    // Configurare API URL pentru producție
+    __API_BASE_URL__: JSON.stringify(
+      mode === 'production' 
+        ? (process.env.VITE_API_URL || 'https://your-backend.railway.app') 
+        : '/api/backend'
+    )
   },
   plugins: [
     react(),
