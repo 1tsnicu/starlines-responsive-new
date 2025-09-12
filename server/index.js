@@ -38,6 +38,14 @@ function buildPayload(body) {
 async function bussystemPost(path, body) {
   const url = `${BUSS_BASE_URL}${path}`;
   const payload = buildPayload(body);
+  
+  if (path === '/curl/new_order.php') {
+    console.log('Sending to Bussystem API:', {
+      url,
+      payload: JSON.stringify(payload, null, 2)
+    });
+  }
+  
   const res = await fetch(url, {
     method: 'POST',
     headers: {
@@ -48,6 +56,15 @@ async function bussystemPost(path, body) {
     body: JSON.stringify(payload)
   });
   const text = await res.text();
+  
+  if (path === '/curl/new_order.php') {
+    console.log('Bussystem API response:', {
+      status: res.status,
+      statusText: res.statusText,
+      body: text.slice(0, 500) // First 500 chars
+    });
+  }
+  
   if (!res.ok) {
     throw new Error(`HTTP ${res.status}: ${text.slice(0,200)}`);
   }
@@ -124,6 +141,7 @@ const FILE_ALLOWED = new Set([
   'get_routes.php',
   'get_free_seats.php',
   'get_plan.php',
+  'get_all_routes.php',
   'get_discount.php',
   'get_baggage.php',
   'new_order.php',
@@ -137,9 +155,20 @@ app.post('/api/backend/curl/:file', async (req, res) => {
     if (!FILE_ALLOWED.has(file)) {
       return res.status(403).json({ error: 'File not allowed' });
     }
+    
+    if (file === 'new_order.php') {
+      console.log('New order request received:', JSON.stringify(req.body, null, 2));
+    }
+    
     const data = await bussystemPost(`/curl/${file}`, req.body || {});
+    
+    if (file === 'new_order.php') {
+      console.log('New order response:', JSON.stringify(data, null, 2));
+    }
+    
     res.json(data);
   } catch (e) {
+    console.error(`Error in ${req.params.file}:`, e.message);
     res.status(500).json({ error: e.message });
   }
 });

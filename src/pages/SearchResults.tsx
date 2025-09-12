@@ -24,19 +24,19 @@ const SearchResults = () => {
   const from = searchParams.get("from") || "";
   const to = searchParams.get("to") || "";
   const date = searchParams.get("date") || "";
+  const returnDate = searchParams.get("returnDate") || "";
   const passengers = searchParams.get("passengers") || "1";
   const fromPointId = searchParams.get("fromPointId") || "";
   const toPointId = searchParams.get("toPointId") || "";
+  
+  // Check if this is a round trip search
+  const isRoundTrip = !!returnDate;
 
-  // Use the real API hook
-  const { data: routes, loading, error } = useRouteSearch({
-    id_from: fromPointId,
-    id_to: toPointId,
-    date: date,
-    trans: "bus",
-    currency: "EUR",
-    lang: "ru"
-  });
+  // State pentru gestionarea bagajelor
+  const [selectedRoute, setSelectedRoute] = useState<RouteSummary | null>(null);
+  const [showBaggageSelection, setShowBaggageSelection] = useState(false);
+  
+  // State pentru dus-întors (nu mai este necesar pentru selecție separată)
 
   const [filters, setFilters] = useState({
     departureTime: [0, 24],
@@ -48,10 +48,18 @@ const SearchResults = () => {
   });
   const [sortBy, setSortBy] = useState("recommended");
   const [showFilters, setShowFilters] = useState(false);
-  
-  // State pentru gestionarea bagajelor
-  const [selectedRoute, setSelectedRoute] = useState<RouteSummary | null>(null);
-  const [showBaggageSelection, setShowBaggageSelection] = useState(false);
+
+  // Use the real API hook for outbound routes
+  const { data: routes, loading, error } = useRouteSearch({
+    id_from: fromPointId,
+    id_to: toPointId,
+    date: date,
+    trans: "bus",
+    currency: "EUR",
+    lang: "ru"
+  });
+
+  // Nu mai este necesar hook-ul pentru return routes separate
 
   const handleFilterChange = (key: string, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -67,40 +75,78 @@ const SearchResults = () => {
   };
 
   const handleSelectRoute = (route: RouteSummary) => {
-    // Verifică dacă ruta suportă bagaje
-    if (route.request_get_baggage === 1) {
-      setSelectedRoute(route);
-      setShowBaggageSelection(true);
-    } else {
-      // Navighează direct la detaliile călătoriei
-      const searchParams = new URLSearchParams({
-        intervalId: route.interval_id,
-        passengers: passengers,
-        from: from,
-        to: to,
-        date: date
+    // Pentru dus-întors, navighează direct la TripDetail cu o singură rută
+    if (isRoundTrip) {
+      // Pentru dus-întors, trimitem intervalIdsAll cu două intervale
+      // Primul interval pentru dus, al doilea pentru întors (va fi încărcat din API)
+      const intervalIdsAll = [route.interval_id, `return_${route.interval_id}`];
+      
+      // Navighează la TripDetail cu ruta dus-întors
+      navigate('/trip-details', {
+        state: {
+          routeData: route,
+          passengers: parseInt(passengers),
+          isRoundTrip: true,
+          intervalIdsAll: intervalIdsAll,
+          searchContext: {
+            from,
+            to,
+            date,
+            returnDate,
+            fromPointId,
+            toPointId,
+            currency: 'EUR',
+            lang: 'ru'
+          }
+        }
       });
-      navigate(`/trip-details?${searchParams.toString()}`);
+    } else {
+      // Pentru călătorie simplă, gestionează bagajele dacă este necesar
+      if (route.request_get_baggage === 1) {
+        setSelectedRoute(route);
+        setShowBaggageSelection(true);
+      } else {
+        // Navighează direct la detaliile călătoriei cu datele rutei în state
+        navigate('/trip-details', {
+          state: {
+            routeData: route,
+            passengers: parseInt(passengers),
+            searchContext: {
+              from,
+              to,
+              date,
+              fromPointId,
+              toPointId,
+              currency: 'EUR',
+              lang: 'ru'
+            }
+          }
+        });
+      }
     }
   };
 
   const handleContinueWithBaggage = (baggageData?: any) => {
     if (!selectedRoute) return;
     
-    const searchParams = new URLSearchParams({
-      intervalId: selectedRoute.interval_id,
-      passengers: passengers,
-      from: from,
-      to: to,
-      date: date
+    // Navighează la detaliile călătoriei cu datele rutei și bagajele în state
+    navigate('/trip-details', {
+      state: {
+        routeData: selectedRoute,
+        passengers: parseInt(passengers),
+        baggageData: baggageData,
+        searchContext: {
+          from,
+          to,
+          date,
+          fromPointId,
+          toPointId,
+          currency: 'EUR',
+          lang: 'ru'
+        }
+      }
     });
     
-    // Dacă avem bagaje selectate, le adăugăm în URL
-    if (baggageData) {
-      searchParams.append('baggage', JSON.stringify(baggageData));
-    }
-    
-    navigate(`/trip-details?${searchParams.toString()}`);
     setShowBaggageSelection(false);
     setSelectedRoute(null);
   };
@@ -453,6 +499,20 @@ const SearchResults = () => {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Header pentru dus-întors */}
+                {isRoundTrip && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <h3 className="font-semibold text-blue-900">Călătorie Dus-Întors</h3>
+                    </div>
+                    <p className="text-sm text-blue-700">
+                      Alegeți ruta dus-întors. Locurile pentru dus și întors se vor selecta în pagina următoare.
+                    </p>
+                  </div>
+                )}
+
+                {/* Rutele dus-întors */}
                 {sortedResults.map((route) => (
                   <Card key={route.interval_id} className="hover-lift border-border">
                     <CardContent className="p-6">
@@ -542,7 +602,10 @@ const SearchResults = () => {
                             className="w-full"
                             onClick={() => handleSelectRoute(route)}
                           >
-                            {route.request_get_baggage === 1 ? 'Selectează & Bagaje' : 'Selectează'}
+                            {isRoundTrip ? 
+                              (route.request_get_baggage === 1 ? 'Selectează Dus-Întors & Bagaje' : 'Selectează Dus-Întors') :
+                              (route.request_get_baggage === 1 ? 'Selectează & Bagaje' : 'Selectează')
+                            }
                           </Button>
                         </div>
                       </div>
