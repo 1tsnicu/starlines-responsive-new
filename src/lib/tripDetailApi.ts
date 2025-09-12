@@ -23,7 +23,7 @@ import { GetAllRoutesResponse, GetAllRoutesRequest } from '@/types/getAllRoutes'
 // API Configuration
 // ===============================
 
-const API_BASE_URL = import.meta.env.DEV ? '/api/backend' : '/api/backend';
+const API_BASE_URL = import.meta.env.DEV ? '/api/backend' : '/api';
 
 // ===============================
 // Error Handling
@@ -60,7 +60,7 @@ function handleApiError(error: unknown): TripDetailError {
 
 export async function apiFreeSeats(payload: GetFreeSeatsRequest): Promise<FreeSeatsResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/seats/free`, {
+    const response = await fetch(`${API_BASE_URL}/get-free-seats`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -653,7 +653,7 @@ export function getBaggageWeight(baggage: BaggageItem): string {
 export async function apiCreateBooking(request: BookingRequest): Promise<BookingResponse> {
   try {
     console.log('Sending booking request to API:', request);
-    const response = await fetch(`${API_BASE_URL}/curl/new_order.php`, {
+    const response = await fetch(`${API_BASE_URL}/new-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
