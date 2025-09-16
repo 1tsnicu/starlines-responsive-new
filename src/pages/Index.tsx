@@ -12,7 +12,8 @@ import {
   Percent,
   Package,
   CreditCard,
-  FileText
+  FileText,
+  Ticket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +22,6 @@ import { Link } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import PopularRoutesSection from "@/components/PopularRoutesSection";
-import QuickLinks from "@/components/QuickLinks";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
 const Index = () => {
@@ -29,28 +29,28 @@ const Index = () => {
   // Simple main actions for elderly users
   const mainActions = [
     {
-      title: t('index.bookTicket'),
-      description: t('index.bookTicketDesc'),
-      href: "/search",
-      icon: <Calendar className="h-6 w-6 sm:h-8 sm:w-8" />,
-      color: "bg-blue-500",
-      buttonText: t('index.readyBookNow')
-    },
-    {
-      title: t('index.viewRoutes'),
-      description: t('index.viewRoutesDesc'),
-      href: "/transport-routes",
-      icon: <MapPin className="h-6 w-6 sm:h-8 sm:w-8" />,
-      color: "bg-green-500",
-      buttonText: t('index.viewTimetable')
-    },
-    {
       title: t('index.timetable'),
       description: t('index.timetableDesc'),
       href: "/timetable",
       icon: <Clock className="h-6 w-6 sm:h-8 sm:w-8" />,
       color: "bg-purple-500",
       buttonText: t('index.viewTimetable')
+    },
+    {
+      title: t('header.myTickets'),
+      description: t('index.myTicketsDesc'),
+      href: "/my-tickets",
+      icon: <Ticket className="h-6 w-6 sm:h-8 sm:w-8" />,
+      color: "bg-blue-500",
+      buttonText: t('index.viewMyTickets')
+    },
+    {
+      title: t('index.contactUs'),
+      description: t('index.contactDesc'),
+      href: "/contacts",
+      icon: <Phone className="h-6 w-6 sm:h-8 sm:w-8" />,
+      color: "bg-green-500",
+      buttonText: t('index.viewAllContacts')
     }
   ];
 
@@ -242,9 +242,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Quick Links */}
-      <QuickLinks />
-
       {/* Bottom CTA */}
       <section className="py-12 sm:py-16 bg-gradient-to-r from-primary/10 to-accent/10">
         <div className="container text-center px-4 sm:px-6 lg:px-8">
@@ -255,18 +252,14 @@ const Index = () => {
             {t('index.readyDesc')}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link to="/search">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 px-6 sm:px-8 py-3 h-12 sm:h-auto w-full sm:w-auto">
-                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                <span className="text-sm sm:text-base">{t('index.readyBookNow')}</span>
-              </Button>
-            </Link>
-            <Link to="/transport-routes">
-              <Button variant="outline" size="lg" className="px-6 sm:px-8 py-3 h-12 sm:h-auto w-full sm:w-auto">
-                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
-                <span className="text-sm sm:text-base">{t('index.readyViewRoutes')}</span>
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-primary hover:bg-primary/90 px-6 sm:px-8 py-3 h-12 sm:h-auto w-full sm:w-auto"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            >
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+              <span className="text-sm sm:text-base">{t('index.readyBookNow')}</span>
+            </Button>
           </div>
         </div>
       </section>

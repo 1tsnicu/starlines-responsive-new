@@ -771,6 +771,46 @@ export async function getBaggage(params: {
   });
 }
 
+// ------------- DISCOUNTS ------------- 
+
+/**
+ * Get available discounts for a route interval
+ * 
+ * @param params - Request parameters
+ * @returns Promise with available discounts
+ * 
+ * API Documentation:
+ * - Call when request_get_discount = 1 in route data
+ * - Returns list of available discounts with prices
+ */
+export async function getDiscount(params: {
+  interval_id: string;     // Key from get_routes response
+  currency?: string;       // "EUR"
+  lang?: string;           // "ru"
+  session?: string;
+}): Promise<GetDiscountsResponse> {
+  const { interval_id, currency = "EUR", lang = "ru", session } = params;
+  
+  if (USE_MOCK_API) {
+    return (mockBussystemAPI as {
+      getDiscount: (params: {
+        interval_id: string;
+        currency?: string;
+        lang?: string;
+        session?: string;
+      }) => Promise<GetDiscountsResponse>;
+    }).getDiscount(params);
+  }
+
+  return post<GetDiscountsResponse>("/curl/get_discount.php", {
+    json: 1,
+    interval_id,
+    currency,
+    lang,
+    session,
+  });
+}
+
 // ------------- SEATS & SEATING ------------- 
 
 /**

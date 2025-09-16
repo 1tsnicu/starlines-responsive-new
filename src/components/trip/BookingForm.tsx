@@ -91,16 +91,59 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     ));
   };
 
+  // Validation functions
+  const validateBirthDate = (birthDate: string): boolean => {
+    if (!birthDate) return false;
+    
+    const date = new Date(birthDate);
+    const today = new Date();
+    const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()); // Max 120 years old
+    const maxDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate()); // Min 1 year old
+    
+    return date >= minDate && date <= maxDate && !isNaN(date.getTime());
+  };
+
+  const validatePhoneNumber = (phone: string): boolean => {
+    if (!phone.trim()) return false;
+    
+    // Phone must start with +373 or +383 or any other + country code
+    const phoneRegex = /^\+[1-9]\d{1,14}$/;
+    return phoneRegex.test(phone.trim());
+  };
+
+  // Check if form is valid for submission
+  const isFormValid = (): boolean => {
+    // Check if all required fields are filled and valid
+    const hasValidPassengers = passengerData.every(passenger => 
+      Boolean(passenger.name.trim()) && 
+      Boolean(passenger.surname.trim()) && 
+      Boolean(passenger.birth_date) && 
+      validateBirthDate(passenger.birth_date)
+    );
+
+    const hasValidContact = Boolean(contactInfo.phone.trim()) && 
+                           validatePhoneNumber(contactInfo.phone) && 
+                           Boolean(contactInfo.email.trim());
+
+    return hasValidPassengers && hasValidContact;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
+    // Enhanced validation
     const errors: string[] = [];
     
     passengerData.forEach((passenger, index) => {
       if (!passenger.name.trim()) errors.push(`Passenger ${index + 1}: Name is required`);
       if (!passenger.surname.trim()) errors.push(`Passenger ${index + 1}: Surname is required`);
-      if (!passenger.birth_date) errors.push(`Passenger ${index + 1}: Birth date is required`);
+      
+      // Enhanced birth date validation
+      if (!passenger.birth_date) {
+        errors.push(`Passenger ${index + 1}: Birth date is required`);
+      } else if (!validateBirthDate(passenger.birth_date)) {
+        errors.push(`Passenger ${index + 1}: Birth date must be a valid date (between 1 and 120 years old)`);
+      }
       
       // Document validation based on route requirements
       if (route?.need_doc === 1 || true) {
@@ -117,7 +160,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       }
     });
 
-    if (!contactInfo.phone.trim()) errors.push('Phone number is required');
+    // Enhanced phone validation
+    if (!contactInfo.phone.trim()) {
+      errors.push('Phone number is required');
+    } else if (!validatePhoneNumber(contactInfo.phone)) {
+      errors.push('Phone number must start with + followed by country code (e.g., +373, +383, +375)');
+    }
+    
     if (!contactInfo.email.trim()) errors.push('Email address is required');
 
     if (errors.length > 0) {
@@ -234,7 +283,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                   <Badge variant="outline">Passenger {index + 1}</Badge>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor={`name-${index}`}>First Name *</Label>
                     <Input
@@ -257,7 +306,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     />
                   </div>
                   
-                  <div>
+                  <div className="lg:col-span-2">
                     <Label htmlFor={`birth-${index}`}>Birth Date *</Label>
                     <Input
                       id={`birth-${index}`}
@@ -265,7 +314,13 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                       value={passenger.birth_date}
                       onChange={(e) => updatePassengerData(index, 'birth_date', e.target.value)}
                       required
+                      className={!validateBirthDate(passenger.birth_date) && passenger.birth_date ? 'border-red-500' : ''}
                     />
+                    {passenger.birth_date && !validateBirthDate(passenger.birth_date) && (
+                      <p className="text-sm text-red-500 mt-1">
+                        Birth date must be between 1 and 120 years old
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -273,7 +328,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                 {(route?.need_doc === 1 || true) && (
                   <div className="space-y-4">
                     <h4 className="text-md font-medium text-gray-700">Document Information</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor={`docType-${index}`}>Document Type *</Label>
                         <Select 
@@ -364,7 +419,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
               Contact Information
             </h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="phone">Phone Number *</Label>
                 <Input
@@ -372,9 +427,15 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                   type="tel"
                   value={contactInfo.phone}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+375291234567"
+                  placeholder="+373291234567"
                   required
+                  className={!validatePhoneNumber(contactInfo.phone) && contactInfo.phone ? 'border-red-500' : ''}
                 />
+                {contactInfo.phone && !validatePhoneNumber(contactInfo.phone) && (
+                  <p className="text-sm text-red-500 mt-1">
+                    Phone must start with + followed by country code (e.g., +373, +383, +375)
+                  </p>
+                )}
               </div>
               
               <div>
@@ -438,7 +499,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             type="submit" 
             className="w-full" 
             size="lg"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isFormValid()}
           >
             {isSubmitting ? (
               <>

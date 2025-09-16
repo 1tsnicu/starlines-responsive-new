@@ -176,11 +176,11 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
           </div>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 lg:space-y-6">
           {/* Location Selection Row */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
             {/* From City */}
-            <div className="md:col-span-5 space-y-2">
+            <div className="lg:col-span-5 space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                 <span className="text-white text-sm font-medium">De unde</span>
@@ -201,19 +201,19 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
             </div>
 
             {/* Swap Button */}
-            <div className="md:col-span-2 flex justify-center">
+            <div className="lg:col-span-2 flex justify-center order-first lg:order-none">
               <button
                 type="button"
                 onClick={handleSwapCities}
-                className="h-12 w-12 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300 hover:scale-110 group flex items-center justify-center"
+                className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300 hover:scale-110 group flex items-center justify-center"
                 title="Schimbă orașele"
               >
-                <ArrowLeftRight className="h-5 w-5 text-white group-hover:rotate-180 transition-transform duration-300" />
+                <ArrowLeftRight className="h-4 w-4 lg:h-5 lg:w-5 text-white group-hover:rotate-180 transition-transform duration-300" />
               </button>
             </div>
 
             {/* To City */}
-            <div className="md:col-span-5 space-y-2">
+            <div className="lg:col-span-5 space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 bg-red-400 rounded-full"></div>
                 <span className="text-white text-sm font-medium">Unde</span>
@@ -235,9 +235,9 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
           </div>
 
           {/* Date and Search Row */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
             {/* Departure Date */}
-            <div className="md:col-span-4 space-y-2">
+            <div className="lg:col-span-4 space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
                 <span className="text-white text-sm font-medium">Data plecării</span>
@@ -269,7 +269,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
 
             {/* Return Date (if round trip) */}
             {isRoundTrip && (
-              <div className="md:col-span-4 space-y-2">
+              <div className="lg:col-span-4 space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
                   <span className="text-white text-sm font-medium">Data întoarcerii</span>
@@ -301,7 +301,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
             )}
 
             {/* Search Button */}
-            <div className={cn("md:col-span-4", isRoundTrip ? "" : "md:col-start-9")}>
+            <div className={cn("lg:col-span-4", isRoundTrip ? "" : "lg:col-start-9")}>
               <Button 
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden group"
                 size="lg"

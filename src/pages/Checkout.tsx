@@ -98,7 +98,7 @@ const Checkout = () => {
       <div className="container py-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-foreground mb-4">{t('tripDetails.error.routeNotFound')}</h2>
-          <Button onClick={() => navigate("/transport-routes")}>{t('tripDetails.backToRoutes')}</Button>
+          <Button onClick={() => navigate("/search")}>{t('tripDetails.backToRoutes')}</Button>
         </div>
       </div>
     );

@@ -23,7 +23,6 @@ const Footer = () => {
     {
       title: t('footer.transport'),
       links: [
-        { name: t('header.routes'), href: "/transport-routes" },
         { name: t('header.timetable'), href: "/timetable" },
         { name: t('header.bookings'), href: "/search" },
         { name: t('header.myTickets'), href: "/my-tickets" }
@@ -52,8 +51,8 @@ const Footer = () => {
   return (
     <footer className="bg-foreground text-background">
       {/* Main Footer Content */}
-      <div className="container py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="container py-8 lg:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center gap-3 mb-4">
@@ -71,7 +70,7 @@ const Footer = () => {
             </p>
 
             {/* Trust Badges */}
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-4">
               <div className="flex items-center gap-1 text-xs">
                 <Shield className="h-3 w-3 text-green-400" />
                 <span>{t('features.safeTransport')}</span>

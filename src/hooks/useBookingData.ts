@@ -201,7 +201,17 @@ export function useBookingData({
       baseTotalPrice,
       totalDiscountAmount,
       totalBaggageAmount,
-      finalTotalPrice
+      finalTotalPrice,
+      outboundBaggageAmount,
+      returnBaggageAmount,
+      outboundBaggage: Object.keys(outboundBaggage).length,
+      returnBaggage: Object.keys(returnBaggage).length,
+      outboundDiscountAmount,
+      returnDiscountAmount,
+      outboundDiscounts: Object.keys(outboundDiscounts).length,
+      returnDiscounts: Object.keys(returnDiscounts).length,
+      outboundDiscountDetails: outboundDiscounts,
+      returnDiscountDetails: returnDiscounts
     });
 
     return {
@@ -303,13 +313,16 @@ export function useBookingData({
     // Add baggage data if available (conform API documentation)
     const outboundBaggageIds = Object.values(outboundBaggage).flatMap(baggage => 
       Array(baggage.quantity).fill(baggage.baggage_id)
-    );
+    ).join(',');
     const returnBaggageIds = Object.values(returnBaggage).flatMap(baggage => 
       Array(baggage.quantity).fill(baggage.baggage_id)
-    );
+    ).join(',');
 
     if (outboundBaggageIds.length > 0 || returnBaggageIds.length > 0) {
-      request.baggage = [outboundBaggageIds, returnBaggageIds];
+      request.baggage = {
+        "0": outboundBaggageIds.length > 0 ? [outboundBaggageIds] : [],
+        "1": returnBaggageIds.length > 0 ? [returnBaggageIds] : []
+      };
     }
 
     // Note: Promocode handling would need to be implemented separately

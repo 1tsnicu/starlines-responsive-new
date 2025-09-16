@@ -199,7 +199,7 @@ export function BussystemAutocomplete({
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={() => {
-            if (inputValue.length >= minLength && points.length > 0) {
+            if (inputValue.length > 0) {
               updateDropdownPosition();
               setIsOpen(true);
             }
@@ -215,7 +215,7 @@ export function BussystemAutocomplete({
         </div>
       </div>
 
-      {isOpen && (
+      {isOpen && inputValue.length > 0 && (
         <div 
           className="absolute top-full left-0 w-full bg-white border shadow-xl rounded-lg mt-1"
           style={{ zIndex: 999999, maxHeight: '240px', overflow: 'auto' }}
@@ -228,9 +228,16 @@ export function BussystemAutocomplete({
               </div>
             )}
             
-            {error && (
+            {error && !error.includes('must contain 3 or more characters') && (
               <div className="p-4 text-center text-sm text-red-600 bg-red-50 rounded-lg m-2">
                 Eroare: {error}
+              </div>
+            )}
+            
+            {inputValue.length > 0 && inputValue.length < minLength && (
+              <div className="p-4 text-center text-sm text-gray-600 bg-gray-50 rounded-lg m-2">
+                <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2 text-blue-500" />
+                Introduceți cel puțin {minLength} caractere pentru căutare...
               </div>
             )}
             

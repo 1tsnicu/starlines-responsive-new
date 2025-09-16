@@ -573,7 +573,8 @@ export function formatDiscountPrice(price: number | undefined | null, currency: 
 
 export interface GetBaggageRequest {
   interval_id: string;
-  station_id_to: string;
+  station_from_id?: string;
+  station_to_id?: string;
   currency: string;
   lang: string;
 }

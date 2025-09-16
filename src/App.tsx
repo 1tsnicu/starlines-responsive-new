@@ -24,7 +24,6 @@ import Contacts from "@/pages/Contacts";
 import TermsOfService from "@/pages/TermsOfService";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import RefundPolicy from "@/pages/RefundPolicy";
-import TransportRoutes from "@/pages/TransportRoutes";
 import AdminRoutes from "@/pages/AdminRoutes";
 import Login from "@/pages/Login";
 import PaymentDemo from "@/pages/PaymentDemo";
@@ -66,7 +65,6 @@ function App() {
                   <Route path="/legal/terms" element={<TermsOfService />} />
                   <Route path="/legal/privacy" element={<PrivacyPolicy />} />
                   <Route path="/legal/refunds" element={<RefundPolicy />} />
-                  <Route path="/transport-routes" element={<TransportRoutes />} />
                   <Route path="/admin/routes" element={<AdminRoutes />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/payment-demo" element={<PaymentDemo />} />

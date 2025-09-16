@@ -32,28 +32,28 @@ const HeroSection = () => {
         <div className="absolute bottom-1/3 left-1/4 w-32 h-32 bg-[radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:15px_15px]" />
       </div>
 
-      <div className="container relative z-10 py-20">
+      <div className="container relative z-10 py-12 lg:py-20">
         {/* Main Content */}
-        <div className="text-center max-w-4xl mx-auto mb-12">
-          <div className="flex justify-center mb-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
-              <Star className="h-12 w-12 text-white" />
+        <div className="text-center max-w-4xl mx-auto mb-8 lg:mb-12">
+          <div className="flex justify-center mb-4 lg:mb-6">
+            <div className="flex h-16 w-16 lg:h-20 lg:w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+              <Star className="h-8 w-8 lg:h-12 lg:w-12 text-white" />
             </div>
           </div>
           
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 lg:mb-6 leading-tight">
             {t('hero.title')}{" "}
-            <span className="text-accent-foreground bg-accent px-4 py-2 rounded-2xl inline-block transform rotate-1">
+            <span className="text-accent-foreground bg-accent px-3 py-1 lg:px-4 lg:py-2 rounded-2xl inline-block transform rotate-1 text-sm sm:text-base lg:text-lg xl:text-xl">
               Starlines
             </span>
           </h1>
           
-          <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
+          <p className="text-lg sm:text-xl lg:text-2xl text-white/90 mb-6 lg:mb-8 leading-relaxed">
             {t('hero.subtitle')}
           </p>
 
           {/* Enhanced Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
             {[
               { icon: MapPin, value: "300+", label: t('hero.routes') },
               { icon: Users, value: "2M+", label: t('hero.passengers') },
@@ -83,9 +83,9 @@ const HeroSection = () => {
         </div>
 
         {/* Enhanced USP Bar */}
-        <div className="mt-16">
-          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="mt-12 lg:mt-16">
+          <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-4 lg:p-6 border border-white/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
               {[
                 {
                   icon: Shield,

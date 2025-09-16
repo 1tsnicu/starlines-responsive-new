@@ -33,7 +33,6 @@ const Sitemap = () => {
       title: "Booking & Travel",
       icon: Ticket,
       links: [
-        { name: "Transport Routes", href: "/transport-routes", description: "Browse all available routes" },
         { name: "Trip Details", href: "/trip-details", description: "View detailed trip information" },
         { name: "Checkout", href: "/checkout", description: "Complete your booking process" },
         { name: "Payment Status", href: "/payment/status", description: "Check payment confirmation" },

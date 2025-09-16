@@ -66,12 +66,6 @@ const Header = () => {
       description: "Pagina principală"
     },
     {
-      title: t('header.routes'),
-      href: "/transport-routes",
-      icon: <MapPin className="h-4 w-4" />,
-      description: "Toate rutele disponibile"
-    },
-    {
       title: t('header.timetable'),
       href: "/timetable",
       icon: <Clock className="h-4 w-4" />,
@@ -87,12 +81,6 @@ const Header = () => {
 
   // Additional pages dropdown (no admin)
   const additionalPages = [
-    {
-      title: "My Tickets",
-      href: "/my-tickets",
-      icon: <Ticket className="h-4 w-4" />,
-      description: "Manage your tickets"
-    },
     {
       title: t('about.title'),
       href: "/about",
@@ -158,27 +146,31 @@ const Header = () => {
       {/* Top Bar - Trust Indicators */}
       <div className="bg-primary/10 border-b border-primary/20">
         <div className="container flex items-center justify-between py-2 text-xs">
-          <div className="flex items-center gap-4 text-primary/80">
+          <div className="hidden sm:flex items-center gap-2 lg:gap-4 text-primary/80">
             <div className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
-              <span>{t('header.trust.safe')}</span>
+              <span className="hidden md:inline">{t('header.trust.safe')}</span>
             </div>
             <div className="flex items-center gap-1">
               <Star className="h-3 w-3" />
-              <span>{t('header.trust.experience')}</span>
+              <span className="hidden md:inline">{t('header.trust.experience')}</span>
             </div>
           </div>
+          <div className="sm:hidden flex items-center gap-2 text-primary/80">
+            <Shield className="h-3 w-3" />
+            <Star className="h-3 w-3" />
+          </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 lg:gap-4">
             {/* Language Selector */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 lg:gap-2">
               <Globe className="h-3 w-3 text-primary/80" />
               <Select value={currentLanguage} onValueChange={setLanguage}>
-                <SelectTrigger className="h-6 w-16 text-xs border-0 bg-transparent p-0 hover:bg-primary/10 rounded">
+                <SelectTrigger className="h-6 w-12 lg:w-16 text-xs border-0 bg-transparent p-0 hover:bg-primary/10 rounded">
                   <SelectValue>
                     <span className="flex items-center gap-1">
                       <span>{getLanguageFlag(currentLanguage)}</span>
-                      <span className="hidden sm:inline">{currentLanguage.toUpperCase()}</span>
+                      <span className="hidden lg:inline">{currentLanguage.toUpperCase()}</span>
                     </span>
                   </SelectValue>
                 </SelectTrigger>
@@ -197,14 +189,14 @@ const Header = () => {
             </div>
 
             {/* Currency Selector */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 lg:gap-2">
               <CreditCard className="h-3 w-3 text-primary/80" />
               <Select value={currentCurrency} onValueChange={setCurrency}>
-                <SelectTrigger className="h-6 w-16 text-xs border-0 bg-transparent p-0 hover:bg-primary/10 rounded">
+                <SelectTrigger className="h-6 w-12 lg:w-16 text-xs border-0 bg-transparent p-0 hover:bg-primary/10 rounded">
                   <SelectValue>
                     <span className="flex items-center gap-1">
                       <span>{getCurrencyFlag(currentCurrency)}</span>
-                      <span className="hidden sm:inline">{currentCurrency}</span>
+                      <span className="hidden lg:inline">{currentCurrency}</span>
                     </span>
                   </SelectValue>
                 </SelectTrigger>
@@ -236,8 +228,8 @@ const Header = () => {
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold text-foreground">Starlines</h1>
-              <p className="text-xs text-foreground/70">Transport Internațional</p>
+              <h1 className="text-lg lg:text-xl font-bold text-foreground">Starlines</h1>
+              <p className="text-xs text-foreground/70 hidden lg:block">Transport Internațional</p>
             </div>
           </Link>
 
@@ -305,8 +297,8 @@ const Header = () => {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="ml-2 flex items-center gap-2">
-                    <span className="truncate max-w-[120px]">
+                  <Button variant="outline" size="sm" className="ml-2 flex items-center gap-1 lg:gap-2">
+                    <span className="truncate max-w-[80px] lg:max-w-[120px]">
                       {profile?.first_name || user.email}
                     </span>
                     <ChevronDown className="h-3 w-3" />
@@ -329,8 +321,15 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="outline" size="sm">
-                <Link to="/login">{t('auth.login.button')}</Link>
+              <Button asChild variant="outline" size="sm" className="ml-2">
+                <Link to="/login" className="hidden sm:inline">{t('auth.login.button')}</Link>
+              </Button>
+            )}
+            {!user && (
+              <Button asChild variant="outline" size="sm" className="ml-2 sm:hidden">
+                <Link to="/login">
+                  <Users className="h-4 w-4" />
+                </Link>
               </Button>
             )}
 

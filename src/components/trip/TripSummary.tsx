@@ -316,7 +316,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Euro className="w-5 h-5 text-green-600" />
-                <span className="text-lg font-semibold text-green-800">Total Price</span>
+                <span className="text-lg font-semibold text-green-800">Base Price</span>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-green-900">
@@ -325,6 +325,9 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                 <div className="text-sm text-green-700">
                   Outbound: {route.price_one_way?.toFixed(2)} {route.currency} + 
                   Return: {returnRoute.price_one_way?.toFixed(2)} {route.currency}
+                </div>
+                <div className="text-xs text-green-600 mt-1">
+                  * Final price includes baggage and discounts
                 </div>
               </div>
             </div>

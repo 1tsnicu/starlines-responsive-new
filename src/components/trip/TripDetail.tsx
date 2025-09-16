@@ -457,8 +457,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         return;
       }
 
-      // If request_get_discount is 1, fetch discounts via API
-      if (routeData.request_get_discount === 1) {
+      // If request_get_discount is true or 1, fetch discounts via API
+      if (routeData.request_get_discount === 1 || routeData.request_get_discount === true) {
         console.log('Fetching discounts via API for interval:', tripData.intervalIdMain);
         
         const discountResponse = await apiGetDiscounts({
@@ -492,8 +492,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         return;
       }
 
-      // If request_get_discount is 1, fetch discounts via API
-      if (returnRouteData.request_get_discount === 1) {
+      // If request_get_discount is true or 1, fetch discounts via API
+      if (returnRouteData.request_get_discount === 1 || returnRouteData.request_get_discount === true) {
         console.log('Fetching return discounts via API for interval:', returnRouteData.interval_id);
         
         const discountResponse = await apiGetDiscounts({
@@ -523,18 +523,17 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       // Check if baggage info is available in the route data (luggage field)
       if (routeData.luggage) {
         console.log('Using luggage info from route data:', routeData.luggage);
-        // For now, we'll just log the luggage info since it's text-based
-        // In a real implementation, you might want to parse this text
-        return;
+        // Log the luggage info but continue to check for API baggage if request_get_baggage = 1
       }
 
-      // If request_get_baggage is 1, fetch baggage via API
-      if (routeData.request_get_baggage === 1) {
+      // If request_get_baggage is true or 1, fetch baggage via API
+      if (routeData.request_get_baggage === 1 || routeData.request_get_baggage === true) {
         console.log('Fetching baggage via API for interval:', tripData.intervalIdMain);
         
         const baggageResponse = await apiGetBaggage({
           interval_id: tripData.intervalIdMain || '',
-          station_id_to: routeData.station_to || '123', // Default station ID
+          station_from_id: routeData.station_from || '',
+          station_to_id: routeData.station_to || '',
           currency: routeData.currency || 'EUR',
           lang: 'ru'
         });
@@ -560,16 +559,17 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       // Check if baggage info is available in the return route data
       if (returnRouteData.luggage) {
         console.log('Using return luggage info from route data:', returnRouteData.luggage);
-        return;
+        // Log the luggage info but continue to check for API baggage if request_get_baggage = 1
       }
 
-      // If request_get_baggage is 1, fetch baggage via API
-      if (returnRouteData.request_get_baggage === 1) {
+      // If request_get_baggage is true or 1, fetch baggage via API
+      if (returnRouteData.request_get_baggage === 1 || returnRouteData.request_get_baggage === true) {
         console.log('Fetching return baggage via API for interval:', returnRouteData.interval_id);
         
         const baggageResponse = await apiGetBaggage({
           interval_id: returnRouteData.interval_id,
-          station_id_to: returnRouteData.station_to || '123',
+          station_from_id: returnRouteData.station_from || '',
+          station_to_id: returnRouteData.station_to || '',
           currency: returnRouteData.currency || 'EUR',
           lang: 'ru'
         });
@@ -893,6 +893,16 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
   const outboundBasePrice = route?.price_one_way ? parseFloat(route.price_one_way) : 0;
   const returnBasePrice = returnRoute?.price_one_way ? parseFloat(returnRoute.price_one_way) : 0;
   const currency = route?.currency || 'EUR';
+  
+  // Debug logging
+  console.log('Route price:', route?.price_one_way);
+  console.log('Outbound base price:', outboundBasePrice);
+  console.log('Outbound discounts:', outboundDiscounts);
+  console.log('Return discounts:', returnDiscounts);
+  console.log('Outbound baggage:', outboundBaggage);
+  console.log('Return baggage:', returnBaggage);
+  console.log('Route request_get_baggage:', route?.request_get_baggage);
+  console.log('Route request_get_discount:', route?.request_get_discount);
 
   const outboundDiscountSelection = useDiscountSelection({
     passengers,
@@ -1084,9 +1094,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
         {/* Trip Summary */}
-        <div className="lg:col-span-1">
+        <div className="xl:col-span-1">
           <TripSummary
             route={{
               route_name: route.route_name,
@@ -1148,7 +1158,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         </div>
 
         {/* Seat Selection */}
-        <div className="lg:col-span-2">
+        <div className="xl:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Select Your Seats</CardTitle>
@@ -1186,7 +1196,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                     )}
                     
                     {/* Discount Selector pentru călătoria dus */}
-                    {outboundDiscounts['default'] && (
+                    {(route?.request_get_discount === 1 || route?.request_get_discount === true) && outboundDiscounts['default'] && outboundDiscounts['default'].length > 0 && (
                       <div className="mt-6">
                         <DiscountSelector
                           discounts={outboundDiscounts['default']}
@@ -1202,22 +1212,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                       </div>
                     )}
                     
-                    {/* Baggage Selector pentru călătoria dus */}
-                    {outboundBaggage['default'] && (
-                      <div className="mt-6">
-                        <BaggageSelector
-                          baggageItems={outboundBaggage['default']}
-                          selectedBaggage={outboundBaggageSelection.selectedBaggage}
-                          passengers={passengers}
-                          currency={currency}
-                          segmentName="Outbound Journey"
-                          onAddBaggage={outboundBaggageSelection.addBaggage}
-                          onRemoveBaggage={outboundBaggageSelection.removeBaggage}
-                          onUpdateQuantity={outboundBaggageSelection.updateBaggageQuantity}
-                          loading={loadingBaggage}
-                        />
-                      </div>
-                    )}
+                    {/* Baggage Selector moved to main content area - after seat selection */}
+                    
                   </div>
 
                   {/* Călătoria Întors */}
@@ -1392,6 +1388,23 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 )
               )}
 
+              {/* Baggage Selection - After seat selection, before checkout */}
+              {(route?.request_get_baggage === 1 || route?.request_get_baggage === true) && outboundBaggage['default'] && outboundBaggage['default'].length > 0 && (
+                <div className="mt-6">
+                  <BaggageSelector
+                    baggageItems={outboundBaggage['default']}
+                    selectedBaggage={outboundBaggageSelection.selectedBaggage}
+                    passengers={passengers}
+                    currency={currency}
+                    segmentName="Outbound Journey"
+                    onAddBaggage={outboundBaggageSelection.addBaggage}
+                    onRemoveBaggage={outboundBaggageSelection.removeBaggage}
+                    onUpdateQuantity={outboundBaggageSelection.updateBaggageQuantity}
+                    loading={loadingBaggage}
+                  />
+                </div>
+              )}
+
               {/* Continue Button */}
               <div className="mt-6">
                 <Button
@@ -1401,17 +1414,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   size="lg"
                 >
                   Continue to Checkout
-                  {isRoundTrip ? (
-                    <Badge variant="secondary" className="ml-2">
-                      {(outboundTotalPrice + returnTotalPrice).toFixed(2)} {outboundCurrency}
-                    </Badge>
-                  ) : (
-                    outboundTotalPrice > 0 && (
-                      <Badge variant="secondary" className="ml-2">
-                        {outboundTotalPrice.toFixed(2)} {outboundCurrency}
-                      </Badge>
-                    )
-                  )}
+                  <Badge variant="secondary" className="ml-2">
+                    {bookingData.bookingSummary.totalPrice.toFixed(2)} {bookingData.bookingSummary.currency}
+                  </Badge>
                 </Button>
               </div>
             </CardContent>
@@ -1421,8 +1426,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
 
       {/* Booking Form Modal */}
       {showBookingForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Complete Your Booking</h2>
@@ -1447,8 +1452,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
 
       {/* Booking Confirmation */}
       {bookingResponse && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Booking Confirmed</h2>

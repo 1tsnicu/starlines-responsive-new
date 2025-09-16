@@ -1,65 +1,60 @@
-import { useNavigate } from "react-router-dom";
-import { MapPin, Clock, Star, ArrowRight, Bus, Users, Zap, Heart } from "lucide-react";
+import { MapPin, Clock, Star, Bus, Users, Zap, Heart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
 const PopularRoutesSection = () => {
-  const navigate = useNavigate();
   const { formatPrice, t } = useLocalization();
 
 const popularRoutes = [
   {
       id: "1",
     from: "Chișinău",
-    to: "București",
-      price: 45,
-    duration: "8h 30m",
+    to: "Kiev",
+      price: 35,
+    duration: "6h 45m",
       departureTime: "08:00",
-      arrivalTime: "16:30",
+      arrivalTime: "14:45",
       operator: "Starlines Express",
       rating: 4.8,
       reviews: 1247,
       amenities: ["WiFi", "USB", "WC", "AC"],
-      stops: 2,
+      stops: 3,
       popularity: "Very Popular"
     },
     {
       id: "2",
     from: "Chișinău",
-      to: "Istanbul",
-      price: 85,
-      duration: "12h 45m",
-      departureTime: "20:00",
-      arrivalTime: "08:45",
-      operator: "Starlines Premium",
+      to: "Vinnița",
+      price: 25,
+      duration: "4h 30m",
+      departureTime: "14:00",
+      arrivalTime: "18:30",
+      operator: "Starlines Express",
       rating: 4.9,
       reviews: 892,
-      amenities: ["WiFi", "USB", "WC", "AC", "Entertainment"],
-      stops: 3,
-      popularity: "Premium Route"
+      amenities: ["WiFi", "USB", "WC", "AC"],
+      stops: 2,
+      popularity: "Popular Route"
     },
     {
       id: "3",
       from: "Chișinău",
-      to: "Budapest",
-    price: 65,
-      duration: "14h 20m",
-      departureTime: "06:30",
-      arrivalTime: "20:50",
+      to: "Jîtomîr",
+    price: 30,
+      duration: "5h 15m",
+      departureTime: "10:30",
+      arrivalTime: "15:45",
       operator: "Starlines Express",
       rating: 4.7,
       reviews: 567,
       amenities: ["WiFi", "USB", "WC", "AC"],
-      stops: 4,
-      popularity: "Scenic Route"
+      stops: 2,
+      popularity: "Regular Route"
     }
   ];
 
-  const handleViewRoutes = (routeId: string) => {
-    navigate(`/trip/${routeId}`);
-  };
 
   return (
     <section className="py-20 bg-gradient-to-br from-background via-surface/30 to-background relative overflow-hidden">
@@ -114,8 +109,8 @@ const popularRoutes = [
                     backdrop-blur-sm border shadow-sm font-medium text-xs px-2 py-1
                     ${route.popularity === "Very Popular" 
                       ? "bg-red-500/90 text-white border-red-400" 
-                      : route.popularity === "Premium Route"
-                      ? "bg-purple-500/90 text-white border-purple-400"
+                      : route.popularity === "Popular Route"
+                      ? "bg-blue-500/90 text-white border-blue-400"
                       : "bg-green-500/90 text-white border-green-400"
                     }
                   `}
@@ -194,24 +189,15 @@ const popularRoutes = [
                   ))}
                 </div>
 
-                {/* Price and CTA */}
+                {/* Price */}
                 <div className="text-center pt-4 border-t border-border/20">
-                  <div className="mb-3">
+                  <div>
                     <span className="text-xs text-foreground/70">{t('routes.perPerson')}</span>
                     <div className="text-3xl font-bold text-primary">
                       {formatPrice(route.price, undefined, 'EUR')}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <Button 
-                    size="sm"
-                    className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors"
-                    onClick={() => handleViewRoutes(route.id)}
-              >
-                    <span>{t('routes.viewDetails')}</span>
-                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </div>
               </CardContent>
             </Card>
           ))}
@@ -233,6 +219,7 @@ const popularRoutes = [
             <Button 
               size="sm" 
               className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 w-full sm:w-auto sm:size-lg text-sm sm:text-base h-10 sm:h-12"
+              onClick={() => window.location.href = '/timetable'}
             >
               <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               {t('routes.browseAll')}

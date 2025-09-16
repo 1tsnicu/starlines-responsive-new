@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Clock, Bus } from 'lucide-react';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 // Data structure for the timetable
 interface TimetableStop {
@@ -26,6 +27,45 @@ interface TimetableData {
 }
 
 const Timetable = () => {
+  const { t } = useLocalization();
+
+  // Helper function to get translated station name
+  const getStationName = (originalName: string) => {
+    const stationMap: { [key: string]: string } = {
+      "Київ АС «Видубичі»": t('stations.kyivVydubychi'),
+      "Київ АС «Київ»": t('stations.kyivCentral'),
+      "Житомир": t('stations.zhytomyr'),
+      "Бердичів АС": t('stations.berdychiv'),
+      "Вінниця": t('stations.vinnytsia'),
+      "Могилів-Подільський АС": t('stations.mohylivPodilskyi'),
+      "АПП «Могилів-Подільський»": t('stations.mohylivBorderUkraine'),
+      "АПП «Атаки»": t('stations.atakiBorderMoldova'),
+      "Єдинці АС": t('stations.edinet'),
+      "Бєльці АС": t('stations.balti'),
+      "Оргєєв АС": t('stations.orhei'),
+      "Кишинів АП": t('stations.chisinauBusPark'),
+      "Кишинів АС": t('stations.chisinauCentral'),
+    };
+    return stationMap[originalName] || originalName;
+  };
+
+  // Helper function to get translated station address
+  const getStationAddress = (originalName: string) => {
+    const addressMap: { [key: string]: string } = {
+      "Київ АС «Видубичі»": t('addresses.kyivVydubychi'),
+      "Київ АС «Київ»": t('addresses.kyivCentral'),
+      "Житомир": t('addresses.zhytomyr'),
+      "Бердичів АС": t('addresses.berdychiv'),
+      "Вінниця": t('addresses.vinnytsia'),
+      "Могилів-Подільський АС": t('addresses.mohylivPodilskyi'),
+      "Єдинці АС": t('addresses.edinet'),
+      "Бєльці АС": t('addresses.balti'),
+      "Оргєєв АС": t('addresses.orhei'),
+      "Кишинів АП": t('addresses.chisinauBusPark'),
+      "Кишинів АС": t('addresses.chisinauCentral'),
+    };
+    return addressMap[originalName] || '';
+  };
   // Timetable data for Kyiv (Ukraine) – Chișinău (Republic of Moldova)
   const timetableData: TimetableData[] = [
     {
@@ -273,8 +313,8 @@ const Timetable = () => {
   ];
 
   const formatTime = (time?: string) => time || "-";
-  const formatDuration = (duration?: number) => duration ? `${duration} хв` : "-";
-  const formatDistance = (distance?: number) => distance !== undefined ? `${distance} км` : "-";
+  const formatDuration = (duration?: number) => duration ? `${duration} ${t('timetable.minutes')}` : "-";
+  const formatDistance = (distance?: number) => distance !== undefined ? `${distance} ${t('timetable.kilometers')}` : "-";
 
   return (
     <div className="min-h-screen bg-background">
@@ -283,13 +323,13 @@ const Timetable = () => {
         <div className="container py-6 px-4">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              РОЗКЛАД
+              {t('timetable.scheduleTitle')}
             </h1>
             <p className="text-muted-foreground text-lg">
-              руху автобусів на маршруті
+              {t('timetable.busSchedule')}
             </p>
             <p className="text-foreground font-semibold text-xl mt-2">
-              Київ (Україна) – Кишинів (Республіка Молдова)
+              {t('timetable.routeTitle')}
             </p>
           </div>
         </div>
@@ -303,31 +343,31 @@ const Timetable = () => {
                 <thead>
                   <tr className="bg-muted/50">
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      прибуття год. хв.
+                      {t('timetable.arrivalTime')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      стоянка хв.
+                      {t('timetable.stopDuration')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      відправ-лення год. хв.
+                      {t('timetable.departureTime')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      Від-стань км. від почат. зуп.
+                      {t('timetable.distanceFromStart')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm bg-blue-50">
-                      НАЗВИ ЗУПИНОК
+                      {t('timetable.stopNames')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      Відстань км. між зуп.
+                      {t('timetable.distanceBetweenStops')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      прибуття год. хв.
+                      {t('timetable.arrivalTime')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      стоянка хв.
+                      {t('timetable.stopDuration')}
                     </th>
                     <th className="border border-border p-3 text-left font-semibold text-sm">
-                      відправ-лення год. хв.
+                      {t('timetable.departureTime')}
                     </th>
                   </tr>
                 </thead>
@@ -352,11 +392,11 @@ const Timetable = () => {
                       <td className="border border-border p-3 text-sm bg-blue-50">
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-              <div>
-                            <div className="font-medium">{row.stop.name}</div>
+                          <div>
+                            <div className="font-medium">{getStationName(row.stop.name)}</div>
                             {row.stop.address && (
                               <div className="text-xs text-muted-foreground mt-1">
-                                {row.stop.address}
+                                {getStationAddress(row.stop.name)}
                               </div>
                             )}
                             <div className="flex items-center gap-1 mt-1">
@@ -364,11 +404,11 @@ const Timetable = () => {
                                 variant={row.stop.country === 'Ukraine' ? 'default' : 'secondary'}
                                 className="text-xs"
                               >
-                                {row.stop.country === 'Ukraine' ? 'Україна' : 'Молдова'}
+                                {row.stop.country === 'Ukraine' ? 'Ukraine' : 'Moldova'}
                               </Badge>
                               {row.stop.isBorderCrossing && (
                                 <Badge variant="outline" className="text-xs">
-                                  АПП
+                                  {t('timetable.borderCrossing')}
                                 </Badge>
                               )}
                             </div>
@@ -403,18 +443,18 @@ const Timetable = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Bus className="h-5 w-5" />
-                у прямому напрямку
+                {t('timetable.directDirection')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Київ → Кишинів
+                {t('timetable.directRoute')}
               </p>
               <div className="mt-2 space-y-1 text-xs">
-                <div>• <strong>прибуття год. хв.</strong> - час прибуття на зупинку</div>
-                <div>• <strong>стоянка хв.</strong> - тривалість зупинки</div>
-                <div>• <strong>відправлення год. хв.</strong> - час відправлення з зупинки</div>
-                <div>• <strong>Відстань км. від почат. зуп.</strong> - відстань від початкової зупинки</div>
+                <div>• <strong>{t('timetable.arrivalTime')}</strong> - {t('timetable.arrivalTimeDesc')}</div>
+                <div>• <strong>{t('timetable.stopDuration')}</strong> - {t('timetable.stopDurationDesc')}</div>
+                <div>• <strong>{t('timetable.departureTime')}</strong> - {t('timetable.departureTimeDesc')}</div>
+                <div>• <strong>{t('timetable.distanceFromStart')}</strong> - {t('timetable.distanceFromStartDesc')}</div>
               </div>
             </CardContent>
           </Card>
@@ -423,18 +463,18 @@ const Timetable = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Clock className="h-5 w-5" />
-                у зворотному напрямку
+                {t('timetable.reverseDirection')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Кишинів → Київ
+                {t('timetable.reverseRoute')}
               </p>
               <div className="mt-2 space-y-1 text-xs">
-                <div>• <strong>Відстань км. між зуп.</strong> - відстань від попередньої зупинки</div>
-                <div>• <strong>прибуття год. хв.</strong> - час прибуття на зупинку</div>
-                <div>• <strong>стоянка хв.</strong> - тривалість зупинки</div>
-                <div>• <strong>відправлення год. хв.</strong> - час відправлення з зупинки</div>
+                <div>• <strong>{t('timetable.distanceBetweenStops')}</strong> - {t('timetable.distanceBetweenDesc')}</div>
+                <div>• <strong>{t('timetable.arrivalTime')}</strong> - {t('timetable.arrivalTimeDesc')}</div>
+                <div>• <strong>{t('timetable.stopDuration')}</strong> - {t('timetable.stopDurationDesc')}</div>
+                <div>• <strong>{t('timetable.departureTime')}</strong> - {t('timetable.departureTimeDesc')}</div>
               </div>
             </CardContent>
           </Card>
@@ -444,16 +484,16 @@ const Timetable = () => {
         <Card className="mt-4">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="text-lg font-semibold mb-2">Важлива інформація</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('timetable.importantInfo')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
                 <div>
-                  <strong>АПП</strong> - Автомобільний пункт пропуску
+                  <strong>АПП</strong> - {t('timetable.borderCrossing')}
                 </div>
                 <div>
-                  <strong>АС</strong> - Автостанція
+                  <strong>АС</strong> - {t('timetable.busStation')}
                 </div>
-              <div>
-                  <strong>АП</strong> - Автопарк
+                <div>
+                  <strong>АП</strong> - {t('timetable.busPark')}
                 </div>
               </div>
             </div>

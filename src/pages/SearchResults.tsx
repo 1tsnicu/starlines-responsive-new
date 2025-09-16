@@ -243,7 +243,7 @@ const SearchResults = () => {
           variant="ghost" 
           size="sm"
           onClick={() => setShowFilters(false)}
-          className="md:hidden"
+          className="xl:hidden"
         >
           <X className="h-4 w-4" />
         </Button>
@@ -451,19 +451,29 @@ const SearchResults = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="container py-4 lg:py-8">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 lg:gap-8">
           {/* Filters Sidebar */}
-          <div className="hidden lg:block">
+          <div className="hidden xl:block">
             <FilterSidebar />
           </div>
 
           {/* Results */}
-          <div className="lg:col-span-3">
+          <div className="xl:col-span-3">
             <div className="flex items-center justify-between mb-6">
               <p className="text-foreground/70">
                 {sortedResults.length} {sortedResults.length === 1 ? t('search.routeFound') : t('search.routesFound')}
               </p>
+              {/* Mobile Filter Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(true)}
+                className="xl:hidden"
+              >
+                <Filter className="h-4 w-4 mr-2" />
+                Filters
+              </Button>
             </div>
 
             {error ? (
@@ -516,9 +526,9 @@ const SearchResults = () => {
                 {sortedResults.map((route) => (
                   <Card key={route.interval_id} className="hover-lift border-border">
                     <CardContent className="p-6">
-                      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                         {/* Route Info */}
-                        <div className="md:col-span-4">
+                        <div className="lg:col-span-4">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="text-2xl font-bold text-primary">
                               {route.time_from}
@@ -540,11 +550,11 @@ const SearchResults = () => {
                         </div>
 
                         {/* Route Details */}
-                        <div className="md:col-span-4">
+                        <div className="lg:col-span-4">
                           <h3 className="font-semibold text-foreground mb-1">
                             {route.point_from} → {route.point_to}
                           </h3>
-                          <div className="flex items-center gap-4 text-sm text-foreground/70">
+                          <div className="flex items-center gap-2 lg:gap-4 text-sm text-foreground/70 flex-wrap">
                             <span>{route.carrier || 'N/A'}</span>
                             {route.rating && (
                               <div className="flex items-center gap-1">
@@ -554,7 +564,7 @@ const SearchResults = () => {
                               </div>
                             )}
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-xs">
                               {route.trans === 'bus' ? 'Autobus' : route.trans}
                             </Badge>
@@ -567,7 +577,7 @@ const SearchResults = () => {
                         </div>
 
                         {/* Amenities */}
-                        <div className="md:col-span-2">
+                        <div className="lg:col-span-2">
                           <div className="flex flex-wrap gap-1">
                             {parseAmenities(route.comfort).slice(0, 3).map((amenity) => (
                               <Badge key={amenity} variant="outline" className="text-xs">
@@ -590,16 +600,16 @@ const SearchResults = () => {
                         </div>
 
                         {/* Price & CTA */}
-                        <div className="md:col-span-2 text-right">
+                        <div className="lg:col-span-2 text-right">
                           <div className="mb-2">
                             <span className="text-xs text-foreground/70">de la</span>
-                            <div className="text-2xl font-bold text-primary">
+                            <div className="text-xl lg:text-2xl font-bold text-primary">
                               {formatPrice(parseFloat(route.price_one_way || "0"), undefined, route.currency || 'EUR')}
                             </div>
                           </div>
                           <Button 
                             size="sm" 
-                            className="w-full"
+                            className="w-full text-xs lg:text-sm"
                             onClick={() => handleSelectRoute(route)}
                           >
                             {isRoundTrip ? 

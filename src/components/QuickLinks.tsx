@@ -30,13 +30,6 @@ const QuickLinks = () => {
       color: "from-blue-500 to-blue-600"
     },
     {
-      title: t('header.routes'),
-      description: t('index.transportRoutesDesc'),
-      icon: Route,
-      href: "/transport-routes",
-      color: "from-green-500 to-green-600"
-    },
-    {
       title: t('header.timetable'),
       description: t('index.timetableDesc'),
       icon: Clock,
