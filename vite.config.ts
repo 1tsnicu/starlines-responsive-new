@@ -28,11 +28,12 @@ export default defineConfig(({ mode }) => ({
         }
       },
       // Backward-compatible alias (legacy code expects /api/bussystem)
+      // Now routes to our secure backend instead of direct API calls
       '/api/bussystem': {
-        target: 'https://test-api.bussystem.eu',
+        target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/bussystem/, '/server'),
-        secure: true,
+        rewrite: (path) => path.replace(/^\/api\/bussystem/, '/api/backend'),
+        secure: false,
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

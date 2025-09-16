@@ -1416,72 +1416,103 @@ export const mockBussystemAPI = {
     return response;
   },
 
-  // Buy ticket - Complete buy_ticket endpoint with ticket extraction
+  // Buy ticket - Complete buy_ticket endpoint with realistic response
   buyTicket: async (params: { order_id: number; lang?: string; v?: string }) => {
     await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate payment processing
 
-    // Generate mock response based on order_id
-    const basePrice = 150;
-    const numPassengers = 3; // Based on our demo
-    const totalPrice = basePrice * numPassengers * 0.9; // With some discount
+    // Simulate occasional payment failures for testing
+    if (Math.random() < 0.1) { // 10% failure rate
+      throw new Error('Payment failed - insufficient funds');
+    }
+
+    // Generate realistic response based on order_id
+    const basePrice = 75; // EUR per passenger
+    const numPassengers = 2; // Typical booking
+    const baggageCost = 25; // Additional baggage costs
+    const totalPrice = (basePrice * numPassengers) + baggageCost;
 
     const response = {
       order_id: params.order_id,
-      price_total: Math.round(totalPrice * 100) / 100,
+      price_total: totalPrice,
       currency: "EUR",
-      link: `https://bussystem.com/print/order/${params.order_id}?security=abc123`,
+      link: `https://test-api.bussystem.eu/viev/frame/print_ticket.php?order_id=${params.order_id}&security=722842&lang=${params.lang || 'ru'}`,
       
-      // Passenger tickets (objects "0", "1", "2")
+      // Passenger tickets (objects "0", "1", etc.)
       "0": {
-        passenger_id: 1,
-        transaction_id: `txn_${Date.now()}_1`,
-        ticket_id: `ticket_${params.order_id}_1`,
-        security: `sec_${Date.now()}_1`,
-        price: Math.round((basePrice * 0.9) * 100) / 100,
+        passenger_id: 0,
+        transaction_id: `1038038`,
+        ticket_id: `21011`,
+        security: `761899`,
+        price: 90,
         currency: "EUR",
-        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_1?security=sec_${Date.now()}_1`,
+        link: `https://test-api.bussystem.eu/viev/frame/print_ticket.php?ticket_id=21011&security=761899&lang=${params.lang || 'ru'}`,
         baggage: [
           {
-            baggage_title: "Bagaj mic",
-            price: 15,
-            currency: "EUR"
+            baggage_id: "81",
+            baggage_type_id: "1",
+            baggage_type: "small_baggage",
+            baggage_type_abbreviated: "БАГАЖ М/М",
+            baggage_title: "Маломерный багаж",
+            length: "35",
+            width: "10",
+            height: "10",
+            kg: "5",
+            price: 0,
+            currency: "EUR",
+            baggage_ticket_id: 46
+          },
+          {
+            baggage_id: "82",
+            baggage_type_id: "1",
+            baggage_type: "small_baggage",
+            baggage_type_abbreviated: "БАГАЖ М/М",
+            baggage_title: "Маломерный багаж",
+            length: "35",
+            width: "10",
+            height: "10",
+            kg: "5",
+            price: 5,
+            currency: "EUR",
+            baggage_ticket_id: 47
           }
         ]
       },
       "1": {
-        passenger_id: 2,
-        transaction_id: `txn_${Date.now()}_2`,
-        ticket_id: `ticket_${params.order_id}_2`,
-        security: `sec_${Date.now()}_2`,
-        price: Math.round((basePrice * 0.85) * 100) / 100, // With additional discount
+        passenger_id: 1,
+        transaction_id: `1038039`,
+        ticket_id: `21012`,
+        security: `717836`,
+        price: 45,
         currency: "EUR",
-        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_2?security=sec_${Date.now()}_2`,
+        link: `https://test-api.bussystem.eu/viev/frame/print_ticket.php?ticket_id=21012&security=717836&lang=${params.lang || 'ru'}`,
         baggage: [
           {
-            baggage_title: "Bagaj mic",
-            price: 15,
-            currency: "EUR"
+            baggage_id: "81",
+            baggage_type_id: "1",
+            baggage_type: "small_baggage",
+            baggage_type_abbreviated: "БАГАЖ М/М",
+            baggage_title: "Маломерный багаж",
+            length: "35",
+            width: "10",
+            height: "10",
+            kg: "5",
+            price: 0,
+            currency: "EUR",
+            baggage_ticket_id: 48
           },
           {
-            baggage_title: "Bagaj mediu",
-            price: 25,
-            currency: "EUR"
-          }
-        ]
-      },
-      "2": {
-        passenger_id: 3,
-        transaction_id: `txn_${Date.now()}_3`,
-        ticket_id: `ticket_${params.order_id}_3`,
-        security: `sec_${Date.now()}_3`,
-        price: Math.round((basePrice * 0.95) * 100) / 100,
-        currency: "EUR",
-        link: `https://bussystem.com/print/ticket/ticket_${params.order_id}_3?security=sec_${Date.now()}_3`,
-        baggage: [
-          {
-            baggage_title: "Bagaj mare",
-            price: 35,
-            currency: "EUR"
+            baggage_id: "84",
+            baggage_type_id: "2",
+            baggage_type: "medium_baggage",
+            baggage_type_abbreviated: "БАГАЖ С/М",
+            baggage_title: "Среднемерный багаж",
+            length: "50",
+            width: "25",
+            height: "15",
+            kg: "8",
+            price: 10,
+            currency: "EUR",
+            baggage_ticket_id: 49
           }
         ]
       }

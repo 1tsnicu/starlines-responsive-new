@@ -5,8 +5,8 @@ export type DiscountMapPerTrip = Record<string, string>; // "0": "3196" (pasager
 export type BaggagePerTrip = string[]; // per pasager: "82,86" (IDs plătite)
 
 export interface NewOrderPayload {
-  login: string;
-  password: string;
+  login?: string;  // Optional - handled by server
+  password?: string;  // Optional - handled by server
   promocode_name?: string;
   date: string[];           // pe trips
   interval_id: string[];    // pe trips

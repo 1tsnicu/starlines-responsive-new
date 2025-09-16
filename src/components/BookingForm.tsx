@@ -9,12 +9,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { NewOrderErrorDisplay } from './NewOrderErrorDisplay';
 import { User, Phone, Mail, Calendar, Clock, MapPin, Ticket, AlertCircle, CheckCircle, Timer } from "lucide-react";
 import type { NewOrderPayload, ReservationInfo, Passenger, TripMeta, NewOrderResponse } from "@/types/newOrder";
-import type { TicketPurchaseResult } from "@/types/buy";
+import type { TicketPurchaseResult } from "@/types/buyTicket";
 import { buildNewOrderPayload, validateNewOrderPayload } from "@/lib/newOrderBuilder";
 import { newOrder } from "@/lib/bussystem";
-import { PaymentFlow, PaymentSuccess } from "./PaymentFlow";
+import { PaymentFlow } from "./PaymentFlow";
+import { PaymentSuccess } from "./PaymentSuccess";
 
 interface BookingFormProps {
   trips: TripMeta[];
@@ -105,10 +107,8 @@ export function BookingForm({
     setError(null);
 
     try {
-      // Build payload
+      // Build payload - credentials will be handled by backend
       const payload = buildNewOrderPayload({
-        login: "demo_login", // This would come from auth context
-        password: "demo_password", // This would come from auth context
         passengers,
         trips,
         phone: phone || undefined,
@@ -116,6 +116,12 @@ export function BookingForm({
         promocode: promocode || undefined,
         currency: "EUR",
         lang: "ru"
+      });
+
+      console.log('BookingForm - Payload built:', {
+        passengers: passengers.length,
+        trips: trips.length,
+        payload: payload
       });
 
       // Final validation
@@ -217,69 +223,8 @@ export function BookingForm({
     );
   }
 
-  // Default form step
-  if (reservation) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-600">
-            <CheckCircle className="h-5 w-5" />
-            Rezervare Confirmată
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Alert>
-            <Timer className="h-4 w-4" />
-            <AlertDescription>
-              Rezervarea este valabilă până la {reservation.reservation_until} 
-              ({reservation.reservation_until_min} minute)
-            </AlertDescription>
-          </Alert>
-
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <Label className="text-muted-foreground">Numărul comenzii</Label>
-              <div className="font-mono font-bold">{reservation.order_id}</div>
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Cod securitate</Label>
-              <div className="font-mono font-bold">{reservation.security}</div>
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Total de plată</Label>
-              <div className="font-bold text-lg">{reservation.price_total} {reservation.currency}</div>
-            </div>
-            <div>
-              <Label className="text-muted-foreground">Status</Label>
-              <Badge variant={reservation.status === "reserve_ok" ? "default" : "secondary"}>
-                {reservation.status}
-              </Badge>
-            </div>
-          </div>
-
-          {reservation.promocode_info && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-              <div className="text-sm font-medium text-green-800">
-                Promocod aplicat: {reservation.promocode_info.promocode_name}
-              </div>
-              <div className="text-sm text-green-600">
-                Reducere: -{reservation.promocode_info.price_promocode} {reservation.currency}
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button className="flex-1">
-              Continuă la Plată
-            </Button>
-            <Button variant="outline">
-              Printează Biletul
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // This should not be reached as we handle payment and success steps above
+  // If we have a reservation but are not in payment/success step, something went wrong
 
   return (
     <Card>
@@ -291,10 +236,13 @@ export function BookingForm({
       </CardHeader>
       <CardContent className="space-y-6">
         {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <NewOrderErrorDisplay 
+            error={error} 
+            onRetry={() => {
+              setError(null);
+              handleSubmit();
+            }}
+          />
         )}
 
         {/* Trip Summary */}

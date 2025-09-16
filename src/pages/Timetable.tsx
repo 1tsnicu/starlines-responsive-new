@@ -1,369 +1,467 @@
-import { useState, useEffect } from "react";
-import { Calendar, Filter, MapPin, Clock, Bus, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { routes, infoBusAPI } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
-import { useLocalization } from "@/contexts/LocalizationContext";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Clock, Bus } from 'lucide-react';
+
+// Data structure for the timetable
+interface TimetableStop {
+  name: string;
+  address: string;
+  country: 'Ukraine' | 'Moldova';
+  isBorderCrossing?: boolean;
+}
+
+interface TimetableSchedule {
+  arrival?: string;
+  stopDuration?: number;
+  departure?: string;
+  distanceFromStart?: number;
+  distanceFromPrevious?: number;
+}
+
+interface TimetableData {
+  stop: TimetableStop;
+  direct: TimetableSchedule; // Kyiv → Chișinău
+  reverse: TimetableSchedule; // Chișinău → Kyiv
+}
 
 const Timetable = () => {
-  const { t, formatPrice } = useLocalization();
-  const navigate = useNavigate();
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [selectedOperator, setSelectedOperator] = useState<string>("all");
-  const [selectedDirection, setSelectedDirection] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
-
-  // Get unique operators and directions
-  const operators = ["all", ...Array.from(new Set(routes.map(route => route.operator)))];
-  const directions = ["all", ...Array.from(new Set(routes.map(route => `${route.from.name} → ${route.to.name}`)))];
-
-  // Filter routes based on selection
-  const filteredRoutes = routes.filter(route => {
-    if (selectedOperator !== "all" && route.operator !== selectedOperator) return false;
-    if (selectedDirection !== "all" && `${route.from.name} → ${route.to.name}` !== selectedDirection) return false;
-    return true;
-  });
-
-  // Group routes by time
-  const routesByTime = filteredRoutes.reduce((acc, route) => {
-    const time = route.departureTime;
-    if (!acc[time]) acc[time] = [];
-    acc[time].push(route);
-    return acc;
-  }, {} as Record<string, typeof routes>);
-
-  // Calendar navigation
-  const goToPreviousDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() - 1);
-    setSelectedDate(newDate);
-  };
-
-  const goToNextDay = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setDate(newDate.getDate() + 1);
-    setSelectedDate(newDate);
-  };
-
-  const goToToday = () => {
-    setSelectedDate(new Date());
-  };
-
-  // Format date for display
-  const formatDate = (date: Date) => {
-    const dayOfWeek = date.getDay();
-    const dayNames = ['days.sunday', 'days.monday', 'days.tuesday', 'days.wednesday', 'days.thursday', 'days.friday', 'days.saturday'];
-    const dayName = t(dayNames[dayOfWeek]);
-    
-    const month = date.getMonth();
-    const monthNames = ['months.january', 'months.february', 'months.march', 'months.april', 'months.may', 'months.june', 'months.july', 'months.august', 'months.september', 'months.october', 'months.november', 'months.december'];
-    const monthName = t(monthNames[month]);
-    
-    return `${dayName}, ${monthName} ${date.getDate()}, ${date.getFullYear()}`;
-  };
-
-  // Get day of week
-  const getDayOfWeek = (date: Date) => {
-    const dayOfWeek = date.getDay();
-    const dayNames = ['days.sunday', 'days.monday', 'days.tuesday', 'days.wednesday', 'days.thursday', 'days.friday', 'days.saturday'];
-    return t(dayNames[dayOfWeek]);
-  };
-
-  // Check if route operates on selected day
-  const isRouteOperating = (route: typeof routes[0]) => {
-    // Mock logic - in real app this would check actual schedule
-    // For now, assume all routes operate daily
-    return true;
-  };
-
-  // Handle booking a route
-  const handleBookRoute = async (route: typeof routes[0]) => {
-    try {
-      // Find the corresponding route in infoBusAPI
-      const allRoutes = await infoBusAPI.getAllRoutes();
-      const infoBusRoute = allRoutes.find(r => 
-        r.from === route.from.name && 
-        r.to === route.to.name
-      );
-      
-      if (!infoBusRoute) {
-        console.error('Route not found in infoBusAPI', {
-          searchingFor: { from: route.from.name, to: route.to.name },
-          availableRoutes: allRoutes.map(r => ({ from: r.from, to: r.to, id: r.id }))
-        });
-        return;
+  // Timetable data for Kyiv (Ukraine) – Chișinău (Republic of Moldova)
+  const timetableData: TimetableData[] = [
+    {
+      stop: {
+        name: "Київ АС «Видубичі»",
+        address: "дорога Набережно-Печерська, 10А",
+        country: "Ukraine"
+      },
+      direct: {
+        departure: "21:00",
+        distanceFromStart: 0
+      },
+      reverse: {
+        arrival: "11:30",
+        distanceFromPrevious: 12
       }
-      
-      const routeParams = new URLSearchParams({
-        routeId: infoBusRoute.id,
-        from: infoBusRoute.from,
-        to: infoBusRoute.to,
-        date: selectedDate.toISOString().split('T')[0],
-        passengers: '1',
-        fareType: 'economy',
-        price: infoBusRoute.price.economy.toString(),
-        departureTime: infoBusRoute.departureTime,
-        arrivalTime: infoBusRoute.arrivalTime,
-        duration: infoBusRoute.duration,
-        operator: infoBusRoute.operator
-      });
-      navigate(`/trip-details?${routeParams.toString()}`);
-    } catch (error) {
-      console.error('Error finding route:', error);
+    },
+    {
+      stop: {
+        name: "Київ АС «Київ»",
+        address: "вул. С. Петлюри, 32",
+        country: "Ukraine"
+      },
+      direct: {
+        arrival: "21:30",
+        stopDuration: 30,
+        departure: "22:00",
+        distanceFromStart: 12
+      },
+      reverse: {
+        arrival: "11:00",
+        stopDuration: 10,
+        departure: "11:10",
+        distanceFromPrevious: 136
+      }
+    },
+    {
+      stop: {
+        name: "Житомир",
+        address: "вул. Київська 93",
+        country: "Ukraine"
+      },
+      direct: {
+        arrival: "23:50",
+        stopDuration: 10,
+        departure: "00:00",
+        distanceFromStart: 148
+      },
+      reverse: {
+        arrival: "08:50",
+        stopDuration: 10,
+        departure: "09:00",
+        distanceFromPrevious: 62
+      }
+    },
+    {
+      stop: {
+        name: "Бердичів АС",
+        address: "пл. Привокзальна 1-А",
+        country: "Ukraine"
+      },
+      direct: {
+        arrival: "00:55",
+        stopDuration: 5,
+        departure: "01:00",
+        distanceFromStart: 210
+      },
+      reverse: {
+        arrival: "07:50",
+        stopDuration: 5,
+        departure: "07:55",
+        distanceFromPrevious: 86
+      }
+    },
+    {
+      stop: {
+        name: "Вінниця",
+        address: "вул. Київська, 8",
+        country: "Ukraine"
+      },
+      direct: {
+        arrival: "02:10",
+        stopDuration: 10,
+        departure: "02:20",
+        distanceFromStart: 296
+      },
+      reverse: {
+        arrival: "06:20",
+        stopDuration: 10,
+        departure: "06:30",
+        distanceFromPrevious: 122
+      }
+    },
+    {
+      stop: {
+        name: "Могилів-Подільський АС",
+        address: "вул. Пушкінська 41",
+        country: "Ukraine"
+      },
+      direct: {
+        arrival: "04:15",
+        stopDuration: 5,
+        departure: "04:20",
+        distanceFromStart: 418
+      },
+      reverse: {
+        arrival: "04:15",
+        stopDuration: 10,
+        departure: "04:25",
+        distanceFromPrevious: 2
+      }
+    },
+    {
+      stop: {
+        name: "АПП «Могилів-Подільський»",
+        address: "",
+        country: "Ukraine",
+        isBorderCrossing: true
+      },
+      direct: {
+        arrival: "04:30",
+        stopDuration: 30,
+        departure: "05:00",
+        distanceFromStart: 420
+      },
+      reverse: {
+        arrival: "03:35",
+        stopDuration: 30,
+        departure: "04:05",
+        distanceFromPrevious: 1
+      }
+    },
+    {
+      stop: {
+        name: "АПП «Атаки»",
+        address: "",
+        country: "Moldova",
+        isBorderCrossing: true
+      },
+      direct: {
+        arrival: "05:05",
+        stopDuration: 30,
+        departure: "05:35",
+        distanceFromStart: 421
+      },
+      reverse: {
+        arrival: "03:00",
+        stopDuration: 30,
+        departure: "03:30",
+        distanceFromPrevious: 56
+      }
+    },
+    {
+      stop: {
+        name: "Єдинці АС",
+        address: "вул. Индепенденцей, 227",
+        country: "Moldova"
+      },
+      direct: {
+        arrival: "06:30",
+        stopDuration: 5,
+        departure: "06:35",
+        distanceFromStart: 477
+      },
+      reverse: {
+        arrival: "01:50",
+        stopDuration: 5,
+        departure: "01:55",
+        distanceFromPrevious: 71
+      }
+    },
+    {
+      stop: {
+        name: "Бєльці АС",
+        address: "вул. Штефана Великого, 2",
+        country: "Moldova"
+      },
+      direct: {
+        arrival: "07:40",
+        stopDuration: 5,
+        departure: "07:45",
+        distanceFromStart: 548
+      },
+      reverse: {
+        arrival: "00:40",
+        stopDuration: 5,
+        departure: "00:45",
+        distanceFromPrevious: 86
+      }
+    },
+    {
+      stop: {
+        name: "Оргєєв АС",
+        address: "ул. Садовяну, 50",
+        country: "Moldova"
+      },
+      direct: {
+        arrival: "09:00",
+        stopDuration: 5,
+        departure: "09:05",
+        distanceFromStart: 634
+      },
+      reverse: {
+        arrival: "23:20",
+        stopDuration: 5,
+        departure: "23:25",
+        distanceFromPrevious: 59
+      }
+    },
+    {
+      stop: {
+        name: "Кишинів АП",
+        address: "Bulevardul Dacia 80/3",
+        country: "Moldova"
+      },
+      direct: {
+        arrival: "10:05",
+        stopDuration: 10,
+        departure: "10:15",
+        distanceFromStart: 693
+      },
+      reverse: {
+        arrival: "22:05",
+        stopDuration: 15,
+        departure: "22:20",
+        distanceFromPrevious: 13
+      }
+    },
+    {
+      stop: {
+        name: "Кишинів АС",
+        address: "вул. Каля Мошилор, 2/1",
+        country: "Moldova"
+      },
+      direct: {
+        arrival: "10:30",
+        distanceFromStart: 706
+      },
+      reverse: {
+        arrival: "21:15",
+        stopDuration: 30,
+        departure: "21:45"
+      }
     }
-  };
+  ];
 
-  const CalendarView = () => (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Calendar Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-4">
-          <Button variant="outline" size="sm" onClick={goToPreviousDay} className="h-8 sm:h-10 px-2 sm:px-3">
-            <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={goToNextDay} className="h-8 sm:h-10 px-2 sm:px-3">
-            <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
-          </Button>
-        </div>
-        <div className="text-center">
-          <h2 className="text-lg sm:text-xl font-semibold text-foreground">{formatDate(selectedDate)}</h2>
-          <p className="text-xs sm:text-sm text-muted-foreground">{getDayOfWeek(selectedDate)}</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={goToToday} className="h-8 sm:h-10 px-2 sm:px-3 text-xs sm:text-sm">
-          {t('timetable.today')}
-        </Button>
-      </div>
-
-      {/* Time Slots */}
-      <div className="space-y-3 sm:space-y-4">
-        {Object.entries(routesByTime)
-          .sort(([a], [b]) => a.localeCompare(b))
-          .map(([time, routesAtTime]) => (
-            <Card key={time} className="border-border">
-              <CardHeader className="pb-2 sm:pb-3">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  {time}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="space-y-2 sm:space-y-3">
-                  {routesAtTime
-                    .filter(route => isRouteOperating(route))
-                    .map((route) => (
-                      <div key={route.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-muted/50 rounded-lg gap-3 sm:gap-0">
-                        <div className="flex-1">
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                              <span className="font-medium text-sm sm:text-base">{route.from.name}</span>
-                            </div>
-                            <div className="hidden sm:block w-8 h-0.5 bg-muted-foreground/30" />
-                            <div className="flex items-center gap-2">
-                              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                              <span className="font-medium text-sm sm:text-base">{route.to.name}</span>
-                            </div>
-                          </div>
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                            <span>{t('timetable.duration')}: {route.duration}</span>
-                            <span>{t('timetable.stops')}: {route.stops}</span>
-                            <span>{t('timetable.operator')}: {route.operator}</span>
-                          </div>
-                        </div>
-                        <div className="text-center sm:text-right">
-                          <div className="text-xl sm:text-2xl font-bold text-primary mb-1">
-                            {formatPrice(Number(route.price), undefined, 'EUR')}
-                          </div>
-                          <Button size="sm" variant="outline" onClick={() => handleBookRoute(route)} className="w-full sm:w-auto text-xs sm:text-sm">
-                            {t('timetable.book')}
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  {routesAtTime.filter(route => isRouteOperating(route)).length === 0 && (
-                    <div className="text-center py-4 text-muted-foreground text-sm">
-                      {t('timetable.noRoutesOperating')}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-      </div>
-    </div>
-  );
-
-  const ListView = () => (
-    <div className="space-y-3 sm:space-y-4">
-      {filteredRoutes
-        .filter(route => isRouteOperating(route))
-        .sort((a, b) => a.departureTime.localeCompare(b.departureTime))
-        .map((route) => (
-          <Card key={route.id} className="border-border hover-lift">
-            <CardContent className="p-3 sm:p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-start lg:items-center">
-                {/* Time */}
-                <div className="lg:col-span-2">
-                  <div className="text-xl sm:text-2xl font-bold text-primary">
-                    {route.departureTime}
-                  </div>
-                  <div className="text-xs sm:text-sm text-muted-foreground">
-                    {route.duration} • {route.stops} {route.stops === 1 ? t('timetable.stop') : t('timetable.stops')}
-                  </div>
-                </div>
-
-                {/* Route */}
-                <div className="lg:col-span-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                      <span className="font-medium text-sm sm:text-base">{route.from.name}</span>
-                    </div>
-                    <div className="hidden sm:block w-8 h-0.5 bg-muted-foreground/30" />
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-                      <span className="font-medium text-sm sm:text-base">{route.to.name}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                    <Bus className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>{route.operator}</span>
-                  </div>
-                </div>
-
-                {/* Amenities */}
-                <div className="lg:col-span-3">
-                  <div className="flex flex-wrap gap-1">
-                    {route.amenities.slice(0, 3).map((amenity) => (
-                      <Badge key={amenity} variant="outline" className="text-xs">
-                        {amenity}
-                      </Badge>
-                    ))}
-                    {route.amenities.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{route.amenities.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Price & Action */}
-                <div className="lg:col-span-3 text-left lg:text-right">
-                  <div className="mb-2">
-                    <span className="text-xs text-muted-foreground">{t('timetable.from')}</span>
-                    <div className="text-xl sm:text-2xl font-bold text-primary">
-                      {formatPrice(Number(route.price), undefined, 'EUR')}
-                    </div>
-                  </div>
-                  <Button size="sm" className="w-full lg:w-auto" onClick={() => handleBookRoute(route)}>
-                    {t('timetable.bookNow')}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-    </div>
-  );
+  const formatTime = (time?: string) => time || "-";
+  const formatDuration = (duration?: number) => duration ? `${duration} хв` : "-";
+  const formatDistance = (distance?: number) => distance !== undefined ? `${distance} км` : "-";
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-surface border-b border-border">
-        <div className="container py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+        <div className="container py-6 px-4">
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
-              {t('timetable.title')}
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              РОЗКЛАД
             </h1>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
-              {t('timetable.description')}
+            <p className="text-muted-foreground text-lg">
+              руху автобусів на маршруті
+            </p>
+            <p className="text-foreground font-semibold text-xl mt-2">
+              Київ (Україна) – Кишинів (Республіка Молдова)
             </p>
           </div>
         </div>
       </div>
 
-      <div className="container py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-        {/* Filters */}
-        <Card className="mb-4 sm:mb-6">
-          <CardContent className="p-4 sm:p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-              {/* Operator Filter */}
+      <div className="container py-6 px-4">
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-muted/50">
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      прибуття год. хв.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      стоянка хв.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      відправ-лення год. хв.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      Від-стань км. від почат. зуп.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm bg-blue-50">
+                      НАЗВИ ЗУПИНОК
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      Відстань км. між зуп.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      прибуття год. хв.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      стоянка хв.
+                    </th>
+                    <th className="border border-border p-3 text-left font-semibold text-sm">
+                      відправ-лення год. хв.
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {timetableData.map((row, index) => (
+                    <tr key={index} className="hover:bg-muted/30">
+                      {/* Direct direction columns (Kyiv → Chișinău) */}
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatTime(row.direct.arrival)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatDuration(row.direct.stopDuration)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatTime(row.direct.departure)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatDistance(row.direct.distanceFromStart)}
+                      </td>
+                      
+                      {/* Stop name column */}
+                      <td className="border border-border p-3 text-sm bg-blue-50">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
               <div>
-                <label className="text-xs sm:text-sm font-medium text-foreground mb-2 block">
-                  {t('timetable.operator')}
-                </label>
-                <Select value={selectedOperator} onValueChange={setSelectedOperator}>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
-                    <SelectValue placeholder={t('timetable.allOperators')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {operators.map((operator) => (
-                      <SelectItem key={operator} value={operator}>
-                        {operator === "all" ? t('timetable.allOperators') : operator}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Direction Filter */}
-              <div>
-                <label className="text-xs sm:text-sm font-medium text-foreground mb-2 block">
-                  {t('timetable.direction')}
-                </label>
-                <Select value={selectedDirection} onValueChange={setSelectedDirection}>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
-                    <SelectValue placeholder={t('timetable.allDirections')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {directions.map((direction) => (
-                      <SelectItem key={direction} value={direction}>
-                        {direction === "all" ? t('timetable.allDirections') : direction}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* View Mode */}
-              <div>
-                <label className="text-xs sm:text-sm font-medium text-foreground mb-2 block">
-                  {t('timetable.viewMode')}
-                </label>
-                <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as "calendar" | "list")}>
-                  <TabsList className="grid w-full grid-cols-2 h-10 sm:h-11">
-                    <TabsTrigger value="calendar" className="text-xs sm:text-sm">{t('timetable.calendar')}</TabsTrigger>
-                    <TabsTrigger value="list" className="text-xs sm:text-sm">{t('timetable.list')}</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+                            <div className="font-medium">{row.stop.name}</div>
+                            {row.stop.address && (
+                              <div className="text-xs text-muted-foreground mt-1">
+                                {row.stop.address}
+                              </div>
+                            )}
+                            <div className="flex items-center gap-1 mt-1">
+                              <Badge 
+                                variant={row.stop.country === 'Ukraine' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {row.stop.country === 'Ukraine' ? 'Україна' : 'Молдова'}
+                              </Badge>
+                              {row.stop.isBorderCrossing && (
+                                <Badge variant="outline" className="text-xs">
+                                  АПП
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      
+                      {/* Reverse direction columns (Chișinău → Kyiv) */}
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatDistance(row.reverse.distanceFromPrevious)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatTime(row.reverse.arrival)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatDuration(row.reverse.stopDuration)}
+                      </td>
+                      <td className="border border-border p-3 text-sm text-center">
+                        {formatTime(row.reverse.departure)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </CardContent>
         </Card>
 
-        {/* Results Count */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <div className="flex items-center gap-2">
-            <Filter className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
-            <span className="text-muted-foreground text-xs sm:text-sm">
-              {t('timetable.routesOperating')
-                .replace('{count}', filteredRoutes.filter(route => isRouteOperating(route)).length.toString())
-                .replace('{date}', formatDate(selectedDate))}
-            </span>
-          </div>
-        </div>
+        {/* Legend */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Bus className="h-5 w-5" />
+                у прямому напрямку
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Київ → Кишинів
+              </p>
+              <div className="mt-2 space-y-1 text-xs">
+                <div>• <strong>прибуття год. хв.</strong> - час прибуття на зупинку</div>
+                <div>• <strong>стоянка хв.</strong> - тривалість зупинки</div>
+                <div>• <strong>відправлення год. хв.</strong> - час відправлення з зупинки</div>
+                <div>• <strong>Відстань км. від почат. зуп.</strong> - відстань від початкової зупинки</div>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Content */}
-        {viewMode === "calendar" ? <CalendarView /> : <ListView />}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                у зворотному напрямку
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Кишинів → Київ
+              </p>
+              <div className="mt-2 space-y-1 text-xs">
+                <div>• <strong>Відстань км. між зуп.</strong> - відстань від попередньої зупинки</div>
+                <div>• <strong>прибуття год. хв.</strong> - час прибуття на зупинку</div>
+                <div>• <strong>стоянка хв.</strong> - тривалість зупинки</div>
+                <div>• <strong>відправлення год. хв.</strong> - час відправлення з зупинки</div>
+              </div>
+            </CardContent>
+          </Card>
+              </div>
+
+        {/* Additional Info */}
+        <Card className="mt-4">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <h3 className="text-lg font-semibold mb-2">Важлива інформація</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                <div>
+                  <strong>АПП</strong> - Автомобільний пункт пропуску
+                </div>
+                <div>
+                  <strong>АС</strong> - Автостанція
+                </div>
+              <div>
+                  <strong>АП</strong> - Автопарк
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
 };
 
 export default Timetable;
-

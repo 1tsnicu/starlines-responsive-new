@@ -1,789 +1,402 @@
-import { useState, useEffect } from "react";
-import { Search, Download, QrCode, Mail, Copy, ArrowRight, Ticket, Calendar, MapPin, Clock, Bus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { lookupTicket } from "@/lib/mock-data";
-import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { useLocalization } from "@/contexts/LocalizationContext";
-import { useAuth } from "@/contexts/AuthContext";
+/**
+ * MY TICKETS PAGE
+ * 
+ * Displays user's paid tickets with download and cancellation options
+ */
 
-const MyTickets = () => {
-  const { t } = useLocalization();
-  const { user, profile, signIn, signUp, signOut, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState("lookup");
-  const [orderNumber, setOrderNumber] = useState("");
-  const [securityCode, setSecurityCode] = useState("");
-  const [ticket, setTicket] = useState<{
-    orderNumber: string;
-    status: string;
-    route: {
-      from: { name: string };
-      to: { name: string };
-      departureTime: string;
-      arrivalTime: string;
-    };
-    passengers: { firstName: string; lastName: string; seat: string }[];
-    departureDate: string;
-    totalPrice: number;
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Download, 
+  X, 
+  Calendar, 
+  MapPin, 
+  Clock, 
+  User, 
+  CreditCard,
+  AlertCircle,
+  CheckCircle,
+  Loader2
+} from 'lucide-react';
+import { formatBookingPrice } from '@/lib/tripDetailApi';
+import { downloadTicketPDF } from '@/lib/ticketDownload';
+import { cancelOrder, cancelTicket } from '@/lib/cancelTicketApi';
+
+interface SavedTicket {
+  id: string;
+  order_id: number;
+  security: string;
+  status: 'paid' | 'buy_ok' | 'buy' | 'reserve_ok';
+  price_total: number;
     currency: string;
-  } | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [qrDialogOpen, setQrDialogOpen] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
-  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
-  const [authForm, setAuthForm] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: ""
-  });
-  const [formLoading, setFormLoading] = useState(false);
-  const { toast } = useToast();
+  reservation_until: string;
+  created_at: string;
+  trips: Array<{
+    trip_id: number;
+    route_name: string;
+    date_from: string;
+    time_from: string;
+    point_from: string;
+    station_from: string;
+    point_to: string;
+    station_to: string;
+    passengers: Array<{
+      transaction_id: string;
+      name: string;
+      surname: string;
+      seat: string;
+      price: number;
+    }>;
+  }>;
+}
 
-  // Check if user is authenticated
-  const isAuthenticated = !!user;
+export const MyTickets: React.FC = () => {
+  const [tickets, setTickets] = useState<SavedTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [downloadingTickets, setDownloadingTickets] = useState<Set<string>>(new Set());
+  const [cancellingTickets, setCancellingTickets] = useState<Set<string>>(new Set());
 
-  const handleTicketLookup = async () => {
-    if (!orderNumber.trim() || !securityCode.trim()) {
-      toast({
-        title: t('myTickets.missingInformation'),
-        description: t('myTickets.enterBothFields'),
-        variant: "destructive"
-      });
-      return;
-    }
+  // Load tickets from localStorage on component mount
+  useEffect(() => {
+    loadTickets();
+  }, []);
 
-    setLoading(true);
+  const loadTickets = () => {
     try {
-      const ticketData = await lookupTicket(orderNumber, securityCode);
-      setTicket(ticketData);
-      toast({
-        title: t('myTickets.ticketFound'),
-        description: t('myTickets.ticketRetrieved'),
-      });
+      const savedTickets = localStorage.getItem('paid_tickets');
+      if (savedTickets) {
+        const parsedTickets = JSON.parse(savedTickets);
+        
+        // Remove duplicates based on order_id, keeping the first occurrence
+        const uniqueTickets = parsedTickets.filter((ticket: SavedTicket, index: number, self: SavedTicket[]) => 
+          index === self.findIndex((t: SavedTicket) => t.order_id === ticket.order_id)
+        );
+        
+        if (uniqueTickets.length !== parsedTickets.length) {
+          console.log(`Removed ${parsedTickets.length - uniqueTickets.length} duplicate tickets`);
+          localStorage.setItem('paid_tickets', JSON.stringify(uniqueTickets));
+        }
+        
+        setTickets(uniqueTickets);
+      }
     } catch (error) {
-      toast({
-        title: t('myTickets.ticketNotFound'),
-        description: t('myTickets.checkDetails'),
-        variant: "destructive"
-      });
-      setTicket(null);
+      console.error('Error loading tickets:', error);
+      setError('Failed to load tickets');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCopyCode = (text: string, type: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: t('myTickets.copied'),
-      description: `${type} ${t('myTickets.copiedToClipboard')}`,
-    });
-  };
-
-  const handleDownloadPDF = () => {
-    if (!ticket) return;
-    
-    // Create PDF content
-    const pdfContent = `
-      STARLINES - BILET DE AUTOBUZ
-      
-      Numărul Comenzii: ${ticket.orderNumber}
-      Codul de Securitate: ${securityCode}
-      
-      RUTA: ${ticket.route.from.name} → ${ticket.route.to.name}
-      DATA: ${ticket.departureDate}
-      ORA: ${ticket.route.departureTime} - ${ticket.route.arrivalTime}
-      PASAGERI: ${ticket.passengers.map(p => `${p.firstName} ${p.lastName} (${p.seat})`).join(', ')}
-      
-      STATUS: ${ticket.status}
-      TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
-      
-      IMPORTANT:
-      - Prezintă acest bilet la îmbarcare
-      - Să ajungi cu 30 de minute înainte de plecare
-      - Biletul este valabil doar pentru data și ruta specificată
-      
-      Pentru asistență: +373 22 123 456
-      Email: support@starlines.md
-      
-      Mulțumim că ai ales Starlines!
-    `;
-    
-    // Create blob and download
-    const blob = new Blob([pdfContent], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `bilet-${ticket.orderNumber}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    
-    toast({
-      title: t('myTickets.pdfDownloaded'),
-      description: t('myTickets.pdfDownloadedDesc'),
-    });
-  };
-
-  const handleEmailTicket = () => {
-    if (!ticket) return;
-    
-    // Create email content
-    const subject = encodeURIComponent(`Bilet Starlines - ${ticket.orderNumber}`);
-    const body = encodeURIComponent(`
-      Salut!
-      
-      Iată detaliile biletului tău:
-      
-      Numărul Comenzii: ${ticket.orderNumber}
-      Codul de Securitate: ${securityCode}
-      
-      RUTA: ${ticket.route.from.name} → ${ticket.route.to.name}
-      DATA: ${ticket.departureDate}
-      ORA: ${ticket.route.departureTime} - ${ticket.route.arrivalTime}
-      PASAGERI: ${ticket.passengers.map(p => `${p.firstName} ${p.lastName} (${p.seat})`).join(', ')}
-      
-      STATUS: ${ticket.status}
-      TOTAL PLĂTIT: ${ticket.currency} ${ticket.totalPrice}
-      
-      IMPORTANT:
-      - Prezintă acest bilet la îmbarcare
-      - Să ajungi cu 30 de minute înainte de plecare
-      - Biletul este valabil doar pentru data și ruta specificată
-      
-      Pentru asistență: +373 22 123 456
-      Email: support@starlines.md
-      
-      Mulțumim că ai ales Starlines!
-      
-      Cu dragoste,
-      Echipa Starlines
-    `);
-    
-    // Open default email client
-    window.open(`mailto:?subject=${subject}&body=${body}`);
-    
-    toast({
-      title: t('myTickets.emailSent'),
-      description: t('myTickets.emailSentDesc'),
-    });
-  };
-
-  const generateQRCode = (data: string) => {
-    // Simple QR code generation using canvas
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-    
-    canvas.width = 200;
-    canvas.height = 200;
-    
-    // Fill background
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, 200, 200);
-    
-    // Create simple QR-like pattern (simplified version)
-    ctx.fillStyle = 'black';
-    
-    // Generate a simple pattern based on the data
-    const pattern = data.split('').reduce((acc, char) => {
-      return acc + char.charCodeAt(0);
-    }, 0);
-    
-    for (let i = 0; i < 200; i += 10) {
-      for (let j = 0; j < 200; j += 10) {
-        if ((i + j + pattern) % 20 < 10) {
-          ctx.fillRect(i, j, 8, 8);
-        }
-      }
-    }
-    
-    return canvas.toDataURL();
-  };
-
-  const handleSignIn = () => {
-    setAuthMode("signin");
-    setShowAuthDialog(true);
-  };
-
-  const handleCreateAccount = () => {
-    setAuthMode("signup");
-    setShowAuthDialog(true);
-  };
-
-  const handleAuthSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
+  const handleDownloadTicket = async (ticket: SavedTicket, ticketId?: string) => {
+    const downloadKey = ticketId || ticket.order_id.toString();
+    setDownloadingTickets(prev => new Set(prev).add(downloadKey));
 
     try {
-      if (authMode === "signin") {
-        // Sign in with Supabase
-        const { error } = await signIn(authForm.email, authForm.password);
-        
-        if (error) {
-          toast({
-            title: t('myTickets.signInError'),
-            description: error.message || t('myTickets.invalidCredentials'),
-            variant: "destructive"
-          });
-        } else {
-          setShowAuthDialog(false);
-          // Clear form
-          setAuthForm({
-            email: "",
-            password: "",
-            confirmPassword: "",
-            firstName: "",
-            lastName: ""
-          });
-          toast({
-            title: t('myTickets.signInSuccess'),
-            description: t('myTickets.welcomeBack'),
-          });
-        }
+      if (ticketId) {
+        // Download specific ticket
+        await downloadTicketPDF({
+          orderId: ticket.order_id,
+          security: ticket.security,
+          ticketId: parseInt(ticketId)
+        });
       } else {
-        // Sign up with Supabase
-        if (authForm.password !== authForm.confirmPassword) {
-          toast({
-            title: t('myTickets.signUpError'),
-            description: t('myTickets.passwordMismatch'),
-            variant: "destructive"
-          });
-          return;
-        }
-
-        const { error } = await signUp(authForm.email, authForm.password, authForm.firstName, authForm.lastName, "");
-        
-        if (error) {
-          toast({
-            title: t('myTickets.signUpError'),
-            description: error.message || t('myTickets.fillAllFields'),
-            variant: "destructive"
-          });
-        } else {
-          setShowAuthDialog(false);
-          // Clear form
-          setAuthForm({
-            email: "",
-            password: "",
-            confirmPassword: "",
-            firstName: "",
-            lastName: ""
-          });
-          toast({
-            title: t('myTickets.signUpSuccess'),
-            description: t('myTickets.accountCreated'),
-          });
-        }
+        // Download all tickets for the order
+        await downloadTicketPDF({
+          orderId: ticket.order_id,
+          security: ticket.security
+        });
       }
     } catch (error) {
-      toast({
-        title: t('myTickets.authError'),
-        description: t('myTickets.tryAgain'),
-        variant: "destructive"
-      });
+      console.error('Download error:', error);
+      setError(`Failed to download ticket: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
-      setFormLoading(false);
+      setDownloadingTickets(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(downloadKey);
+        return newSet;
+      });
     }
   };
 
-  const handleSignOut = async () => {
+  const handleCancelTicket = async (ticket: SavedTicket, ticketId?: string) => {
+    const cancelKey = ticketId || ticket.order_id.toString();
+    setCancellingTickets(prev => new Set(prev).add(cancelKey));
+
     try {
-      await signOut();
-      setAuthForm({
-        email: "",
-        password: "",
-        confirmPassword: "",
-        firstName: "",
-        lastName: ""
-      });
-      toast({
-        title: t('myTickets.signOutSuccess'),
-        description: t('myTickets.signedOut'),
-      });
+      let result;
+      if (ticketId) {
+        // Cancel specific ticket
+        result = await cancelTicket(parseInt(ticketId), 'en');
+      } else {
+        // Cancel entire order
+        result = await cancelOrder(ticket.order_id, 'en');
+      }
+
+      // Check if cancellation was successful OR if order was already canceled
+      const isAlreadyCanceled = result.error && 
+        (result.error.detal === 'Order already canceled' || 
+         result.error.error === 'cancel_order');
+      
+      if (result.success || isAlreadyCanceled) {
+        // Remove ticket from local storage
+        const updatedTickets = tickets.filter(t => t.id !== ticket.id);
+        setTickets(updatedTickets);
+        localStorage.setItem('paid_tickets', JSON.stringify(updatedTickets));
+        
+        // Show success message
+        setError(null);
+        } else {
+        // Handle error object properly
+        let errorMessage = 'Failed to cancel ticket';
+        if (result.error) {
+          if (typeof result.error === 'string') {
+            errorMessage = result.error;
+          } else if (result.error.detal) {
+            errorMessage = result.error.detal;
+          } else if (result.error.error) {
+            errorMessage = result.error.error;
+          }
+        }
+        setError(errorMessage);
+      }
     } catch (error) {
-      toast({
-        title: t('myTickets.signOutError'),
-        description: t('myTickets.tryAgain'),
-        variant: "destructive"
+      console.error('Cancel error:', error);
+      setError(`Failed to cancel ticket: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setCancellingTickets(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(cancelKey);
+        return newSet;
       });
     }
   };
-
-  const mockTickets = [
-    {
-      id: "1",
-      orderNumber: "STL-2024-001",
-      route: "Chișinău → București",
-      date: "January 20, 2024",
-      time: "08:00 - 16:30",
-      status: "confirmed",
-      passengers: 1,
-      totalPrice: 45,
-      currency: "EUR"
-    },
-    {
-      id: "2",
-      orderNumber: "STL-2024-002",
-      route: "Chișinău → Istanbul",
-      date: "January 25, 2024",
-      time: "20:00 - 18:15",
-      status: "upcoming",
-      passengers: 2,
-      totalPrice: 178,
-      currency: "EUR"
-    }
-  ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return <Badge variant="default" className="bg-success">Confirmed</Badge>;
-      case "upcoming":
-        return <Badge variant="secondary">Upcoming</Badge>;
-      case "completed":
-        return <Badge variant="outline">Completed</Badge>;
-      case "cancelled":
-        return <Badge variant="destructive">Cancelled</Badge>;
+      case 'paid':
+      case 'buy_ok':
+      case 'buy':
+        return <Badge className="bg-green-100 text-green-800">Paid</Badge>;
+      case 'reserve_ok':
+        return <Badge className="bg-yellow-100 text-yellow-800">Reserved</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  if (loading) {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-surface border-b border-border">
-        <div className="container py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">{t('myTickets.title')}</h1>
-            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('myTickets.subtitle')}
-            </p>
-          </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin mr-2" />
+          <span>Loading your tickets...</span>
         </div>
       </div>
+    );
+  }
 
-      <div className="container py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="max-w-4xl mx-auto">
-          <TabsList className="grid w-full grid-cols-2 h-10 sm:h-12">
-            <TabsTrigger value="lookup" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Search className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">{t('myTickets.lookupTab')}</span>
-              <span className="sm:hidden">{t('myTickets.lookup')}</span>
-            </TabsTrigger>
-            <TabsTrigger value="account" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-              <Ticket className="h-3 w-3 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">{t('myTickets.accountTab')}</span>
-              <span className="sm:hidden">{t('myTickets.account')}</span>
-            </TabsTrigger>
-          </TabsList>
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tickets</h1>
+        <p className="text-gray-600">Manage your purchased tickets</p>
+      </div>
 
-          <TabsContent value="lookup" className="mt-6 sm:mt-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              {/* Lookup Form */}
+      {error && (
+        <Alert className="mb-6 border-red-200 bg-red-50">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <AlertDescription className="text-red-800">
+            {error}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {tickets.length === 0 ? (
               <Card>
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.findTicket')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
-                  <div>
-                    <Label htmlFor="orderNumber" className="text-sm">{t('myTickets.orderNumber')}</Label>
-                    <Input
-                      id="orderNumber"
-                      placeholder={t('myTickets.orderNumberPlaceholder')}
-                      value={orderNumber}
-                      onChange={(e) => setOrderNumber(e.target.value)}
-                      className="h-10 sm:h-12 text-sm sm:text-base"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="securityCode" className="text-sm">{t('myTickets.securityCode')}</Label>
-                    <Input
-                      id="securityCode"
-                      placeholder={t('myTickets.securityCodePlaceholder')}
-                      value={securityCode}
-                      onChange={(e) => setSecurityCode(e.target.value)}
-                      type="password"
-                      className="h-10 sm:h-12 text-sm sm:text-base"
-                    />
-                  </div>
-                  <Button 
-                    onClick={handleTicketLookup} 
-                    disabled={loading}
-                    className="w-full h-10 sm:h-12 text-sm sm:text-base"
-                  >
-                    {loading ? t('myTickets.searching') : t('myTickets.findTicketButton')}
+          <CardContent className="text-center py-12">
+            <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
+            <p className="text-gray-600 mb-4">
+              You haven't purchased any tickets yet. Book your first trip to see your tickets here.
+            </p>
+            <Button onClick={() => window.location.href = '/'}>
+              Book a Trip
                   </Button>
-                  
-                  <div className="text-xs sm:text-sm text-muted-foreground text-center space-y-1">
-                    <p>{t('myTickets.helpText1')}</p>
-                    <p>{t('myTickets.helpText2')}</p>
-                  </div>
                 </CardContent>
               </Card>
-
-              {/* Ticket Display */}
+      ) : (
+        <div className="space-y-6">
+          {tickets.map((ticket) => (
+            <Card key={ticket.id} className="border border-gray-200">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
               <div>
-                {ticket ? (
-                  <Card>
-                    <CardHeader className="p-4 sm:p-6">
-                      <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <span className="text-lg sm:text-xl">{t('myTickets.ticketDetails')}</span>
+                    <CardTitle className="text-lg">
+                      Order #{ticket.order_id}
+                    </CardTitle>
+                    <div className="flex items-center gap-2 mt-1">
                         {getStatusBadge(ticket.status)}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
-                      <div className="space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.orderNumber')}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-medium text-sm">{ticket.orderNumber}</span>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleCopyCode(ticket.orderNumber, t('myTickets.orderNumber'))}
-                              className="h-6 w-6 p-0"
-                            >
-                              <Copy className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.route')}</span>
-                          <span className="font-medium text-sm">{ticket.route.from.name} → {ticket.route.to.name}</span>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.date')}</span>
-                          <span className="text-sm">{ticket.departureDate}</span>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.time')}</span>
-                          <span className="text-sm">{ticket.route.departureTime} - {ticket.route.arrivalTime}</span>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.passengers')}</span>
-                          <span className="text-sm">{ticket.passengers.length}</span>
-                        </div>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <span className="text-sm text-muted-foreground">{t('myTickets.totalPaid')}</span>
-                          <span className="font-bold text-primary text-sm sm:text-base">
-                            {ticket.currency} {ticket.totalPrice}
+                      <span className="text-sm text-gray-500">
+                        Purchased on {formatDate(ticket.created_at)}
                           </span>
                         </div>
                       </div>
-
-                      <Separator />
-
-                      <div className="flex flex-col gap-2">
-                        <Button size="sm" className="gap-2 h-10 text-sm" onClick={handleDownloadPDF}>
-                          <Download className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {t('myTickets.downloadPDF')}
-                        </Button>
-                        <div className="grid grid-cols-2 gap-2">
-                          <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="gap-1 sm:gap-2 h-10 text-xs sm:text-sm">
-                                <QrCode className="h-3 w-3 sm:h-4 sm:w-4" />
-                                <span className="hidden sm:inline">{t('myTickets.showQR')}</span>
-                                <span className="sm:hidden">QR</span>
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-md">
-                              <DialogHeader>
-                                <DialogTitle className="text-lg">{t('myTickets.qrCodeTitle')}</DialogTitle>
-                                <DialogDescription className="text-sm">
-                                  {t('myTickets.qrCodeDescription')}
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="text-center space-y-4">
-                                <div className="w-32 h-32 sm:w-48 sm:h-48 bg-white rounded-lg mx-auto flex items-center justify-center p-4">
-                                  {ticket && (
-                                    <img 
-                                      src={generateQRCode(`${ticket.orderNumber}-${securityCode}-${ticket.route.from.name}-${ticket.route.to.name}-${ticket.departureDate}`)} 
-                                      alt="QR Code" 
-                                      className="w-full h-full"
-                                    />
-                                  )}
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-gray-900">
+                      {formatBookingPrice(ticket.price_total, ticket.currency)}
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                  {t('myTickets.order')}: {ticket.orderNumber}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  Scanează acest QR code pentru a verifica biletul
-                                </p>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Button variant="outline" size="sm" className="gap-1 sm:gap-2 h-10 text-xs sm:text-sm" onClick={handleEmailTicket}>
-                            <Mail className="h-3 w-3 sm:h-4 sm:w-4" />
-                            <span className="hidden sm:inline">{t('myTickets.email')}</span>
-                            <span className="sm:hidden">Email</span>
-                          </Button>
+                    <div className="text-sm text-gray-500">
+                      {ticket.trips.length} trip{ticket.trips.length > 1 ? 's' : ''}
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card className="h-full">
-                    <CardContent className="flex items-center justify-center h-48 sm:h-64 p-4">
-                      <div className="text-center text-muted-foreground">
-                        <Ticket className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 opacity-50" />
-                        <p className="text-sm">{t('myTickets.enterOrderDetails')}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             </div>
-          </TabsContent>
-
-          <TabsContent value="account" className="mt-6 sm:mt-8">
-            <div className="space-y-4 sm:space-y-6">
-              {/* Account Info */}
-              <Card>
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.accountInformation')}</CardTitle>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  {!isAuthenticated ? (
-                    <div className="text-center py-6 sm:py-8">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Ticket className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
-                      </div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                        {t('myTickets.signInMessage')}
-                      </h3>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {t('myTickets.createAccountMessage')}
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Button onClick={handleSignIn} className="h-10 text-sm">{t('myTickets.signIn')}</Button>
-                        <Button variant="outline" onClick={handleCreateAccount} className="h-10 text-sm">{t('myTickets.createAccount')}</Button>
+
+              <CardContent className="space-y-4">
+                {/* Trip Details */}
+                {ticket.trips.map((trip, tripIndex) => (
+                  <div key={tripIndex} className="border border-gray-100 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-medium text-gray-900">{trip.route_name}</h4>
+                      <div className="text-sm text-gray-500">
+                        {trip.date_from} at {trip.time_from}
                       </div>
                     </div>
-                  ) : (
-                    <div className="text-center py-6 sm:py-8">
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Ticket className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-                      </div>
-                      <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                        {t('myTickets.welcomeMessage')}
-                      </h3>
-                      {(user && profile) && (
-                        <div className="mb-4">
-                          <p className="text-sm text-muted-foreground">
-                            {profile.first_name} {profile.last_name}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {profile.email}
-                          </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-sm">{trip.point_from}</div>
+                          <div className="text-xs text-gray-500">{trip.station_from}</div>
                         </div>
-                      )}
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {t('myTickets.accountActive')}
-                      </p>
-                      <div className="flex justify-center">
-                        <Button variant="outline" onClick={handleSignOut} className="h-10 text-sm">
-                          {t('myTickets.signOut')}
-                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <div>
+                          <div className="font-medium text-sm">{trip.point_to}</div>
+                          <div className="text-xs text-gray-500">{trip.station_to}</div>
+                        </div>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
 
-              {/* Recent Bookings */}
-              <Card>
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.recentBookings')}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="space-y-3 sm:space-y-4">
-                    {mockTickets.map((ticket) => (
-                      <div key={ticket.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 border border-border rounded-lg gap-3 sm:gap-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-1">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Bus className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-foreground text-sm sm:text-base truncate">{ticket.route}</h4>
-                            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {ticket.date}
+                    {/* Passengers */}
+                    <div className="space-y-2">
+                      <h5 className="text-sm font-medium text-gray-700">Passengers</h5>
+                      {trip.passengers.map((passenger, passengerIndex) => (
+                        <div key={passengerIndex} className="flex items-center justify-between bg-gray-50 rounded p-2">
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-gray-400" />
+                            <span className="text-sm">
+                              {passenger.name} {passenger.surname}
                               </span>
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {ticket.time}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {ticket.passengers} {ticket.passengers === 1 ? t('myTickets.passenger') : t('myTickets.passengers')}
-                              </span>
-                            </div>
+                            <Badge variant="outline" className="text-xs">
+                              Seat {passenger.seat}
+                            </Badge>
                           </div>
-                        </div>
-                        <div className="flex items-center justify-between sm:flex-col sm:items-end sm:justify-center gap-2">
-                          <div className="order-2 sm:order-1">{getStatusBadge(ticket.status)}</div>
-                          <div className="text-sm text-muted-foreground order-1 sm:order-2">
-                            {ticket.currency} {ticket.totalPrice}
-                          </div>
-                          <Button variant="ghost" size="sm" className="order-3 h-8 w-8 p-0">
-                            <ArrowRight className="h-4 w-4" />
-                          </Button>
+                          <div className="text-sm text-gray-600">
+                            {formatBookingPrice(passenger.price, ticket.currency)}
                         </div>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                  </div>
+                ))}
 
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader className="p-4 sm:p-6">
-                  <CardTitle className="text-lg sm:text-xl">{t('myTickets.quickActions')}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 pt-0">
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
-                      <Download className="h-4 w-4 sm:h-6 sm:w-6" />
-                      <span className="text-center leading-tight">{t('myTickets.downloadAllTickets')}</span>
-                    </Button>
-                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
-                      <Mail className="h-4 w-4 sm:h-6 sm:w-6" />
-                      <span className="text-center leading-tight">{t('myTickets.emailAllTickets')}</span>
-                    </Button>
-                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
-                      <Calendar className="h-4 w-4 sm:h-6 sm:w-6" />
-                      <span className="text-center leading-tight">{t('myTickets.viewCalendar')}</span>
-                    </Button>
-                    <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col gap-2 text-xs sm:text-sm">
-                      <ArrowRight className="h-4 w-4 sm:h-6 sm:w-6" />
-                      <span className="text-center leading-tight">{t('myTickets.bookNewTrip')}</span>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Authentication Dialog */}
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
-          <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
-            <DialogTitle className="text-lg sm:text-xl">
-              {authMode === "signin" ? t('myTickets.signIn') : t('myTickets.createAccount')}
-            </DialogTitle>
-            <DialogDescription className="text-sm">
-              {authMode === "signin" 
-                ? t('myTickets.signInDescription') 
-                : t('myTickets.signUpDescription')
-              }
-            </DialogDescription>
-          </DialogHeader>
-          
-          <form onSubmit={handleAuthSubmit} className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
-            {authMode === "signup" && (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="firstName" className="text-sm">{t('myTickets.firstName')}</Label>
-                    <Input
-                      id="firstName"
-                      value={authForm.firstName}
-                      onChange={(e) => setAuthForm({...authForm, firstName: e.target.value})}
-                      required
-                      className="h-10 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="lastName" className="text-sm">{t('myTickets.lastName')}</Label>
-                    <Input
-                      id="lastName"
-                      value={authForm.lastName}
-                      onChange={(e) => setAuthForm({...authForm, lastName: e.target.value})}
-                      required
-                      className="h-10 text-sm"
-                    />
-                  </div>
-                </div>
+                {/* Action Buttons */}
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+                  <Button
+                    onClick={() => handleDownloadTicket(ticket)}
+                    disabled={downloadingTickets.has(ticket.order_id.toString())}
+                    variant="outline"
+                    size="sm"
+                  >
+                    {downloadingTickets.has(ticket.order_id.toString()) ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Downloading...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        Download All Tickets
               </>
             )}
-            
-            <div>
-              <Label htmlFor="email" className="text-sm">{t('myTickets.email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                value={authForm.email}
-                onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-                required
-                className="h-10 text-sm"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="password" className="text-sm">{t('myTickets.password')}</Label>
-              <Input
-                id="password"
-                type="password"
-                value={authForm.password}
-                onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
-                required
-                className="h-10 text-sm"
-              />
-            </div>
-            
-            {authMode === "signup" && (
-              <div>
-                <Label htmlFor="confirmPassword" className="text-sm">{t('myTickets.confirmPassword')}</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={authForm.confirmPassword}
-                  onChange={(e) => setAuthForm({...authForm, confirmPassword: e.target.value})}
-                  required
-                  className="h-10 text-sm"
-                />
-              </div>
-            )}
-            
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                  </Button>
+
+                  <Button
+                    onClick={() => handleCancelTicket(ticket)}
+                    disabled={cancellingTickets.has(ticket.order_id.toString())}
+                    variant="outline"
+                    size="sm"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  >
+                    {cancellingTickets.has(ticket.order_id.toString()) ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Cancelling...
+                      </>
+                    ) : (
+                      <>
+                        <X className="h-4 w-4 mr-2" />
+                        Cancel Order
+                      </>
+                    )}
+                  </Button>
+
+                  {/* Individual ticket actions */}
+                  {ticket.trips.map((trip, tripIndex) => 
+                    trip.passengers.map((passenger, passengerIndex) => (
+                      <div key={`${tripIndex}-${passengerIndex}`} className="flex gap-1">
               <Button 
-                type="submit" 
-                className="flex-1 h-10 text-sm" 
-                disabled={formLoading}
-              >
-                {formLoading ? t('myTickets.processing') : (
-                  authMode === "signin" ? t('myTickets.signIn') : t('myTickets.createAccount')
+                          onClick={() => handleDownloadTicket(ticket, passenger.transaction_id)}
+                          disabled={downloadingTickets.has(passenger.transaction_id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          {downloadingTickets.has(passenger.transaction_id) ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <Download className="h-3 w-3" />
                 )}
               </Button>
               <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setShowAuthDialog(false)}
-                disabled={formLoading}
-                className="h-10 text-sm"
-              >
-                {t('myTickets.cancel')}
+                          onClick={() => handleCancelTicket(ticket, passenger.transaction_id)}
+                          disabled={cancellingTickets.has(passenger.transaction_id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs text-red-600 hover:text-red-700"
+                        >
+                          {cancellingTickets.has(passenger.transaction_id) ? (
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                          ) : (
+                            <X className="h-3 w-3" />
+                          )}
               </Button>
             </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

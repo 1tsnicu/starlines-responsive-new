@@ -253,7 +253,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         } else {
           // Pentru rute simple
           const seatMapData: SeatMapData = {
-            bustype_id: 'default',
+            bustype_id: routeData.bustype_id || 'default',
             hasPlan: routeData.has_plan || 0,
             freeSeats: routeData.free_seats?.map(seatNumber => {
               const price = routeData.price_one_way ? parseFloat(routeData.price_one_way) : undefined;
@@ -271,11 +271,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           if (routeData.has_plan === 1) {
             try {
               const planResponse = await apiPlan({
-                bustype_id: 'default',
+                bustype_id: routeData.bustype_id || 'default',
                 position: 'h',
                 v: '2.0',
               });
-              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, 'default');
+              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, routeData.bustype_id || 'default');
             } catch (planError) {
               console.warn('Failed to load plan for default bustype_id:', planError);
             }
@@ -325,7 +325,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         } else {
           // Pentru rute simple
           const seatMapData: SeatMapData = {
-            bustype_id: 'default',
+            bustype_id: routeData.bustype_id || 'default',
             hasPlan: routeData.has_plan || 0,
             freeSeats: routeData.free_seats?.map(seatNumber => {
               const price = routeData.price_one_way ? parseFloat(routeData.price_one_way) : undefined;
@@ -343,11 +343,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           if (routeData.has_plan === 1) {
             try {
               const planResponse = await apiPlan({
-                bustype_id: 'default',
+                bustype_id: routeData.bustype_id || 'default',
                 position: 'h',
                 v: '2.0',
               });
-              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, 'default');
+              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, routeData.bustype_id || 'default');
             } catch (planError) {
               console.warn('Failed to load plan for default bustype_id:', planError);
             }
@@ -935,7 +935,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
     returnBaggage: returnBaggageSelection.selectedBaggage,
     outboundTotalPrice,
     returnTotalPrice,
-    currency
+    currency,
+    route: route // Pass route information for field requirements
   });
 
   // Handle seat selection - pentru călătoria dus
@@ -1435,6 +1436,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 isRoundTrip={isRoundTrip}
                 bookingSummary={bookingData.bookingSummary}
                 preparedBookingRequest={bookingData.preparedBookingRequest}
+                route={bookingData.route}
                 onBookingSuccess={handleBookingSuccess}
                 onBookingError={handleBookingError}
               />

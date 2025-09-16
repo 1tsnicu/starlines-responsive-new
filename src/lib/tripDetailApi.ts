@@ -23,7 +23,7 @@ import { GetAllRoutesResponse, GetAllRoutesRequest } from '@/types/getAllRoutes'
 // API Configuration
 // ===============================
 
-const API_BASE_URL = import.meta.env.DEV ? '/api/backend' : '/api';
+const API_BASE_URL = import.meta.env.DEV ? '/api/backend' : '/api/backend';
 
 // ===============================
 // Error Handling
@@ -60,7 +60,7 @@ function handleApiError(error: unknown): TripDetailError {
 
 export async function apiFreeSeats(payload: GetFreeSeatsRequest): Promise<FreeSeatsResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/get-free-seats`, {
+    const response = await fetch(`${API_BASE_URL}/seats/free`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -560,7 +560,10 @@ export function calculateFinalPrice(
   return Math.max(0, (basePrice * passengers) - discountAmount);
 }
 
-export function formatDiscountPrice(price: number, currency: string = 'EUR'): string {
+export function formatDiscountPrice(price: number | undefined | null, currency: string = 'EUR'): string {
+  if (price === undefined || price === null || isNaN(price)) {
+    return `0.00 ${currency}`;
+  }
   return `${price.toFixed(2)} ${currency}`;
 }
 
@@ -634,7 +637,10 @@ export function calculateTotalBaggagePrice(
   }, 0);
 }
 
-export function formatBaggagePrice(price: number, currency: string = 'EUR'): string {
+export function formatBaggagePrice(price: number | undefined | null, currency: string = 'EUR'): string {
+  if (price === undefined || price === null || isNaN(price)) {
+    return `0.00 ${currency}`;
+  }
   return `${price.toFixed(2)} ${currency}`;
 }
 
@@ -652,14 +658,17 @@ export function getBaggageWeight(baggage: BaggageItem): string {
 
 export async function apiCreateBooking(request: BookingRequest): Promise<BookingResponse> {
   try {
-    console.log('Sending booking request to API:', request);
-    const response = await fetch(`${API_BASE_URL}/new-order`, {
+    // Remove credentials from request - server will add them
+    const { login, password, ...requestWithoutCredentials } = request;
+    
+    console.log('Sending booking request to API:', requestWithoutCredentials);
+    const response = await fetch(`${API_BASE_URL}/curl/new_order.php`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify(requestWithoutCredentials),
     });
 
     if (!response.ok) {
@@ -702,7 +711,10 @@ export async function apiCreateBooking(request: BookingRequest): Promise<Booking
 // Booking Utility Functions
 // ===============================
 
-export function formatBookingPrice(price: number, currency: string = 'EUR'): string {
+export function formatBookingPrice(price: number | undefined | null, currency: string = 'EUR'): string {
+  if (price === undefined || price === null || isNaN(price)) {
+    return `0.00 ${currency}`;
+  }
   return `${price.toFixed(2)} ${currency}`;
 }
 

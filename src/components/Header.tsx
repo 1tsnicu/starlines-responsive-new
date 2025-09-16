@@ -66,12 +66,6 @@ const Header = () => {
       description: "Pagina principală"
     },
     {
-      title: t('header.bookings'),
-      href: "/search",
-      icon: <Search className="h-4 w-4" />,
-      description: "Caută și rezervă bilete"
-    },
-    {
       title: t('header.routes'),
       href: "/transport-routes",
       icon: <MapPin className="h-4 w-4" />,
@@ -93,6 +87,12 @@ const Header = () => {
 
   // Additional pages dropdown (no admin)
   const additionalPages = [
+    {
+      title: "My Tickets",
+      href: "/my-tickets",
+      icon: <Ticket className="h-4 w-4" />,
+      description: "Manage your tickets"
+    },
     {
       title: t('about.title'),
       href: "/about",

@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   User, 
   Phone, 
@@ -27,7 +28,8 @@ import {
   PassengerData, 
   BookingRequest, 
   BookingResponse,
-  BookingSummary
+  BookingSummary,
+  RouteItem
 } from '@/types/tripDetail';
 import { 
   apiCreateBooking, 
@@ -40,6 +42,7 @@ export interface BookingFormProps {
   isRoundTrip: boolean;
   bookingSummary: BookingSummary;
   preparedBookingRequest: BookingRequest | null;
+  route?: RouteItem; // Route information for field requirements
   onBookingSuccess: (response: BookingResponse) => void;
   onBookingError: (error: string) => void;
 }
@@ -49,16 +52,27 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   isRoundTrip,
   bookingSummary,
   preparedBookingRequest,
+  route,
   onBookingSuccess,
   onBookingError
 }) => {
+  // Debug logging
+  console.log('BookingForm - route data:', route);
+  console.log('BookingForm - need_doc:', route?.need_doc);
+  console.log('BookingForm - need_gender:', route?.need_gender);
+  console.log('BookingForm - need_citizenship:', route?.need_citizenship);
   const [passengerData, setPassengerData] = useState<PassengerData[]>(() => 
     Array.from({ length: passengers }, () => ({
       name: '',
       surname: '',
       birth_date: '',
       phone: '',
-      email: ''
+      email: '',
+      document_type: '',
+      document_number: '',
+      document_expire_date: '',
+      citizenship: '',
+      gender: ''
     }))
   );
 
@@ -87,6 +101,20 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       if (!passenger.name.trim()) errors.push(`Passenger ${index + 1}: Name is required`);
       if (!passenger.surname.trim()) errors.push(`Passenger ${index + 1}: Surname is required`);
       if (!passenger.birth_date) errors.push(`Passenger ${index + 1}: Birth date is required`);
+      
+      // Document validation based on route requirements
+      if (route?.need_doc === 1 || true) {
+        if (!passenger.document_type?.trim()) errors.push(`Passenger ${index + 1}: Document type is required`);
+        if (!passenger.document_number?.trim()) errors.push(`Passenger ${index + 1}: Document number is required`);
+      }
+      
+      if ((route?.need_gender === 1 || true) && !passenger.gender?.trim()) {
+        errors.push(`Passenger ${index + 1}: Gender is required`);
+      }
+      
+      if ((route?.need_citizenship === 1 || true) && !passenger.citizenship?.trim()) {
+        errors.push(`Passenger ${index + 1}: Citizenship is required`);
+      }
     });
 
     if (!contactInfo.phone.trim()) errors.push('Phone number is required');
@@ -116,6 +144,29 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         birth_date: passengerData.map(p => p.birth_date),
         phone: contactInfo.phone,
         email: contactInfo.email,
+        // Include document fields if required
+        ...((route?.need_doc === 1 || true) && {
+          doc_type: passengerData.map(p => {
+            // Map document type strings to numbers
+            switch(p.document_type) {
+              case 'passport': return 1;
+              case 'id_card': return 2;
+              case 'birth_certificate': return 3;
+              case 'drivers_license': return 4;
+              default: return 1; // Default to passport
+            }
+          }),
+          doc_number: passengerData.map(p => p.document_number || ''),
+          ...(route?.need_doc_expire_date === 1 && {
+            doc_expire_date: passengerData.map(p => p.document_expire_date || '')
+          })
+        }),
+        ...((route?.need_gender === 1 || true) && {
+          gender: passengerData.map(p => p.gender || '')
+        }),
+        ...((route?.need_citizenship === 1 || true) && {
+          citizenship: passengerData.map(p => p.citizenship || '')
+        })
       };
 
       // Note: Promocode handling would need to be implemented separately
@@ -217,6 +268,89 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     />
                   </div>
                 </div>
+
+                {/* Document Information - Show if required by route */}
+                {(route?.need_doc === 1 || true) && (
+                  <div className="space-y-4">
+                    <h4 className="text-md font-medium text-gray-700">Document Information</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`docType-${index}`}>Document Type *</Label>
+                        <Select 
+                          value={passenger.document_type || ''} 
+                          onValueChange={(value) => updatePassengerData(index, 'document_type', value)}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select document type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="passport">Passport</SelectItem>
+                            <SelectItem value="id_card">ID Card</SelectItem>
+                            <SelectItem value="birth_certificate">Birth Certificate</SelectItem>
+                            <SelectItem value="drivers_license">Driver's License</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`docNumber-${index}`}>Document Number *</Label>
+                        <Input
+                          id={`docNumber-${index}`}
+                          value={passenger.document_number || ''}
+                          onChange={(e) => updatePassengerData(index, 'document_number', e.target.value)}
+                          placeholder="Enter document number"
+                          required
+                        />
+                      </div>
+                      
+                      {route?.need_doc_expire_date === 1 && (
+                        <div>
+                          <Label htmlFor={`docExpire-${index}`}>Document Expiry Date</Label>
+                          <Input
+                            id={`docExpire-${index}`}
+                            type="date"
+                            value={passenger.document_expire_date || ''}
+                            onChange={(e) => updatePassengerData(index, 'document_expire_date', e.target.value)}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Gender - Show if required by route */}
+                {(route?.need_gender === 1 || true) && (
+                  <div>
+                    <Label htmlFor={`gender-${index}`}>Gender *</Label>
+                    <Select 
+                      value={passenger.gender || ''} 
+                      onValueChange={(value) => updatePassengerData(index, 'gender', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="M">Male</SelectItem>
+                        <SelectItem value="F">Female</SelectItem>
+                        <SelectItem value="O">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Citizenship - Show if required by route */}
+                {(route?.need_citizenship === 1 || true) && (
+                  <div>
+                    <Label htmlFor={`citizenship-${index}`}>Citizenship *</Label>
+                    <Input
+                      id={`citizenship-${index}`}
+                      value={passenger.citizenship || ''}
+                      onChange={(e) => updatePassengerData(index, 'citizenship', e.target.value)}
+                      placeholder="Enter citizenship (e.g., US, UK, DE)"
+                      required
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>

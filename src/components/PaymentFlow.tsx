@@ -1,317 +1,297 @@
-// src/components/PaymentFlow.tsx - Complete payment flow with timer and buy_ticket integration
-
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+// src/components/PaymentFlow.tsx - Payment Flow with Timer
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import { 
   Clock, 
   CreditCard, 
-  Download, 
-  CheckCircle, 
   AlertTriangle, 
-  ExternalLink,
-  Users,
-  Package,
-  Percent
-} from "lucide-react";
-
-import { buyTicket } from "@/lib/bussystem";
+  CheckCircle, 
+  XCircle,
+  Download,
+  ArrowLeft
+} from 'lucide-react';
 import {
-  createPaymentTimer,
-  extractPassengerTickets,
-  createPaymentSummary,
-  formatTimerDisplay,
-  getTimerColorClass,
-  canProceedWithPayment,
-  formatPrice,
-  formatPriceDifference
-} from "@/lib/paymentUtils";
-
-import { TicketPrintManager } from "./TicketPrintManager";
-
-import type { NewOrderResponse } from "@/types/newOrder";
+  completePayment, 
+  formatTimeRemaining, 
+  calculateTimeRemaining 
+} from '@/lib/bussystem';
 import type { 
+  PaymentFlowProps, 
+  TicketPurchaseResult, 
   PaymentTimer, 
-  TicketPurchaseResult,
-  PassengerTicketInfo 
-} from "@/types/buy";
+  TimerCallbacks 
+} from '@/types/buyTicket';
 
-interface PaymentFlowProps {
-  reservation: NewOrderResponse;
-  onPaymentComplete: (result: TicketPurchaseResult) => void;
-  onCancel: () => void;
-}
-
-export function PaymentFlow({ reservation, onPaymentComplete, onCancel }: PaymentFlowProps) {
-  const [timer, setTimer] = useState<PaymentTimer>(() => 
-    createPaymentTimer(reservation.reservation_until)
-  );
-  const [isProcessing, setIsProcessing] = useState(false);
+export function PaymentFlow({ 
+  reservation, 
+  onPaymentComplete, 
+  onCancel 
+}: PaymentFlowProps) {
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [timer, setTimer] = useState<PaymentTimer>({
+    minutes: 0,
+    seconds: 0,
+    totalSeconds: 0,
+    isExpired: false
+  });
+  const [warningShown, setWarningShown] = useState<Set<number>>(new Set());
 
-  // Update timer every second
+  // Initialize timer
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTimer(createPaymentTimer(reservation.reservation_until));
-    }, 1000);
+    const initialSeconds = calculateTimeRemaining(reservation.reservationUntil);
+    setTimer({
+      minutes: Math.floor(initialSeconds / 60),
+      seconds: initialSeconds % 60,
+      totalSeconds: initialSeconds,
+      isExpired: initialSeconds <= 0
+    });
+  }, [reservation.reservationUntil]);
 
-    return () => clearInterval(interval);
-  }, [reservation.reservation_until]);
-
-  const handlePayment = async () => {
-    setError(null);
-    
-    // Final validation before payment
-    const validation = canProceedWithPayment(reservation.reservation_until);
-    if (!validation.canProceed) {
-      setError(validation.reason || "Nu se poate procesa plata");
-      return;
-    }
-
-    setIsProcessing(true);
-    
-    try {
-      // Call buy_ticket API
-      const buyResponse = await buyTicket({
-        order_id: reservation.order_id,
-        lang: "ro",
-        v: "1.1"
-      });
-
-      // Extract passenger tickets
-      const passengerTickets = extractPassengerTickets(buyResponse);
-      
-      // Create payment summary
-      const summary = createPaymentSummary(reservation, buyResponse);
-
-      // Build complete result
-      const result: TicketPurchaseResult = {
-        success: true,
-        order_id: buyResponse.order_id,
-        price_total: buyResponse.price_total,
-        currency: buyResponse.currency,
-        allTicketsLink: buyResponse.link,
-        passengerTickets,
-        summary,
-        rawResponse: buyResponse
-      };
-
-      onPaymentComplete(result);
-      
-    } catch (err) {
-      console.error("Payment error:", err);
-      setError(err instanceof Error ? err.message : "Eroare la procesarea plății");
-    } finally {
-      setIsProcessing(false);
+  // Timer callbacks
+  const timerCallbacks: TimerCallbacks = {
+    onUpdate: (newTimer) => {
+      setTimer(newTimer);
+    },
+    onExpired: () => {
+      setError('Rezervarea a expirat. Te rugăm să începi din nou procesul de rezervare.');
+    },
+    onWarning: (minutesLeft) => {
+      if (!warningShown.has(minutesLeft)) {
+        setWarningShown(prev => new Set([...prev, minutesLeft]));
+        // Could show toast notification here
+        console.warn(`Atenție! Mai ai doar ${minutesLeft} minute până la expirarea rezervării.`);
+      }
     }
   };
 
-  const timerColorClass = getTimerColorClass(timer);
-  const canPay = !timer.isExpired && !isProcessing;
+  // Start timer
+  useEffect(() => {
+    if (timer.totalSeconds > 0 && !timer.isExpired) {
+    const interval = setInterval(() => {
+        const remaining = calculateTimeRemaining(reservation.reservationUntil);
+        if (remaining <= 0) {
+          timerCallbacks.onExpired?.();
+          clearInterval(interval);
+        } else {
+          const minutes = Math.floor(remaining / 60);
+          const seconds = remaining % 60;
+          
+          timerCallbacks.onUpdate?.({
+            minutes,
+            seconds,
+            totalSeconds: remaining,
+            isExpired: false
+          });
+
+          // Warning callbacks
+          if (minutes === 5 && seconds === 0 && !warningShown.has(5)) {
+            timerCallbacks.onWarning?.(5);
+          } else if (minutes === 2 && seconds === 0 && !warningShown.has(2)) {
+            timerCallbacks.onWarning?.(2);
+          } else if (minutes === 1 && seconds === 0 && !warningShown.has(1)) {
+            timerCallbacks.onWarning?.(1);
+          }
+        }
+    }, 1000);
+
+    return () => clearInterval(interval);
+    }
+  }, [reservation.reservationUntil, timer.totalSeconds, timer.isExpired, warningShown]);
+
+  const handlePayment = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const result = await completePayment(
+        reservation.orderId,
+        reservation.security,
+        reservation.reservationUntil,
+        timerCallbacks
+      );
+
+      if (result.success) {
+      onPaymentComplete(result);
+      } else {
+        setError(result.error || 'Plata a eșuat. Te rugăm să încerci din nou.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'A apărut o eroare la procesarea plății.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getTimerColor = () => {
+    if (timer.isExpired) return 'text-red-500';
+    if (timer.minutes <= 2) return 'text-orange-500';
+    if (timer.minutes <= 5) return 'text-yellow-500';
+    return 'text-green-500';
+  };
+
+  const getTimerIcon = () => {
+    if (timer.isExpired) return <XCircle className="h-5 w-5" />;
+    if (timer.minutes <= 2) return <AlertTriangle className="h-5 w-5" />;
+    if (timer.minutes <= 5) return <AlertTriangle className="h-5 w-5" />;
+    return <Clock className="h-5 w-5" />;
+  };
 
   return (
-    <div className="space-y-6">
-      {/* Timer and Status */}
-      <Card className={`border-2 ${timer.isExpired ? 'border-red-200 bg-red-50' : 'border-blue-200 bg-blue-50'}`}>
-        <CardHeader className="pb-3">
+    <div className="max-w-2xl mx-auto space-y-6">
+      {/* Header */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Timp Rămas pentru Plată
+              <CreditCard className="h-6 w-6" />
+              Confirmare Plată
           </CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onCancel}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Înapoi
+            </Button>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Timer */}
+          <div className={`flex items-center justify-center gap-3 p-4 rounded-lg border-2 ${
+            timer.isExpired ? 'border-red-200 bg-red-50' :
+            timer.minutes <= 2 ? 'border-orange-200 bg-orange-50' :
+            timer.minutes <= 5 ? 'border-yellow-200 bg-yellow-50' :
+            'border-green-200 bg-green-50'
+          }`}>
+            {getTimerIcon()}
           <div className="text-center">
-            <div className={`text-4xl font-mono font-bold ${timerColorClass}`}>
-              {formatTimerDisplay(timer)}
+              <div className={`text-2xl font-bold ${getTimerColor()}`}>
+                {formatTimeRemaining(timer.totalSeconds)}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {timer.isExpired ? 'Rezervarea a expirat' : 'Timp rămas pentru plată'}
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground mt-1">
-              {timer.isExpired 
-                ? "Rezervarea a expirat" 
-                : "Rezervarea este valabilă până la finalizarea plății"
-              }
-            </p>
           </div>
           
-          {timer.isExpired && (
-            <Alert className="mt-3">
+          {/* Warning for low time */}
+          {timer.minutes <= 5 && !timer.isExpired && (
+            <Alert className="border-orange-200 bg-orange-50">
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                Timpul de rezervare a expirat. Vă rugăm să reîncepeți procesul de rezervare.
+                Atenție! Rezervarea va expira în {timer.minutes} minute. 
+                Te rugăm să completezi plata cât mai curând.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Expired warning */}
+          {timer.isExpired && (
+            <Alert className="border-red-200 bg-red-50">
+              <XCircle className="h-4 w-4" />
+              <AlertDescription>
+                Rezervarea a expirat. Nu mai poți finaliza plata pentru această comandă.
               </AlertDescription>
             </Alert>
           )}
         </CardContent>
       </Card>
 
-      {/* Payment Summary */}
+      {/* Order Summary */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            Rezumatul Plății
-          </CardTitle>
+          <CardTitle>Detalii Comandă</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">Comanda #{reservation.order_id}</span>
-            <Badge variant="outline">{reservation.status}</Badge>
-          </div>
-          
-          <Separator />
-          
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span>Preț Total:</span>
-              <span className="font-semibold text-lg">
-                {formatPrice(reservation.price_total, reservation.currency)}
-              </span>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="text-muted-foreground">ID Comandă:</span>
+              <div className="font-mono">{reservation.orderId}</div>
             </div>
-            
-            {reservation.promocode_info?.promocode_valid === 1 && (
-              <div className="flex justify-between items-center text-green-600">
-                <span className="flex items-center gap-1">
-                  <Percent className="h-4 w-4" />
-                  Promocode "{reservation.promocode_info.promocode_name}"
-                </span>
-                <span>
-                  -{formatPrice(reservation.promocode_info.price_promocode, reservation.currency)}
-                </span>
+            <div>
+              <span className="text-muted-foreground">Status:</span>
+              <div>
+                <Badge variant={timer.isExpired ? "destructive" : "default"}>
+                  {timer.isExpired ? 'Expirat' : 'Rezervat'}
+                </Badge>
               </div>
-            )}
+            </div>
           </div>
           
           <Separator />
           
-          <div className="text-xs text-muted-foreground">
-            <p>• Prețul include toate serviciile selectate (bilete, bagaje, reduceri)</p>
-            <p>• Plata se procesează securizat prin Bussystem</p>
-            <p>• Veți primi biletele electronice după confirmare</p>
+          <div className="flex justify-between items-center text-lg font-semibold">
+            <span>Total de plată:</span>
+            <span className="text-primary">
+              {reservation.priceTotal} {reservation.currency}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Methods */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Metode de Plată</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3">
+            <Button
+              onClick={handlePayment}
+              disabled={loading || timer.isExpired}
+              className="w-full h-12 text-lg"
+              size="lg"
+            >
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Se procesează...
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5" />
+                  Plătește {reservation.priceTotal} {reservation.currency}
+                </div>
+              )}
+            </Button>
+
+            <div className="text-xs text-muted-foreground text-center">
+              Prin completarea plății, confirmi rezervarea și accepti termenii și condițiile.
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Error Display */}
       {error && (
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
+        <Alert className="border-red-200 bg-red-50">
+          <XCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <Button
-          onClick={handlePayment}
-          disabled={!canPay}
-          className="flex-1"
-          size="lg"
-        >
-          {isProcessing ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-              Procesez plata...
-            </>
-          ) : (
-            <>
-              <CreditCard className="h-4 w-4 mr-2" />
-              Confirmă Plata - {formatPrice(reservation.price_total, reservation.currency)}
-            </>
-          )}
-        </Button>
-        
-        <Button
-          variant="outline"
-          onClick={onCancel}
-          disabled={isProcessing}
-        >
-          Anulează
-        </Button>
-      </div>
-
-      {/* Additional Info */}
-      <Card className="bg-slate-50">
+      {/* Security Info */}
+      <Card className="border-blue-200 bg-blue-50">
         <CardContent className="pt-4">
-          <div className="text-sm text-muted-foreground space-y-2">
-            <h4 className="font-medium text-slate-900">Informații importante:</h4>
-            <ul className="space-y-1 list-disc list-inside">
-              <li>Rezervarea este valabilă pentru {reservation.reservation_until_min} minute</li>
-              <li>După expirare, comanda se anulează automat</li>
-              <li>Biletele vor fi trimise prin email după plată</li>
-              <li>Pentru suport: contactați serviciul clienți</li>
-            </ul>
+          <div className="flex items-start gap-3">
+            <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+            <div className="text-sm">
+              <div className="font-medium text-blue-900 mb-1">Securitate</div>
+              <div className="text-blue-700">
+                Toate plățile sunt procesate în siguranță prin API-ul Bussystem. 
+                Nu stocăm datele tale de plată.
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
-    </div>
-  );
-}
-
-// Success component for after payment
-interface PaymentSuccessProps {
-  result: TicketPurchaseResult;
-  onContinue: () => void;
-}
-
-export function PaymentSuccess({ result, onContinue }: PaymentSuccessProps) {
-  return (
-    <div className="space-y-6">
-      {/* Success Header */}
-      <Card className="border-green-200 bg-green-50">
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-green-800 mb-2">
-              Plata Finalizată cu Succes!
-            </h2>
-            <p className="text-green-600">
-              Comanda #{result.order_id} a fost procesată
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Price Summary */}
-      {result.summary.hasPriceDifference && (
-        <Alert>
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            <strong>Ajustare preț finală:</strong> 
-            {(() => {
-              const diff = formatPriceDifference(result.summary.priceDifference, result.currency);
-              return (
-                <span className={diff.colorClass}>
-                  {" "}{diff.formatted} față de prețul inițial
-                </span>
-              );
-            })()}
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {/* Download Links */}
-            {/* Ticket Print Manager */}
-      <TicketPrintManager 
-        buyTicketResponse={result.rawResponse as {
-          order_id: number;
-          link: string;
-          security?: string;
-          price_total: number;
-          currency: string;
-          [key: string]: unknown;
-        }}
-        passengerNames={result.passengerTickets.map((ticket, index) => ({
-          firstName: `Pasager`,
-          lastName: `${index + 1}`
-        }))}
-      />
-
-      {/* Continue Button */}
-      <Button onClick={onContinue} className="w-full" size="lg">
-        Continuă către Contul Meu
-      </Button>
     </div>
   );
 }

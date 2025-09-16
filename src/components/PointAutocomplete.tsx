@@ -44,7 +44,7 @@ export function PointAutocomplete({
 
   // Debounced search function
   const debouncedSearch = useCallback(async (searchQuery: string) => {
-    if (searchQuery.length < 2) {
+    if (searchQuery.length < 3) {
       setResults([]);
       setLoading(false);
       return;
@@ -212,7 +212,7 @@ export function PointAutocomplete({
                 </div>
               )}
               
-              {!loading && !error && results.length === 0 && query.length >= 2 && (
+              {!loading && !error && results.length === 0 && query.length >= 3 && (
                 <CommandEmpty>
                   <div className="text-center py-6">
                     <MapPin className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
@@ -289,10 +289,10 @@ export function PointAutocomplete({
                 </CommandGroup>
               )}
               
-              {query.length > 0 && query.length < 2 && (
+              {query.length > 0 && query.length < 3 && (
                 <div className="p-4 text-center">
                   <p className="text-sm text-muted-foreground">
-                    Type at least 2 characters to search
+                    Type at least 3 characters to search
                   </p>
                 </div>
               )}

@@ -5,10 +5,10 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,15 +24,29 @@ const BUSS_BASE_URL = process.env.BUSS_BASE_URL || process.env.VITE_BUSS_BASE_UR
 
 if (!BUSS_LOGIN || !BUSS_PASSWORD) {
   console.warn('⚠️  Missing Bussystem credentials (BUSS_LOGIN / BUSS_PASSWORD). Set them in .env');
+} else {
+  console.log('✅ Bussystem credentials loaded:', {
+    login: BUSS_LOGIN,
+    password: BUSS_PASSWORD ? '***' + BUSS_PASSWORD.slice(-4) : 'MISSING',
+    baseUrl: BUSS_BASE_URL
+  });
 }
 
 function buildPayload(body) {
-  return {
+  const payload = {
     login: BUSS_LOGIN,
     password: BUSS_PASSWORD,
     json: 1,
     ...body
   };
+  
+  console.log('Building payload with credentials:', {
+    login: BUSS_LOGIN,
+    password: BUSS_PASSWORD ? '***' + BUSS_PASSWORD.slice(-4) : 'MISSING',
+    bodyKeys: Object.keys(body)
+  });
+  
+  return payload;
 }
 
 async function bussystemPost(path, body) {
@@ -146,7 +160,8 @@ const FILE_ALLOWED = new Set([
   'get_baggage.php',
   'new_order.php',
   'buy_ticket.php',
-  'get_order.php'
+  'get_order.php',
+  'cancel_ticket.php'
 ]);
 
 app.post('/api/backend/curl/:file', async (req, res) => {
@@ -246,6 +261,95 @@ app.post('/api/backend/reservations/validate', async (req, res) => {
     if (!phone) return res.status(400).json({ error: 'phone required' });
     res.json({ success: true, phone, sms_required: false });
   } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Ticket download proxy to avoid CORS issues
+app.get('/api/backend/ticket/download', async (req, res) => {
+  try {
+    const { order_id, security, lang = 'en', ticket_id } = req.query;
+    
+    if (!order_id || !security) {
+      return res.status(400).json({ error: 'order_id and security are required' });
+    }
+    
+    // Build the Bussystem ticket URL
+    const ticketUrl = new URL('https://test-api.bussystem.eu/viev/frame/print_ticket.php');
+    ticketUrl.searchParams.append('order_id', order_id);
+    ticketUrl.searchParams.append('security', security);
+    ticketUrl.searchParams.append('lang', lang);
+    
+    if (ticket_id) {
+      ticketUrl.searchParams.append('ticket_id', ticket_id);
+    }
+    
+    console.log('Proxying ticket download request:', ticketUrl.toString());
+    
+    // Fetch the ticket from Bussystem
+    const response = await fetch(ticketUrl.toString(), {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Starlight-Backend/1.0'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    // Check if response contains error messages
+    const responseText = await response.text();
+    
+    if (responseText.includes('Error creating PDF ticket') || 
+        responseText.includes('Error! Check input parameters') ||
+        responseText.includes('Contact the ticketing agency')) {
+      return res.status(400).json({ 
+        error: 'PDF ticket creation failed. This is common for newly created orders. Please wait 2-5 minutes and try again.',
+        errorType: 'PDF_CREATION_FAILED',
+        retryAfter: 120 // 2 minutes in seconds
+      });
+    }
+    
+    // Set appropriate headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="ticket_${order_id}.pdf"`);
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    
+    // Send the PDF content
+    res.send(responseText);
+    
+  } catch (e) {
+    console.error('Ticket download proxy error:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Cancel ticket endpoint
+app.post('/api/backend/tickets/cancel', async (req, res) => {
+  try {
+    const { order_id, ticket_id, lang = 'en' } = req.body;
+    
+    if (!order_id && !ticket_id) {
+      return res.status(400).json({ error: 'Either order_id or ticket_id is required' });
+    }
+    
+    console.log('Cancel ticket request received:', { order_id, ticket_id, lang });
+    
+    const data = await bussystemPost('/curl/cancel_ticket.php', {
+      order_id,
+      ticket_id,
+      lang
+    });
+    
+    console.log('Cancel ticket response:', JSON.stringify(data, null, 2));
+    
+    res.json(data);
+    
+  } catch (e) {
+    console.error('Cancel ticket error:', e.message);
     res.status(500).json({ error: e.message });
   }
 });

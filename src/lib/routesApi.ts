@@ -241,7 +241,7 @@ function mapApiError(error: Error): RouteSearchError {
     return createRouteError(
       'DEALER_NO_ACTIV',
       error.message,
-      'Account temporarily unavailable. Please try again later.'
+      'Service temporarily unavailable. Please contact support to activate your account.'
     );
   }
   

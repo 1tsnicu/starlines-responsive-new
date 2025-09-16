@@ -28,7 +28,7 @@ const SearchResults = () => {
   const passengers = searchParams.get("passengers") || "1";
   const fromPointId = searchParams.get("fromPointId") || "";
   const toPointId = searchParams.get("toPointId") || "";
-  
+
   // Check if this is a round trip search
   const isRoundTrip = !!returnDate;
 
@@ -48,7 +48,7 @@ const SearchResults = () => {
   });
   const [sortBy, setSortBy] = useState("recommended");
   const [showFilters, setShowFilters] = useState(false);
-
+  
   // Use the real API hook for outbound routes
   const { data: routes, loading, error } = useRouteSearch({
     id_from: fromPointId,
@@ -102,10 +102,10 @@ const SearchResults = () => {
       });
     } else {
       // Pentru călătorie simplă, gestionează bagajele dacă este necesar
-      if (route.request_get_baggage === 1) {
-        setSelectedRoute(route);
-        setShowBaggageSelection(true);
-      } else {
+    if (route.request_get_baggage === 1) {
+      setSelectedRoute(route);
+      setShowBaggageSelection(true);
+    } else {
         // Navighează direct la detaliile călătoriei cu datele rutei în state
         navigate('/trip-details', {
           state: {

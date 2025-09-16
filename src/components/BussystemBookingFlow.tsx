@@ -6,10 +6,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { NewOrderErrorDisplay } from './NewOrderErrorDisplay';
 import Stepper from '@/components/Stepper';
 import { RouteSummary, PassengerInfo, OrderInfo, buyTicket, reserveValidation, smsValidation, reserveTicket, buildPrintTicketURL } from '@/lib/bussystem';
 import { newOrder } from '@/lib/bussystem';
 import type { NewOrderPayload, NewOrderResponse } from '@/types/newOrder';
+import { validatePhoneNumber } from '@/lib/phoneValidation';
 import { Clock, CreditCard, Smartphone, Download, ArrowLeft } from 'lucide-react';
 
 interface BookingResult {
@@ -223,12 +225,24 @@ function PassengerForm({
               <Input
                 id={`phone-${index}`}
                 value={passenger.phone || ''}
-                onChange={(e) => updatePassenger(index, 'phone', e.target.value)}
-                placeholder="+373xxxxxxxx"
+                onChange={(e) => {
+                  let value = e.target.value;
+                  // Auto-add + if user starts typing digits
+                  if (value && !value.startsWith('+') && /^\d/.test(value)) {
+                    value = '+' + value;
+                  }
+                  updatePassenger(index, 'phone', value);
+                }}
+                placeholder="+373 60 123 456"
                 className={errors[`phone-${index}`] ? 'border-red-500' : ''}
               />
               {errors[`phone-${index}`] && (
                 <p className="text-sm text-red-500 mt-1">{errors[`phone-${index}`]}</p>
+              )}
+              {index === 0 && !errors[`phone-${index}`] && passenger.phone && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Пример: +373 60 123 456, +40 721 234 567
+                </p>
               )}
             </div>
           </CardContent>
@@ -340,6 +354,13 @@ export function BussystemBookingFlow({ route, onBack, onComplete }: BussystemBoo
       if (index === 0 && !passenger.phone?.trim()) {
         newErrors[`phone-${index}`] = 'Телефон основного пассажира обязателен';
         isValid = false;
+      } else if (index === 0 && passenger.phone?.trim()) {
+        // Validate phone number format
+        const phoneValidation = validatePhoneNumber(passenger.phone);
+        if (!phoneValidation.isValid) {
+          newErrors[`phone-${index}`] = phoneValidation.error || 'Неверный формат номера телефона';
+          isValid = false;
+        }
       }
       if (route.need_birth === 1 && !passenger.birth_date) {
         newErrors[`birthDate-${index}`] = 'Обязательное поле';
@@ -372,8 +393,6 @@ export function BussystemBookingFlow({ route, onBack, onComplete }: BussystemBoo
     try {
       // Build new_order payload
       const payload: NewOrderPayload = {
-        login: "demo_login",
-        password: "demo_password",
         date: [route.date_from], // Array of dates
         interval_id: [route.interval_id], // Array of interval IDs
         seat: [passengers.map((_, index) => String(index + 1))], // Simple seat assignment
@@ -517,9 +536,15 @@ export function BussystemBookingFlow({ route, onBack, onComplete }: BussystemBoo
 
       {/* Error display */}
       {errors.general && (
-        <Alert>
-          <AlertDescription>{errors.general}</AlertDescription>
-        </Alert>
+        <NewOrderErrorDisplay 
+          error={errors.general} 
+          onRetry={() => {
+            setErrors({});
+            if (currentStep === 2) {
+              handlePassengerSubmit();
+            }
+          }}
+        />
       )}
 
       {/* Step content */}

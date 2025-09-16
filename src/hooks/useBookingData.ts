@@ -30,6 +30,7 @@ export interface UseBookingDataProps {
   outboundTotalPrice: number;
   returnTotalPrice: number;
   currency: string;
+  route?: any; // Route information for field requirements
 }
 
 export interface UseBookingDataReturn {
@@ -53,6 +54,7 @@ export interface UseBookingDataReturn {
   validationErrors: string[];
   bookingSummary: BookingSummary;
   preparedBookingRequest: BookingRequest | null;
+  route?: any; // Route information for field requirements
 }
 
 export function useBookingData({
@@ -70,7 +72,8 @@ export function useBookingData({
   returnBaggage,
   outboundTotalPrice,
   returnTotalPrice,
-  currency
+  currency,
+  route
 }: UseBookingDataProps): UseBookingDataReturn {
   const [passengerData, setPassengerData] = useState<PassengerData[]>(() => 
     Array.from({ length: passengers }, () => ({
@@ -260,8 +263,7 @@ export function useBookingData({
     }
 
     const request: BookingRequest = {
-      login: '', // Will be injected server-side
-      password: '', // Will be injected server-side
+      // login and password will be handled by server
       v: '1.1', // API version
       date: [outboundDate],
       interval_id: [outboundIntervalId],
@@ -345,6 +347,7 @@ export function useBookingData({
     isBookingReady,
     validationErrors,
     bookingSummary,
-    preparedBookingRequest
+    preparedBookingRequest,
+    route
   };
 }

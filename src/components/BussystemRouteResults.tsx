@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Users, Wifi, Zap, Snowflake, Music, Tv, Star, MessageCircle } from 'lucide-react';
 import { RouteSummary, getFreeSeats, getDiscounts, getPlan } from '@/lib/bussystem';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DealerErrorDisplay } from './DealerErrorDisplay';
 
 interface BussystemRouteResultsProps {
   routes: RouteSummary[];
@@ -255,6 +256,13 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
 
   if (error) {
     const isNoInterval = /interval_no_found/i.test(error);
+    const isDealerError = /dealer/i.test(error) || /inactive/i.test(error);
+    
+    // Show special dealer error display
+    if (isDealerError) {
+      return <DealerErrorDisplay error={error} onRetry={() => window.location.reload()} />;
+    }
+    
     return (
       <Alert>
         <AlertDescription>

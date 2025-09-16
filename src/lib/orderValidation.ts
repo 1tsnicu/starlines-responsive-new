@@ -255,8 +255,7 @@ export function buildOrderPayload(builder: OrderBuilder): NewOrderPayload {
   const { trips, passengers, commonData } = builder;
   
     const payload: NewOrderPayload = {
-    login: commonData?.login || '',
-    password: commonData?.password || '',
+    // login and password will be handled by server
     date: trips.map(trip => trip.date),
     interval_id: trips.map(trip => trip.interval_id),
     seat: buildSeatStructure(trips, passengers.length)

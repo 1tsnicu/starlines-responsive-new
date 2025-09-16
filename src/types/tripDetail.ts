@@ -69,11 +69,16 @@ export interface PassengerData {
   birth_date: string;
   phone?: string;
   email?: string;
+  document_type?: string;
+  document_number?: string;
+  document_expire_date?: string;
+  citizenship?: string;
+  gender?: string;
 }
 
 export interface BookingRequest {
-  login: string;
-  password: string;
+  login?: string;  // Optional - handled by server
+  password?: string;  // Optional - handled by server
   session?: string;
   partner?: string;
   v?: string;

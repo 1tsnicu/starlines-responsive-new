@@ -27,6 +27,7 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import TransportRoutes from "@/pages/TransportRoutes";
 import AdminRoutes from "@/pages/AdminRoutes";
 import Login from "@/pages/Login";
+import PaymentDemo from "@/pages/PaymentDemo";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -68,6 +69,7 @@ function App() {
                   <Route path="/transport-routes" element={<TransportRoutes />} />
                   <Route path="/admin/routes" element={<AdminRoutes />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/payment-demo" element={<PaymentDemo />} />
                 </Routes>
               </main>
               <Footer />

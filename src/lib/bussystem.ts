@@ -7,7 +7,7 @@ import type { GetPlanResponse } from '../types/plan';
 import type { GetDiscountsResponse } from '../types/discounts';
 import type { GetBaggageResponse } from '../types/baggage';
 import type { NewOrderPayload, NewOrderResponse } from '../types/newOrder';
-import type { BuyTicketRequest, BuyTicketResponse } from '../types/buy';
+import type { BuyTicketRequest, BuyTicketResponse, TicketPurchaseResult, PaymentState, PaymentTimer, TimerCallbacks } from '../types/buyTicket';
 
 // Configuration for Partner Affiliate Integration
 export interface BussystemConfig {
@@ -447,6 +447,13 @@ async function post<T = ApiResponse>(path: string, body: Json): Promise<T> {
     ...body 
   };
 
+  console.log('Bussystem API Request:', {
+    url: url,
+    method: 'POST',
+    headers: DEFAULT_HEADERS,
+    payload: payload
+  });
+
   const request = fetch(url, {
     method: "POST",
     headers: DEFAULT_HEADERS,
@@ -473,16 +480,45 @@ async function post<T = ApiResponse>(path: string, body: Json): Promise<T> {
   if (contentType.includes("application/json")) {
     const data = await res.json();
     
+    console.log('Bussystem API Response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url,
+      data: data
+    });
+    
     if (data?.error) {
-      throw new Error(`Bussystem API error: ${String(data.error)}`);
+      console.error('Bussystem API Error Details:', {
+        error: data.error,
+        detal: data.detal,
+        fullResponse: data
+      });
+      
+      // Provide specific error messages for common issues
+      if (data.error === "dealer_no_activ") {
+        const errorMessage = `Dealer account is inactive. Please contact Bussystem support to activate your account. Details: ${data.detal || 'No additional details'}`;
+        throw new Error(errorMessage);
+      }
+      
+      throw new Error(`Bussystem API error: ${String(data.error)}${data.detal ? ` - ${data.detal}` : ''}`);
     }
     
     return data as T;
   } else {
     // Handle XML response
     const text = await res.text();
+    console.log('Bussystem API XML Response:', {
+      status: res.status,
+      statusText: res.statusText,
+      url: res.url,
+      text: text
+    });
+    
     if (text.includes("<error>dealer_no_activ</error>")) {
-      throw new Error("dealer_no_activ");
+      throw new Error("Dealer account is inactive. Please contact Bussystem support to activate your account.");
+    }
+    if (text.includes("<error>new_order</error>")) {
+      throw new Error("new_order");
     }
     throw new Error("Răspuns XML neașteptat; asigură-te că trimiți Accept: application/json");
   }
@@ -818,18 +854,21 @@ export async function newOrder(payload: NewOrderPayload): Promise<NewOrderRespon
     }).newOrder(payload);
   }
 
-  // Pentru new_order, trimitem exact payload-ul așa cum este (include login/password)
+  // Remove login/password from payload - server will add them
+  const { login, password, ...payloadWithoutCredentials } = payload;
+
   return post<NewOrderResponse>("/curl/new_order.php", {
     json: 1,
-    ...payload
+    ...payloadWithoutCredentials
   });
 }
 
 /**
  * Buy ticket from created order
+ * Follows complete Bussystem API specification for buy_ticket
  */
 export async function buyTicket(req: BuyTicketRequest): Promise<BuyTicketResponse> {
-  const { order_id, lang = "ru", v = "1.1" } = req;
+  const { order_id, lang = "en", v = "1.1" } = req;
   
   // Use mock API for development
   if (USE_MOCK_API) {
@@ -844,6 +883,155 @@ export async function buyTicket(req: BuyTicketRequest): Promise<BuyTicketRespons
     lang,
     v,
   });
+}
+
+/**
+ * Complete payment flow with timer management
+ */
+export async function completePayment(
+  orderId: number,
+  security: string,
+  reservationUntil: string,
+  callbacks?: TimerCallbacks
+): Promise<TicketPurchaseResult> {
+  try {
+    console.log('Starting payment process for order:', orderId);
+    
+    // Start timer for reservation
+    const timer = startPaymentTimer(reservationUntil, callbacks);
+    
+    // Attempt to buy ticket
+    const buyResult = await buyTicket({
+      login: 'backend_managed', // Will be handled by backend
+      password: 'backend_managed',
+      order_id: orderId,
+      lang: 'ru',
+      v: '1.1'
+    });
+    
+    // Parse tickets from response
+    const tickets: any[] = [];
+    const ticketKeys = Object.keys(buyResult).filter(key => 
+      key !== 'order_id' && 
+      key !== 'price_total' && 
+      key !== 'currency' && 
+      key !== 'link' &&
+      !isNaN(Number(key))
+    );
+    
+    ticketKeys.forEach(key => {
+      const ticketData = buyResult[key];
+      if (ticketData && typeof ticketData === 'object') {
+        tickets.push({
+          passenger_id: ticketData.passenger_id,
+          transaction_id: ticketData.transaction_id,
+          ticket_id: ticketData.ticket_id,
+          security: ticketData.security,
+          price: ticketData.price,
+          currency: ticketData.currency,
+          link: ticketData.link,
+          baggage: ticketData.baggage || []
+        });
+      }
+    });
+    
+    const result: TicketPurchaseResult = {
+      success: true,
+      orderId: buyResult.order_id,
+      priceTotal: buyResult.price_total,
+      currency: buyResult.currency,
+      tickets,
+      printUrl: buyResult.link
+    };
+    
+    console.log('Payment completed successfully:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('Payment failed:', error);
+    return {
+      success: false,
+      orderId,
+      priceTotal: 0,
+      currency: 'EUR',
+      tickets: [],
+      printUrl: '',
+      error: error instanceof Error ? error.message : 'Payment failed'
+    };
+  }
+}
+
+/**
+ * Start payment timer with callbacks
+ */
+export function startPaymentTimer(
+  reservationUntil: string,
+  callbacks?: TimerCallbacks
+): PaymentTimer {
+  const reservationTime = new Date(reservationUntil).getTime();
+  const now = new Date().getTime();
+  const totalSeconds = Math.max(0, Math.floor((reservationTime - now) / 1000));
+  
+  let currentSeconds = totalSeconds;
+  let isExpired = false;
+  
+  const timer = setInterval(() => {
+    currentSeconds--;
+    
+    if (currentSeconds <= 0) {
+      isExpired = true;
+      clearInterval(timer);
+      callbacks?.onExpired?.();
+      return;
+    }
+    
+    const minutes = Math.floor(currentSeconds / 60);
+    const seconds = currentSeconds % 60;
+    
+    const timerState: PaymentTimer = {
+      minutes,
+      seconds,
+      totalSeconds: currentSeconds,
+      isExpired
+    };
+    
+    callbacks?.onUpdate?.(timerState);
+    
+    // Warning callbacks
+    if (minutes === 5 && seconds === 0) {
+      callbacks?.onWarning?.(5);
+    } else if (minutes === 2 && seconds === 0) {
+      callbacks?.onWarning?.(2);
+    } else if (minutes === 1 && seconds === 0) {
+      callbacks?.onWarning?.(1);
+    }
+    
+  }, 1000);
+  
+  return {
+    minutes: Math.floor(currentSeconds / 60),
+    seconds: currentSeconds % 60,
+    totalSeconds: currentSeconds,
+    isExpired
+  };
+}
+
+/**
+ * Calculate time remaining until reservation expires
+ */
+export function calculateTimeRemaining(reservationUntil: string): number {
+  const reservationTime = new Date(reservationUntil).getTime();
+  const now = new Date().getTime();
+  return Math.max(0, Math.floor((reservationTime - now) / 1000));
+}
+
+/**
+ * Format time remaining as MM:SS string
+ */
+export function formatTimeRemaining(seconds: number): string {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
 /**
