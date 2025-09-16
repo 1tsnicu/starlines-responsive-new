@@ -317,7 +317,7 @@ export async function diagnoseTicketDownload(options: TicketDownloadOptions): Pr
 /**
  * Check if booking is paid and tickets can be downloaded
  */
-export function canDownloadTickets(bookingResponse: any): boolean {
+export function canDownloadTickets(bookingResponse: BookingResponse): boolean {
   const isPaid = bookingResponse.status === 'buy_ok' || 
                  bookingResponse.status === 'buy' ||
                  bookingResponse.status === 'paid';
