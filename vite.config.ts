@@ -60,8 +60,8 @@ export default defineConfig(({ mode }) => ({
   define: {
     // Configurare API URL pentru producție
     __API_BASE_URL__: JSON.stringify(
-      mode === 'production' 
-        ? (process.env.VITE_API_URL || 'https://your-backend.railway.app') 
+      mode === 'production'
+        ? (process.env.VITE_API_URL || '/api/backend')
         : '/api/backend'
     )
   },
