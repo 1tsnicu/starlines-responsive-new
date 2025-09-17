@@ -21,15 +21,29 @@ export const getApiBaseUrl = (): string => {
 
 export const API_BASE_URL = getApiBaseUrl();
 
-// API endpoints
+// Helper to safely join paths without duplicating segments like /api/backend/api/backend
+function join(base: string, path: string) {
+  // Normalize double slashes
+  const b = base.replace(/\/$/, '');
+  const p = path.replace(/^\//, '');
+  // If path already contains api/backend and base ends with it, avoid repeating
+  if (b.endsWith('/api/backend') && p.startsWith('api/backend/')) {
+    return b + '/' + p.replace(/^api\/backend\//, '');
+  }
+  return `${b}/${p}`;
+}
+
+// Base already points to /api/backend in both dev & prod now, so endpoints are relative
+const base = API_BASE_URL; // e.g. '/api/backend'
+
 export const API_ENDPOINTS = {
-  HEALTH: `${API_BASE_URL}/health`,
-  POINTS_AUTOCOMPLETE: `${API_BASE_URL}/api/backend/points/autocomplete`,
-  ROUTES_SEARCH: `${API_BASE_URL}/api/backend/routes/search`,
-  ORDERS_NEW: `${API_BASE_URL}/api/backend/orders/new`,
-  ORDERS_BUY: `${API_BASE_URL}/api/backend/orders/buy`,
-  ORDERS_GET: `${API_BASE_URL}/api/backend/orders/get`,
-  SEATS_FREE: `${API_BASE_URL}/api/backend/seats/free`,
-  RESERVATIONS_VALIDATE: `${API_BASE_URL}/api/backend/reservations/validate`,
-  CURL: (file: string) => `${API_BASE_URL}/api/backend/curl/${file}`
+  HEALTH: join(base, 'health'),
+  POINTS_AUTOCOMPLETE: join(base, 'points/autocomplete'),
+  ROUTES_SEARCH: join(base, 'routes/search'),
+  ORDERS_NEW: join(base, 'orders/new'),
+  ORDERS_BUY: join(base, 'orders/buy'),
+  ORDERS_GET: join(base, 'orders/get'),
+  SEATS_FREE: join(base, 'seats/free'),
+  RESERVATIONS_VALIDATE: join(base, 'reservations/validate'),
+  CURL: (file: string) => join(base, `curl/${file}`)
 } as const;
