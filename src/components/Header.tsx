@@ -160,7 +160,6 @@ const Header = () => {
             <Shield className="h-3 w-3" />
             <Star className="h-3 w-3" />
           </div>
-
           <div className="flex items-center gap-2 lg:gap-4">
             {/* Language Selector */}
             <div className="flex items-center gap-1 lg:gap-2">
@@ -187,7 +186,6 @@ const Header = () => {
                 </SelectContent>
               </Select>
             </div>
-
             {/* Currency Selector */}
             <div className="flex items-center gap-1 lg:gap-2">
               <CreditCard className="h-3 w-3 text-primary/80" />
@@ -213,8 +211,9 @@ const Header = () => {
                 </SelectContent>
               </Select>
             </div>
-        </div>
-      </div>
+          </div>{/* end right controls */}
+        </div>{/* end container */}
+      </div>{/* end top bar */}
 
       {/* Main Header */}
       <div className="container">
@@ -332,48 +331,57 @@ const Header = () => {
                 </Link>
               </Button>
             )}
-
-            {/* Mobile Menu Button */}
+          </nav>
+          {/* Mobile controls now outside desktop nav */}
+          <div className="flex items-center gap-2 lg:hidden">
+            {!user && (
+              <Button asChild variant="outline" size="sm" aria-label="Login">
+                <Link to="/login">
+                  <Users className="h-4 w-4" />
+                </Link>
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"
+              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               onClick={toggleMobileMenu}
-              className="lg:hidden"
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
-          </nav>
           </div>
-        </div>
-      </div>
+        </div>{/* end flex */}
+      </div>{/* end main container */}
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background">
           <div className="container py-4">
-            <nav className="space-y-2">
+            <nav className="space-y-4">
               {/* Main Navigation */}
-              {mainNavigation.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive(item.href)
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground/70 hover:text-foreground hover:bg-muted"
-                  }`}
-                >
-                  {item.icon}
-                  <div>
-                    <div className="font-medium">{item.title}</div>
-                    <div className="text-xs opacity-80">{item.description}</div>
-                  </div>
-                </Link>
-              ))}
+              <div className="space-y-2">
+                {mainNavigation.map((item) => (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                      isActive(item.href)
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground/70 hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {item.icon}
+                    <div>
+                      <div className="font-medium">{item.title}</div>
+                      <div className="text-xs opacity-80">{item.description}</div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
 
               {/* Additional Pages */}
-              <div className="pt-2 border-t border-border">
+              <div className="pt-2 border-t border-border space-y-2">
                 <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">Informații</h4>
                 {additionalPages.map((item) => (
                   <Link
@@ -392,7 +400,7 @@ const Header = () => {
               </div>
 
               {/* Legal Pages */}
-              <div className="pt-2 border-t border-border">
+              <div className="pt-2 border-t border-border space-y-2">
                 <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">Legal</h4>
                 {legalPages.map((item) => (
                   <Link
@@ -408,6 +416,40 @@ const Header = () => {
                     </div>
                   </Link>
                 ))}
+              </div>
+
+              {/* User / Auth Section */}
+              <div className="pt-2 border-t border-border">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="px-4 text-sm text-foreground/70 flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span className="truncate">{profile?.first_name || user.email}</span>
+                    </div>
+                    {isAdmin && (
+                      <Link
+                        to="/admin/routes"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-muted"
+                      >
+                        <Shield className="h-4 w-4" />
+                        <span className="font-medium">Admin Panel</span>
+                      </Link>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mx-4 w-[calc(100%-2rem)]"
+                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                    >
+                      {t('auth.logout')}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button asChild size="sm" className="mx-4 w-[calc(100%-2rem)]" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to="/login">{t('auth.login.button')}</Link>
+                  </Button>
+                )}
               </div>
             </nav>
           </div>

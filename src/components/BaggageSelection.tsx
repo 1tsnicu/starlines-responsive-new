@@ -261,40 +261,37 @@ export function BaggageSelection({
     return (
       <Card key={item.baggage_id} className={`${compactMode ? 'p-3' : 'p-4'} ${selectedQuantity > 0 ? 'ring-2 ring-blue-200' : ''}`}>
         <CardContent className="p-0">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             {/* Item Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">{displayInfo.category_icon}</span>
-                <h4 className="font-medium text-sm line-clamp-1">{displayInfo.title}</h4>
+            <div className="flex-1 w-full min-w-0">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="text-2xl flex-shrink-0">{displayInfo.category_icon}</span>
+                <h4 className="font-medium text-sm line-clamp-1 flex-1 min-w-[140px]">{displayInfo.title}</h4>
                 {item.is_included && (
                   <Badge variant="secondary" className="text-xs">Gratuit</Badge>
                 )}
               </div>
-              
               {!compactMode && (
-                <div className="space-y-1 text-xs text-muted-foreground">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground w-full sm:max-w-xl">
                   {displayInfo.dimensions && (
-                    <div>📏 {displayInfo.dimensions}</div>
+                    <div className="col-span-2 xs:col-span-1">📏 {displayInfo.dimensions}</div>
                   )}
                   {displayInfo.weight && (
-                    <div>⚖️ {displayInfo.weight}</div>
+                    <div className="col-span-2 xs:col-span-1">⚖️ {displayInfo.weight}</div>
                   )}
                   {displayInfo.restrictions && (
-                    <div>⚠️ {displayInfo.restrictions}</div>
+                    <div className="col-span-2">⚠️ {displayInfo.restrictions}</div>
                   )}
                 </div>
               )}
             </div>
-            
             {/* Price & Selection */}
-            <div className="flex flex-col items-end gap-2">
-              <div className="text-sm font-medium">
+            <div className="flex flex-row sm:flex-col items-center sm:items-end gap-3 w-full sm:w-auto">
+              <div className="text-sm font-medium whitespace-nowrap self-start sm:self-end order-1 sm:order-none">
                 {displayInfo.price_display}
               </div>
-              
               {!readonly && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 order-2 sm:order-none">
                   <Button
                     variant="outline"
                     size="sm"
@@ -304,11 +301,9 @@ export function BaggageSelection({
                   >
                     <MinusIcon className="h-3 w-3" />
                   </Button>
-                  
                   <span className="w-8 text-center text-sm font-medium">
                     {selectedQuantity}
                   </span>
-                  
                   <Button
                     variant="outline"
                     size="sm"
@@ -320,7 +315,6 @@ export function BaggageSelection({
                   </Button>
                 </div>
               )}
-              
               {readonly && selectedQuantity > 0 && (
                 <Badge variant="outline">{selectedQuantity}×</Badge>
               )}
@@ -334,14 +328,13 @@ export function BaggageSelection({
   const renderBaggageGroup = (group: BaggageGroup) => {
     return (
       <div key={group.group_id} className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h3 className="font-medium text-base">{group.group_name}</h3>
-          <Badge variant={group.group_type === 'free' ? 'secondary' : 'default'}>
+          <Badge variant={group.group_type === 'free' ? 'secondary' : 'default'} className="w-fit">
             {group.items.length} {group.items.length === 1 ? 'opțiune' : 'opțiuni'}
           </Badge>
         </div>
-        
-        <div className="grid gap-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {group.items.map(renderBaggageItem)}
         </div>
       </div>
@@ -459,16 +452,16 @@ export function BaggageSelection({
       {showCostSummary && costCalculation && costCalculation.total_cost > 0 && (
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center justify-between">
+              <div className="w-full sm:flex-1">
                 <div className="font-medium">Total bagaje</div>
                 {summary && (
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground mt-1">
                     {summary.short_summary}
                   </div>
                 )}
               </div>
-              <div className="text-right">
+              <div className="text-left sm:text-right w-full sm:w-auto">
                 <div className="text-2xl font-bold">
                   {costCalculation.total_cost.toFixed(2)} {costCalculation.currency}
                 </div>
@@ -479,7 +472,6 @@ export function BaggageSelection({
                 )}
               </div>
             </div>
-            
             {validation?.valid && (
               <div className="flex items-center gap-2 mt-3 text-sm text-green-600">
                 <CheckCircleIcon className="h-4 w-4" />

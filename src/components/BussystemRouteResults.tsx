@@ -72,88 +72,77 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
   return (
     <Card className="w-full">
       <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-base md:text-lg font-semibold break-words">
               {route.carrier} - {route.route_name}
             </CardTitle>
-            
             {/* Route and timing */}
-            <div className="flex items-center space-x-4 mt-2">
-              <div className="flex items-center space-x-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-2 text-sm">
+              <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  {route.time_from} → {route.time_to}
-                </span>
+                <span>{route.time_from} → {route.time_to}</span>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm">
-                  {route.point_from} → {route.point_to}
-                </span>
+                <span className="truncate max-w-[200px] sm:max-w-none">{route.point_from} → {route.point_to}</span>
               </div>
               {route.time_in_way && (
-                <Badge variant="secondary">
-                  {formatDuration(route.time_in_way)}
-                </Badge>
+                <Badge variant="secondary" className="whitespace-nowrap">{formatDuration(route.time_in_way)}</Badge>
               )}
             </div>
-
             {/* Amenities */}
             {comfortItems.length > 0 && (
-              <div className="flex items-center space-x-2 mt-2">
+              <div className="flex flex-wrap items-center gap-2 mt-2">
                 {comfortItems.map((item, index) => (
-                  <Badge key={index} variant="outline" className="flex items-center space-x-1">
+                  <Badge key={index} variant="outline" className="flex items-center gap-1">
                     {item.icon}
                     <span className="text-xs">{item.name}</span>
                   </Badge>
                 ))}
               </div>
             )}
-
             {/* Rating and reviews */}
             {(route.rating || route.reviews) && (
-              <div className="flex items-center space-x-2 mt-2">
+              <div className="flex items-center gap-4 mt-2 text-sm flex-wrap">
                 {route.rating && (
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 text-yellow-500" />
-                    <span className="text-sm font-medium">{route.rating}</span>
+                    <span className="font-medium">{route.rating}</span>
                   </div>
                 )}
                 {route.reviews && (
-                  <div className="flex items-center space-x-1">
-                    <MessageCircle className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground">{route.reviews} отзывов</span>
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{route.reviews} отзывов</span>
                   </div>
                 )}
               </div>
             )}
           </div>
-
           {/* Price and actions */}
-          <div className="text-right">
-            <div className="text-2xl font-bold">
-              {route.price_one_way} {route.currency}
-            </div>
-            {route.bonus_eur && (
-              <div className="text-sm text-green-600">
-                +{route.bonus_eur} EUR бонус
+          <div className="text-left md:text-right md:w-48 flex md:block items-center justify-between gap-4">
+            <div>
+              <div className="text-xl md:text-2xl font-bold leading-tight">
+                {route.price_one_way} {route.currency}
               </div>
-            )}
-            
-            <div className="flex flex-col space-y-2 mt-3">
+              {route.bonus_eur && (
+                <div className="text-xs md:text-sm text-green-600">
+                  +{route.bonus_eur} EUR бонус
+                </div>
+              )}
+            </div>
+            <div className="flex md:flex-col gap-2">
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={handleShowSeats}
                 disabled={loadingSeats}
+                className="whitespace-nowrap"
               >
                 {loadingSeats ? 'Загрузка...' : 'Места'}
               </Button>
-              <Button 
-                onClick={onSelect}
-                size="sm"
-              >
+              <Button onClick={onSelect} size="sm" className="whitespace-nowrap">
                 Выбрать
               </Button>
             </div>
@@ -299,15 +288,14 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <h3 className="text-lg font-semibold">
           Найдено маршрутов: {routes.length}
         </h3>
-        <Badge variant="outline">
+        <Badge variant="outline" className="w-fit">
           {routes[0]?.trans === 'bus' ? 'Автобус' : 'Поезд'}
         </Badge>
       </div>
-
       <div className="space-y-4">
         {routes.map((route, index) => (
           <RouteCard 
