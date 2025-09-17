@@ -31,13 +31,13 @@ export interface BussystemConfig {
 
 // Default configuration for testing
 export const defaultBussystemConfig: BussystemConfig = {
-  baseUrl: import.meta.env.DEV ? '/api/backend/curl' : '/api/backend/curl',
-  login: 'backend_managed',        // Credentials now handled by backend
-  password: 'backend_managed',     // Not sent from browser in production
-  partnerId: 'XXXX',         // Will be replaced with real partner ID
+  baseUrl: '/api/backend', // use backend proxy root (no trailing /curl to avoid duplication)
+  login: 'backend_managed',        // Credentials handled server-side
+  password: 'backend_managed',
+  partnerId: 'XXXX',
   bookingBaseUrl: 'https://booking.bussystem.eu',
   iframeBaseUrl: 'https://iframe.bussystem.eu/booking',
-  useMockData: true,         // Start with mock data
+  useMockData: true,
   defaultLang: 'ru',
   defaultCurrency: 'EUR'
 };
@@ -412,11 +412,8 @@ export interface PlanResponse extends ApiResponse {
 // Configuration
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_BUSSYSTEM === "true";
 
-const BASE_URL = import.meta.env.DEV 
-  ? "/api/bussystem"  // Always use proxy in development
-  : (import.meta.env.VITE_BUSS_BASE_URL || "https://test-api.bussystem.eu/server");
-const LOGIN = import.meta.env.VITE_BUSS_LOGIN || "";
-const PASSWORD = import.meta.env.VITE_BUSS_PASSWORD || "";
+const BASE_URL = '/api/backend';
+// Removed LOGIN/PASSWORD constants from client – backend injects them
 
 const DEFAULT_HEADERS = {
   "Content-Type": "application/json",
@@ -433,95 +430,54 @@ function withTimeout<T>(promise: Promise<T>, ms = 15000): Promise<T> {
   ]);
 }
 
-// Generic POST helper
+// Generic POST helper (now without exposing credentials)
 async function post<T = ApiResponse>(path: string, body: Json): Promise<T> {
-  if (!LOGIN || !PASSWORD) {
-    throw new Error("BUSS login/password lipsesc din .env");
-  }
-  
-  const url = `${BASE_URL}${path}`;
-  const payload = { 
-    login: LOGIN, 
-    password: PASSWORD, 
-    json: 1, // Force JSON response
-    ...body 
-  };
+  // Map any /curl/*.php path to backend /api/backend/curl/:file endpoint
+  const isCurl = path.startsWith('/curl/');
+  const file = isCurl ? path.replace('/curl/', '') : '';
+  const url = isCurl ? `${BASE_URL}/curl/${file}` : `${BASE_URL}${path}`;
+  const payload = { json: 1, ...body }; // backend will add login/password
 
-  console.log('Bussystem API Request:', {
-    url: url,
-    method: 'POST',
-    headers: DEFAULT_HEADERS,
-    payload: payload
-  });
+  console.log('Bussystem API Request (proxied):', { url, method: 'POST', payload });
 
   const request = fetch(url, {
-    method: "POST",
+    method: 'POST',
     headers: DEFAULT_HEADERS,
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payload)
   });
 
   let res: Response;
   try {
     res = await withTimeout(request, 15000);
   } catch (e: unknown) {
-    if ((e as Error)?.message === "Request timeout") {
-      throw new Error("Bussystem API: timeout la solicitare.");
+    if ((e as Error)?.message === 'Request timeout') {
+      throw new Error('Bussystem API: timeout la solicitare.');
     }
     throw e;
   }
 
-  const contentType = res.headers.get("content-type") || "";
-
-  if (!res.ok && !contentType.includes("application/json")) {
-    const text = await res.text().catch(() => "");
+  const contentType = res.headers.get('content-type') || '';
+  if (!res.ok && !contentType.includes('application/json')) {
+    const text = await res.text().catch(() => '');
     throw new Error(`Bussystem API: HTTP ${res.status} - ${text}`);
   }
 
-  if (contentType.includes("application/json")) {
+  if (contentType.includes('application/json')) {
     const data = await res.json();
-    
-    console.log('Bussystem API Response:', {
-      status: res.status,
-      statusText: res.statusText,
-      url: res.url,
-      data: data
-    });
-    
     if (data?.error) {
-      console.error('Bussystem API Error Details:', {
-        error: data.error,
-        detal: data.detal,
-        fullResponse: data
-      });
-      
-      // Provide specific error messages for common issues
-      if (data.error === "dealer_no_activ") {
-        const errorMessage = `Dealer account is inactive. Please contact Bussystem support to activate your account. Details: ${data.detal || 'No additional details'}`;
-        throw new Error(errorMessage);
+      if (data.error === 'dealer_no_activ') {
+        throw new Error(`Dealer account is inactive. Contact support. ${data.detal || ''}`);
       }
-      
       throw new Error(`Bussystem API error: ${String(data.error)}${data.detal ? ` - ${data.detal}` : ''}`);
     }
-    
     return data as T;
-  } else {
-    // Handle XML response
-    const text = await res.text();
-    console.log('Bussystem API XML Response:', {
-      status: res.status,
-      statusText: res.statusText,
-      url: res.url,
-      text: text
-    });
-    
-    if (text.includes("<error>dealer_no_activ</error>")) {
-      throw new Error("Dealer account is inactive. Please contact Bussystem support to activate your account.");
-    }
-    if (text.includes("<error>new_order</error>")) {
-      throw new Error("new_order");
-    }
-    throw new Error("Răspuns XML neașteptat; asigură-te că trimiți Accept: application/json");
   }
+
+  const text = await res.text();
+  if (text.includes('<error>dealer_no_activ</error>')) {
+    throw new Error('Dealer account is inactive. Contact support.');
+  }
+  throw new Error('Unexpected non-JSON response');
 }
 
 // ------------- SEARCH & INFO ------------- 
@@ -792,7 +748,7 @@ export async function getDiscount(params: {
   const { interval_id, currency = "EUR", lang = "ru", session } = params;
   
   if (USE_MOCK_API) {
-    return (mockBussystemAPI as {
+    return (mockBussystemAPI as unknown as {
       getDiscount: (params: {
         interval_id: string;
         currency?: string;
