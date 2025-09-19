@@ -4,9 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Users, Wifi, Zap, Snowflake, Music, Tv, Star, MessageCircle } from 'lucide-react';
-import { RouteSummary, getFreeSeats, getDiscounts, getPlan } from '@/lib/bussystem';
+import { RouteSummary, getFreeSeats } from '@/lib/bussystem';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DealerErrorDisplay } from './DealerErrorDisplay';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 interface BussystemRouteResultsProps {
   routes: RouteSummary[];
@@ -35,16 +36,18 @@ function parseComfort(comfort?: string) {
 }
 
 // Helper to format duration
-function formatDuration(timeInWay?: string) {
+function formatDuration(timeInWay?: string, t?: (k: string) => string) {
   if (!timeInWay) return '';
   const [hours, minutes] = timeInWay.split(':');
-  return `${hours}h ${minutes}m`;
+  const h = t ? t('duration.h') : 'h';
+  const m = t ? t('duration.m') : 'm';
+  return `${hours}${h} ${minutes}${m}`;
 }
 
 // Route card component
-function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => void }) {
+function RouteCard({ route, onSelect, t }: { route: RouteSummary; onSelect: () => void; t: (k: string) => string }) {
   const [showDetails, setShowDetails] = useState(false);
-  const [seatInfo, setSeatInfo] = useState<Record<string, unknown> | null>(null);
+  const [seatInfo, setSeatInfo] = useState<Record<string, any> | null>(null);
   const [loadingSeats, setLoadingSeats] = useState(false);
   
   const comfortItems = parseComfort(route.comfort);
@@ -57,7 +60,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
           interval_id: route.interval_id,
           date: route.date_from,
         });
-        setSeatInfo(seats);
+        setSeatInfo(seats as any);
         setShowDetails(true);
       } catch (error) {
         console.error('Error fetching seats:', error);
@@ -88,7 +91,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
                 <span className="truncate max-w-[200px] sm:max-w-none">{route.point_from} → {route.point_to}</span>
               </div>
               {route.time_in_way && (
-                <Badge variant="secondary" className="whitespace-nowrap">{formatDuration(route.time_in_way)}</Badge>
+                <Badge variant="secondary" className="whitespace-nowrap">{formatDuration(route.time_in_way, t)}</Badge>
               )}
             </div>
             {/* Amenities */}
@@ -114,7 +117,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
                 {route.reviews && (
                   <div className="flex items-center gap-1 text-muted-foreground">
                     <MessageCircle className="h-4 w-4" />
-                    <span>{route.reviews} отзывов</span>
+                    <span>{route.reviews} {t('transport.reviews')}</span>
                   </div>
                 )}
               </div>
@@ -128,7 +131,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
               </div>
               {route.bonus_eur && (
                 <div className="text-xs md:text-sm text-green-600">
-                  +{route.bonus_eur} EUR бонус
+                  +{route.bonus_eur} EUR {t('bussystem.bonus')}
                 </div>
               )}
             </div>
@@ -140,10 +143,10 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
                 disabled={loadingSeats}
                 className="whitespace-nowrap"
               >
-                {loadingSeats ? 'Загрузка...' : 'Места'}
+                {loadingSeats ? t('common.loading') : t('bussystem.seats')}
               </Button>
               <Button onClick={onSelect} size="sm" className="whitespace-nowrap">
-                Выбрать
+                {t('common.select')}
               </Button>
             </div>
           </div>
@@ -156,17 +159,17 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {/* Seat information */}
             {seatInfo && (
               <div className="mb-4">
-                <h4 className="font-medium mb-2">Доступные места:</h4>
+                <h4 className="font-medium mb-2">{t('bussystem.availableSeatsTitle')}</h4>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Users className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm">
-                      Свободно: {seatInfo.free_seats ? String(seatInfo.free_seats) : 'Неизвестно'}
+                      {t('bussystem.free')} {seatInfo.free_seats ? String(seatInfo.free_seats) : t('bussystem.unknown')}
                     </span>
                   </div>
                   {seatInfo.total_seats && (
                     <span className="text-sm text-muted-foreground">
-                      из {String(seatInfo.total_seats)}
+                      {t('bussystem.of')} {String(seatInfo.total_seats)}
                     </span>
                   )}
                 </div>
@@ -176,12 +179,11 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {/* Cancellation policy */}
             {route.cancel_hours_info && route.cancel_hours_info.length > 0 && (
               <div className="mb-4">
-                <h4 className="font-medium mb-2">Политика возврата:</h4>
+                <h4 className="font-medium mb-2">{t('bussystem.refundPolicy')}</h4>
                 <div className="space-y-2">
                   {route.cancel_hours_info.map((policy, index) => (
                     <div key={index} className="text-sm text-muted-foreground">
-                      За {policy.hours_before_depar}ч до отправления: 
-                      возврат {policy.money_back}% (комиссия {policy.cancel_rate}%)
+                      {t('bussystem.before')} {policy.hours_before_depar}{t('bussystem.hours')} {t('bussystem.beforeDeparture')}: {t('bussystem.refund')} {policy.money_back}% ({t('bussystem.fee')} {policy.cancel_rate}%)
                     </div>
                   ))}
                 </div>
@@ -191,7 +193,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {route.cancel_free_min && (
               <Alert>
                 <AlertDescription>
-                  Бесплатная отмена в течение {route.cancel_free_min} минут после бронирования
+                  {t('bussystem.freeCancelWithinPrefix')} {route.cancel_free_min} {t('bussystem.minutes')} {t('bussystem.freeCancelWithinSuffix')}
                 </AlertDescription>
               </Alert>
             )}
@@ -199,7 +201,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {/* Luggage info */}
             {route.luggage && (
               <div className="mt-4">
-                <h4 className="font-medium mb-2">Багаж:</h4>
+                <h4 className="font-medium mb-2">{t('bussystem.luggage')}</h4>
                 <p className="text-sm text-muted-foreground">{route.luggage}</p>
               </div>
             )}
@@ -207,7 +209,7 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {/* Route info */}
             {route.route_info && (
               <div className="mt-4">
-                <h4 className="font-medium mb-2">Информация о маршруте:</h4>
+                <h4 className="font-medium mb-2">{t('bussystem.routeInfo')}</h4>
                 <p className="text-sm text-muted-foreground">{route.route_info}</p>
               </div>
             )}
@@ -215,13 +217,13 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
             {/* Booking constraints */}
             <div className="mt-4 text-xs text-muted-foreground space-y-1">
               {route.lock_min && (
-                <div>Резервация действует {route.lock_min} минут</div>
+                <div>{t('bussystem.bookingActive')} {route.lock_min} {t('bussystem.minutes')}</div>
               )}
               {route.max_seats && (
-                <div>Максимум {route.max_seats} мест за раз</div>
+                <div>{t('bussystem.max')} {route.max_seats} {t('bussystem.seatsLower')} {t('bussystem.atOnce')}</div>
               )}
               {route.stop_sale_hours && (
-                <div>Продажа останавливается за {route.stop_sale_hours} часов до отправления</div>
+                <div>{t('bussystem.stopSale')} {route.stop_sale_hours} {t('bussystem.hoursBeforeDeparture')}</div>
               )}
             </div>
           </div>
@@ -232,12 +234,14 @@ function RouteCard({ route, onSelect }: { route: RouteSummary; onSelect: () => v
 }
 
 export function BussystemRouteResults({ routes, loading, error, onRouteSelect }: BussystemRouteResultsProps) {
+  const { t } = useLocalization();
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-sm text-muted-foreground">Поиск маршрутов...</p>
+          <p className="mt-2 text-sm text-muted-foreground">{t('bussystem.search.searching')}</p>
         </div>
       </div>
     );
@@ -257,18 +261,18 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
         <AlertDescription>
           {isNoInterval ? (
             <div className="space-y-2">
-              <div><strong>Маршруты не найдены для выбранных параметров.</strong></div>
+              <div><strong>{t('bussystem.search.noRoutesTitle')}</strong></div>
               <ul className="list-disc pl-5 text-sm space-y-1">
-                <li>Попробуйте другую дату (часто нет рейсов каждый день)</li>
-                <li>Убедитесь что выбраны реальные города через автокомплит (а не пресет ID)</li>
-                <li>Попробуйте язык en вместо ru (редко влияет, но можно)</li>
-                <li>Удалите параметр change=auto (только прямые рейсы) — нужно обновить код если тестируете</li>
-                <li>Если аккаунт ещё не активирован полностью, часть направлений может отсутствовать</li>
+                <li>{t('bussystem.search.tip1')}</li>
+                <li>{t('bussystem.search.tip2')}</li>
+                <li>{t('bussystem.search.tip3')}</li>
+                <li>{t('bussystem.search.tip4')}</li>
+                <li>{t('bussystem.search.tip5')}</li>
               </ul>
-              <div className="text-xs text-muted-foreground break-all">Техническая ошибка API: interval_no_found</div>
+              <div className="text-xs text-muted-foreground break-all">{t('bussystem.search.apiError')} interval_no_found</div>
             </div>
           ) : (
-            <>Ошибка при поиске маршрутов: {error}</>
+            <>{t('bussystem.search.searchError')} {error}</>
           )}
         </AlertDescription>
       </Alert>
@@ -278,9 +282,9 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
   if (!routes.length) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">Маршруты не найдены</p>
+        <p className="text-muted-foreground">{t('bussystem.search.noneTitle')}</p>
         <p className="text-sm text-muted-foreground mt-1">
-          Попробуйте изменить дату или направление
+          {t('bussystem.search.noneSuggestion')}
         </p>
       </div>
     );
@@ -290,10 +294,10 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
         <h3 className="text-lg font-semibold">
-          Найдено маршрутов: {routes.length}
+          {t('search.routesFound')}: {routes.length}
         </h3>
         <Badge variant="outline" className="w-fit">
-          {routes[0]?.trans === 'bus' ? 'Автобус' : 'Поезд'}
+          {routes[0]?.trans === 'bus' ? t('transport.bus') : t('transport.train')}
         </Badge>
       </div>
       <div className="space-y-4">
@@ -302,6 +306,7 @@ export function BussystemRouteResults({ routes, loading, error, onRouteSelect }:
             key={`${route.interval_id}-${index}`}
             route={route}
             onSelect={() => onRouteSelect(route)}
+            t={t}
           />
         ))}
       </div>

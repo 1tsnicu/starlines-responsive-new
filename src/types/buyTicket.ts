@@ -104,6 +104,14 @@ export interface PaymentFlowProps {
     reservationUntilMin: number;
     priceTotal: number;
     currency: string;
+  } | {
+    // Allow raw NewOrderResponse shape
+    order_id: number;
+    security: string;
+    reservation_until: string;
+    reservation_until_min: string;
+    price_total: number;
+    currency: string;
   };
   onPaymentComplete: (result: TicketPurchaseResult) => void;
   onCancel: () => void;

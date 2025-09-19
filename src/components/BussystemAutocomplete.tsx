@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
+import { Loader2, MapPin } from 'lucide-react';
 import { usePointsAutocomplete, BussPoint } from '@/lib/bussystem';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, MapPin } from 'lucide-react';
+import { CardContent } from '@/components/ui/card';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 interface BussystemAutocompleteProps {
   placeholder?: string;
@@ -21,17 +21,18 @@ interface BussystemAutocompleteProps {
 }
 
 export function BussystemAutocomplete({ 
-  placeholder = "Căutați orașul...", 
+  placeholder, 
   value = "",
   onSelect,
   className = "",
   country_id,
   trans = "bus",
-  lang = "ru",
+  lang,
   showCountry = true,
   showDetails = true,
   minLength = 2
 }: BussystemAutocompleteProps) {
+  const { t, currentLanguage } = useLocalization();
   const [inputValue, setInputValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -39,10 +40,13 @@ export function BussystemAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Prefer current UI language unless a lang prop is explicitly provided
+  const languageForApi = lang || currentLanguage || 'ru';
+
   const { data: points, loading, error } = usePointsAutocomplete(inputValue, {
     country_id,
     trans,
-    lang,
+    lang: languageForApi,
     minLength
   });
 
@@ -194,7 +198,7 @@ export function BussystemAutocomplete({
         <Input
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('search.citySearchPlaceholder')}
           value={inputValue}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
@@ -224,26 +228,26 @@ export function BussystemAutocomplete({
             {loading && inputValue.length >= minLength && (
               <div className="p-4 text-center text-sm text-gray-600">
                 <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2 text-blue-500" />
-                Se caută...
+                {t('autocomplete.searching')}
               </div>
             )}
             
             {error && !error.includes('must contain 3 or more characters') && (
               <div className="p-4 text-center text-sm text-red-600 bg-red-50 rounded-lg m-2">
-                Eroare: {error}
+                {t('common.error')}: {error}
               </div>
             )}
             
             {inputValue.length > 0 && inputValue.length < minLength && (
               <div className="p-4 text-center text-sm text-gray-600 bg-gray-50 rounded-lg m-2">
                 <Loader2 className="h-4 w-4 animate-spin mx-auto mb-2 text-blue-500" />
-                Introduceți cel puțin {minLength} caractere pentru căutare...
+                {t('autocomplete.enterAtLeast')} {minLength} {t('autocomplete.charactersForSearch')}
               </div>
             )}
             
             {!loading && !error && points.length === 0 && inputValue.length >= minLength && (
               <div className="p-4 text-center text-sm text-gray-500">
-                Nu s-au găsit rezultate pentru "{inputValue}"
+                {t('autocomplete.noResultsFor')} "{inputValue}"
               </div>
             )}
             

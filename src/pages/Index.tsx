@@ -1,26 +1,16 @@
 import { 
-  Bus, 
-  MapPin, 
   Calendar, 
   Star, 
-  Shield, 
-  Users, 
   Phone, 
   Clock,
   CheckCircle,
   ArrowRight,
-  Percent,
-  Package,
-  CreditCard,
-  FileText,
   Ticket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import HeroSection from "@/components/HeroSection";
-import FeaturesSection from "@/components/FeaturesSection";
 import PopularRoutesSection from "@/components/PopularRoutesSection";
 import { useLocalization } from "@/contexts/LocalizationContext";
 
@@ -54,34 +44,13 @@ const Index = () => {
     }
   ];
 
-  // Trust indicators
-  const trustFeatures = [
-    {
-      icon: <Shield className="h-6 w-6" />,
-      title: t('index.trustSafe'),
-      description: t('index.trustSafeDesc')
-    },
-    {
-      icon: <Star className="h-6 w-6" />,
-      title: t('index.trustExperience'),
-      description: t('index.trustExperienceDesc')
-    },
-    {
-      icon: <Users className="h-6 w-6" />,
-      title: t('index.trustSupport'),
-      description: t('index.trustSupportDesc')
-    },
-    {
-      icon: <CheckCircle className="h-6 w-6" />,
-      title: t('index.trustSimple'),
-      description: t('index.trustSimpleDesc')
-    }
-  ];
-
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <HeroSection />
+
+      {/* Popular Routes - moved just below Hero to reduce spacing */}
+      <PopularRoutesSection />
 
       {/* Main Actions - Simple and Clear */}
       <section className="py-12 sm:py-16 bg-muted/30">
@@ -124,43 +93,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
-      {/* Trust Features */}
-      <section className="py-12 sm:py-16">
-        <div className="container px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-3 sm:mb-4">
-              De ce să alegi Starlines?
-            </h2>
-            <p className="text-base sm:text-lg text-foreground/70 max-w-2xl mx-auto px-2">
-              Suntem aici să îți oferim cea mai bună experiență de călătorie
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {trustFeatures.map((feature, index) => (
-              <Card key={index} className="border-border text-center hover:shadow-md transition-shadow">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                    <div className="text-primary">
-                      {feature.icon}
-                    </div>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-foreground/70 text-sm">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Routes */}
-      <PopularRoutesSection />
 
       {/* Quick Help Section */}
       <section className="py-12 sm:py-16 bg-primary/5">

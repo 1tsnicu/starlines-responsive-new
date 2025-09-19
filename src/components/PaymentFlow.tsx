@@ -31,6 +31,15 @@ export function PaymentFlow({
   onPaymentComplete, 
   onCancel 
 }: PaymentFlowProps) {
+  const normalized = 'orderId' in reservation ? reservation : {
+    orderId: reservation.order_id,
+    security: reservation.security,
+    reservationUntil: reservation.reservation_until,
+    reservationUntilMin: Number(reservation.reservation_until_min),
+    priceTotal: reservation.price_total,
+    currency: reservation.currency
+  };
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [timer, setTimer] = useState<PaymentTimer>({
@@ -43,80 +52,36 @@ export function PaymentFlow({
 
   // Initialize timer
   useEffect(() => {
-    const initialSeconds = calculateTimeRemaining(reservation.reservationUntil);
+    const initialSeconds = calculateTimeRemaining(normalized.reservationUntil);
     setTimer({
       minutes: Math.floor(initialSeconds / 60),
       seconds: initialSeconds % 60,
       totalSeconds: initialSeconds,
       isExpired: initialSeconds <= 0
     });
-  }, [reservation.reservationUntil]);
-
-  // Timer callbacks
-  const timerCallbacks: TimerCallbacks = {
-    onUpdate: (newTimer) => {
-      setTimer(newTimer);
-    },
-    onExpired: () => {
-      setError('Rezervarea a expirat. Te rugăm să începi din nou procesul de rezervare.');
-    },
-    onWarning: (minutesLeft) => {
-      if (!warningShown.has(minutesLeft)) {
-        setWarningShown(prev => new Set([...prev, minutesLeft]));
-        // Could show toast notification here
-        console.warn(`Atenție! Mai ai doar ${minutesLeft} minute până la expirarea rezervării.`);
-      }
-    }
-  };
-
-  // Start timer
-  useEffect(() => {
-    if (timer.totalSeconds > 0 && !timer.isExpired) {
-    const interval = setInterval(() => {
-        const remaining = calculateTimeRemaining(reservation.reservationUntil);
-        if (remaining <= 0) {
-          timerCallbacks.onExpired?.();
-          clearInterval(interval);
-        } else {
-          const minutes = Math.floor(remaining / 60);
-          const seconds = remaining % 60;
-          
-          timerCallbacks.onUpdate?.({
-            minutes,
-            seconds,
-            totalSeconds: remaining,
-            isExpired: false
-          });
-
-          // Warning callbacks
-          if (minutes === 5 && seconds === 0 && !warningShown.has(5)) {
-            timerCallbacks.onWarning?.(5);
-          } else if (minutes === 2 && seconds === 0 && !warningShown.has(2)) {
-            timerCallbacks.onWarning?.(2);
-          } else if (minutes === 1 && seconds === 0 && !warningShown.has(1)) {
-            timerCallbacks.onWarning?.(1);
-          }
-        }
-    }, 1000);
-
-    return () => clearInterval(interval);
-    }
-  }, [reservation.reservationUntil, timer.totalSeconds, timer.isExpired, warningShown]);
+  }, [normalized.reservationUntil]);
 
   const handlePayment = async () => {
     setLoading(true);
     setError(null);
-
     try {
       const result = await completePayment(
-        reservation.orderId,
-        reservation.security,
-        reservation.reservationUntil,
-        timerCallbacks
+        normalized.orderId,
+        normalized.security,
+        normalized.reservationUntil,
+        {
+          onUpdate: (newTimer) => setTimer(newTimer),
+          onExpired: () => setError('Rezervarea a expirat. Te rugăm să începi din nou procesul de rezervare.'),
+          onWarning: (minutesLeft) => {
+            if (!warningShown.has(minutesLeft)) {
+              setWarningShown(prev => new Set([...prev, minutesLeft]));
+              console.warn(`Atenție! Mai ai doar ${minutesLeft} minute.`);
+            }
+          }
+        }
       );
-
       if (result.success) {
-      onPaymentComplete(result);
+        onPaymentComplete(result);
       } else {
         setError(result.error || 'Plata a eșuat. Te rugăm să încerci din nou.');
       }
@@ -126,6 +91,33 @@ export function PaymentFlow({
       setLoading(false);
     }
   };
+
+  // Start timer
+  useEffect(() => {
+    if (timer.totalSeconds <= 0 || timer.isExpired) return;
+    const interval = setInterval(() => {
+      const remaining = calculateTimeRemaining(normalized.reservationUntil);
+      if (remaining <= 0) {
+        setTimer(t => ({ ...t, totalSeconds: 0, minutes: 0, seconds: 0, isExpired: true }));
+        setError('Rezervarea a expirat. Te rugăm să începi din nou procesul de rezervare.');
+        clearInterval(interval);
+        return;
+      }
+      const minutes = Math.floor(remaining / 60);
+      const seconds = remaining % 60;
+      setTimer({ minutes, seconds, totalSeconds: remaining, isExpired: false });
+      if (seconds === 0) {
+        if (minutes === 5 && !warningShown.has(5)) {
+          setWarningShown(prev => new Set([...prev, 5]));
+        } else if (minutes === 2 && !warningShown.has(2)) {
+          setWarningShown(prev => new Set([...prev, 2]));
+        } else if (minutes === 1 && !warningShown.has(1)) {
+          setWarningShown(prev => new Set([...prev, 1]));
+        }
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer.totalSeconds, timer.isExpired, normalized.reservationUntil, warningShown]);
 
   const getTimerColor = () => {
     if (timer.isExpired) return 'text-red-500';
@@ -213,7 +205,7 @@ export function PaymentFlow({
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-muted-foreground">ID Comandă:</span>
-              <div className="font-mono">{reservation.orderId}</div>
+              <div className="font-mono">{normalized.orderId}</div>
             </div>
             <div>
               <span className="text-muted-foreground">Status:</span>
@@ -230,7 +222,7 @@ export function PaymentFlow({
           <div className="flex justify-between items-center text-lg font-semibold">
             <span>Total de plată:</span>
             <span className="text-primary">
-              {reservation.priceTotal} {reservation.currency}
+              {normalized.priceTotal} {normalized.currency}
             </span>
           </div>
         </CardContent>
@@ -257,7 +249,7 @@ export function PaymentFlow({
               ) : (
                 <div className="flex items-center gap-2">
                   <CreditCard className="h-5 w-5" />
-                  Plătește {reservation.priceTotal} {reservation.currency}
+                  Plătește {normalized.priceTotal} {normalized.currency}
                 </div>
               )}
             </Button>

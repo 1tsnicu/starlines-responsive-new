@@ -4,7 +4,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 export const SUPPORTED_LANGUAGES = [
   { code: 'ro', name: 'Română', flag: '🇷🇴' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
-  { code: 'en', name: 'English', flag: '🇬🇧' }
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'uk', name: 'Українська', flag: '🇺🇦' }
 ];
 
 // Supported currencies
@@ -12,15 +13,17 @@ export const SUPPORTED_CURRENCIES = [
   { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
   { code: 'MDL', name: 'Leu Moldovenesc', symbol: 'L', flag: '🇲🇩' },
   { code: 'USD', name: 'Dollar American', symbol: '$', flag: '🇺🇸' },
-  { code: 'RON', name: 'Leu Românesc', symbol: 'Lei', flag: '🇷🇴' }
+  { code: 'RON', name: 'Leu Românesc', symbol: 'Lei', flag: '🇷🇴' },
+  { code: 'UAH', name: 'Hryvnia', symbol: '₴', flag: '🇺🇦' }
 ];
 
 // Exchange rates (mock data - in real app this would come from an API)
 const EXCHANGE_RATES = {
-  EUR: { EUR: 1, MDL: 19.5, USD: 1.08, RON: 4.97 },
-  MDL: { EUR: 0.051, MDL: 1, USD: 0.055, RON: 0.255 },
-  USD: { EUR: 0.93, MDL: 18.1, USD: 1, RON: 4.6 },
-  RON: { EUR: 0.201, MDL: 3.92, USD: 0.217, RON: 1 }
+  EUR: { EUR: 1, MDL: 19.5, USD: 1.08, RON: 4.97, UAH: 43 },
+  MDL: { EUR: 0.051, MDL: 1, USD: 0.055, RON: 0.255, UAH: 2.3 },
+  USD: { EUR: 0.93, MDL: 18.1, USD: 1, RON: 4.6, UAH: 40 },
+  RON: { EUR: 0.201, MDL: 3.92, USD: 0.217, RON: 1, UAH: 8.15 },
+  UAH: { EUR: 0.0233, MDL: 0.4348, USD: 0.025, RON: 0.1227, UAH: 1 }
 };
 
 interface LocalizationContextType {
@@ -48,6 +51,29 @@ interface LocalizationContextType {
 const LocalizationContext = createContext<LocalizationContextType | undefined>(undefined);
 
 // Translations
+const TRANSLATIONS: Record<string, Record<string, string>> = {
+  ro: {
+    // ...existing code...
+    'search.searchTickets': 'Caută Bilete',
+    'search.searchTrips': 'Caută Bilete',
+    'search.popularRoutes': 'Rute Populare',
+    // ...existing code...
+  },
+  ru: {
+    // ...existing code...
+    'search.searchTickets': 'Найти Билеты',
+    'search.searchTrips': 'Найти Билеты',
+    'search.popularRoutes': 'Популярные Маршруты',
+    // ...existing code...
+  },
+  en: {
+    // ...existing code...
+    'search.searchTickets': 'Search Tickets',
+    'search.searchTrips': 'Search Tickets',
+    'search.popularRoutes': 'Popular Routes',
+    // ...existing code...
+  }
+};
 const translations = {
   ro: {
     // Authentication

@@ -3,17 +3,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import { Link } from "react-router-dom";
 
 const PopularRoutesSection = () => {
   const { formatPrice, t } = useLocalization();
 
-const popularRoutes = [
-  {
+  const popularRoutes = [
+    {
       id: "1",
-    from: "Chișinău",
-    to: "Kiev",
+      from: "Chișinău",
+      to: "Kiev",
       price: 35,
-    duration: "6h 45m",
+      duration: "6h 45m",
       departureTime: "08:00",
       arrivalTime: "14:45",
       operator: "Starlines Express",
@@ -25,7 +26,7 @@ const popularRoutes = [
     },
     {
       id: "2",
-    from: "Chișinău",
+      from: "Chișinău",
       to: "Vinnița",
       price: 25,
       duration: "4h 30m",
@@ -42,7 +43,7 @@ const popularRoutes = [
       id: "3",
       from: "Chișinău",
       to: "Jîtomîr",
-    price: 30,
+      price: 30,
       duration: "5h 15m",
       departureTime: "10:30",
       arrivalTime: "15:45",
@@ -55,6 +56,11 @@ const popularRoutes = [
     }
   ];
 
+  const popularityKeyMap: Record<string, string> = {
+    "Very Popular": 'routes.popularity.veryPopular',
+    "Popular Route": 'routes.popularity.popular',
+    "Regular Route": 'routes.popularity.regular'
+  };
 
   return (
     <section className="py-20 bg-gradient-to-br from-background via-surface/30 to-background relative overflow-hidden">
@@ -115,7 +121,7 @@ const popularRoutes = [
                     }
                   `}
                 >
-                  {route.popularity}
+                  {t(popularityKeyMap[route.popularity] || 'transport.popular')}
                 </Badge>
               </div>
               
@@ -139,7 +145,7 @@ const popularRoutes = [
                       <div className="text-center mt-2">
                         <div className="inline-flex items-center gap-1 bg-muted px-2 py-1 rounded-full">
                           <Bus className="h-3 w-3 text-foreground/70" />
-                          <span className="text-xs text-foreground/70">{route.stops} stops</span>
+                          <span className="text-xs text-foreground/70">{route.stops} {t('timetable.stops')}</span>
                         </div>
                 </div>
                 </div>
@@ -177,7 +183,7 @@ const popularRoutes = [
                     <Star className="h-4 w-4 text-warning fill-warning" />
                     <span className="font-medium text-foreground">{route.rating}</span>
                   </div>
-                  <span className="text-foreground/70">({route.reviews} reviews)</span>
+                  <span className="text-foreground/70">({route.reviews} {t('transport.reviews')})</span>
                 </div>
 
                 {/* Amenities */}
@@ -197,6 +203,13 @@ const popularRoutes = [
                       {formatPrice(route.price, undefined, 'EUR')}
                     </div>
                   </div>
+                </div>
+
+                {/* Buy button → Timetable */}
+                <div className="flex justify-end">
+                  <Link to="/timetable">
+                    <Button className="bg-teal-500 hover:bg-teal-600 rounded-xl px-5 h-10">{t('timetable.book')}</Button>
+                  </Link>
                 </div>
               </CardContent>
             </Card>

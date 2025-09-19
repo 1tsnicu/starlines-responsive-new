@@ -17,6 +17,7 @@ import { buildNewOrderPayload, validateNewOrderPayload } from "@/lib/newOrderBui
 import { newOrder } from "@/lib/bussystem";
 import { PaymentFlow } from "./PaymentFlow";
 import { PaymentSuccess } from "./PaymentSuccess";
+import { useNavigate } from 'react-router-dom';
 
 interface BookingFormProps {
   trips: TripMeta[];
@@ -35,6 +36,7 @@ export function BookingForm({
   onPromocodeChange,
   onReservationComplete
 }: BookingFormProps) {
+  const navigate = useNavigate();
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -107,15 +109,17 @@ export function BookingForm({
     setError(null);
 
     try {
-      // Build payload - credentials will be handled by backend
+      // Build payload - credentials placeholder (backend injects real ones server-side)
       const payload = buildNewOrderPayload({
+        login: 'backend_managed',
+        password: 'backend_managed',
         passengers,
         trips,
         phone: phone || undefined,
         email: email || undefined,
         promocode: promocode || undefined,
-        currency: "EUR",
-        lang: "ru"
+        currency: 'EUR',
+        lang: 'ru'
       });
 
       console.log('BookingForm - Payload built:', {
@@ -185,6 +189,12 @@ export function BookingForm({
   const handlePaymentComplete = (result: TicketPurchaseResult) => {
     setPurchaseResult(result);
     setStep('success');
+    // Redirect immediately to tickets page so user can view / download ticket
+    if (result?.orderId) {
+      navigate(`/my-tickets?order_id=${encodeURIComponent(result.orderId)}`);
+    } else {
+      navigate('/my-tickets');
+    }
   };
 
   const handlePaymentCancel = () => {
@@ -198,9 +208,8 @@ export function BookingForm({
     setReservation(null);
     setPurchaseResult(null);
     setError(null);
-    
-    // Could call a parent callback here
-    console.log("Booking flow completed:", purchaseResult);
+    navigate('/my-tickets');
+    console.log('Booking flow completed, redirected to /my-tickets', purchaseResult);
   };
 
   // Render based on current step

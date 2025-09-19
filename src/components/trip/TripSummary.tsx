@@ -117,7 +117,11 @@ const TripCard: React.FC<{
     });
   };
 
-  const comfortAmenities = Array.isArray(comfort) ? comfort : (typeof comfort === 'string' && comfort ? comfort.split(',').map(a => a.trim()) : []);
+  const comfortAmenities: string[] = Array.isArray(comfort)
+    ? (comfort as string[])
+    : (typeof comfort === 'string' && comfort.length > 0)
+      ? (comfort as string).split(',').map(a => a.trim())
+      : [];
 
   return (
     <Card className={cn("w-full", isReturn ? "border-blue-200 bg-blue-50/30" : "border-gray-200")}>
@@ -271,13 +275,20 @@ const TripSummary: React.FC<TripSummaryProps> = ({
   isRoundTrip = false,
 }) => {
   const {
-    comfort = [],
+    comfort: comfortRaw = [],
     luggage,
     route_info,
     cancel_hours_info = [],
   } = route;
 
-  const comfortAmenities = Array.isArray(comfort) ? comfort : (typeof comfort === 'string' && comfort ? comfort.split(',').map(a => a.trim()) : []);
+  // Normalize comfort to string[] regardless of original form
+  const comfortAmenities: string[] = (() => {
+    const c: any = comfortRaw;
+    if (!c) return [];
+    if (Array.isArray(c)) return c as string[];
+    if (typeof c === 'string') return c.split(',').map((a: string) => a.trim()).filter(Boolean);
+    return [];
+  })();
 
   return (
     <div className="space-y-6">

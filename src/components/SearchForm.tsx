@@ -123,8 +123,8 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
-      <div className="bg-gradient-to-br from-teal-400 via-teal-500 to-cyan-600 rounded-3xl shadow-2xl p-8 md:p-10 relative">
+    <div id="search-form" className="w-full max-w-4xl mx-auto px-4">{/* anchor for footer button scroll */}
+      <div className="bg-gradient-to-br from-teal-400 via-teal-500 to-cyan-600 rounded-3xl shadow-2xl p-6 md:p-8 lg:p-10 relative">{/* reduced padding on mobile */}
         {/* Background decorative elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -translate-y-16 translate-x-16 overflow-hidden"></div>
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full blur-2xl translate-y-12 -translate-x-12 overflow-hidden"></div>
@@ -142,7 +142,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
                 : "text-gray-600 hover:text-blue-600"
             )}
           >
-            Dus
+            {t('search.oneWay')}
           </button>
           <button
             onClick={() => setIsRoundTrip(true)}
@@ -153,21 +153,22 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
                 : "text-gray-600 hover:text-blue-600"
             )}
           >
-            Dus-întors
+            {t('search.roundTrip')}
           </button>
         </div>
 
         {/* Quick Routes Chips */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-            <span className="text-white text-sm font-medium">Rute Populare</span>
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+            <span className="text-white text-sm font-medium tracking-wide">{t('search.popularRoutes')}</span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          {/* Horizontal scroll on mobile */}
+          <div className="flex gap-3 overflow-x-auto pb-1 -mx-2 px-2 lg:flex-wrap lg:overflow-visible snap-x snap-mandatory">
             {quickRoutes.map((route, index) => (
               <button
                 key={index}
-                className="bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-white hover:shadow-md transition-all duration-300 hover:scale-105"
+                className="snap-start flex-shrink-0 bg-white/90 backdrop-blur-sm text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-white hover:shadow-md transition-all duration-300 hover:scale-105 min-w-max"
                 onClick={() => handleQuickRoute(route)}
               >
                 {route.from} → {route.to}
@@ -176,18 +177,18 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
           </div>
         </div>
 
-        <div className="space-y-4 lg:space-y-6">
+        <div className="space-y-5 lg:space-y-6">
           {/* Location Selection Row */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-end">
+          <div className="lg:grid lg:grid-cols-12 gap-4 lg:items-end space-y-5 lg:space-y-0">
             {/* From City */}
-            <div className="lg:col-span-5 space-y-2">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span className="text-white text-sm font-medium">De unde</span>
+            <div className="lg:col-span-5 space-y-2 relative z-50">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 bg-green-300 rounded-full"></div>
+                <span className="text-white text-xs font-medium uppercase tracking-wide">{t('search.from')}</span>
               </div>
-              <div className="relative z-[100]">
+              <div className="relative">
                 <BussystemAutocomplete
-                  placeholder="Orașul de plecare"
+                  placeholder={t('search.fromPlaceholder')}
                   value={fromCity}
                   onSelect={handleFromPointSelect}
                   lang="ru"
@@ -200,27 +201,39 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
               </div>
             </div>
 
-            {/* Swap Button */}
-            <div className="lg:col-span-2 flex justify-center order-first lg:order-none">
+            {/* Mobile Swap Button BETWEEN inputs */}
+            <div className="lg:hidden flex justify-center items-center -my-2">
+              <button
+                type="button"
+                onClick={handleSwapCities}
+                className="h-10 w-10 rounded-full bg-white/25 border border-white/40 backdrop-blur-sm flex items-center justify-center shadow-md hover:scale-110 transition"
+                aria-label={t('search.swapCities')}
+              >
+                <ArrowLeftRight className="h-5 w-5 text-white" />
+              </button>
+            </div>
+
+            {/* Swap Button (desktop) */}
+            <div className="hidden lg:flex lg:col-span-2 justify-center">
               <button
                 type="button"
                 onClick={handleSwapCities}
                 className="h-10 w-10 lg:h-12 lg:w-12 rounded-full bg-white/20 backdrop-blur-sm border-2 border-white/30 hover:bg-white/30 transition-all duration-300 hover:scale-110 group flex items-center justify-center"
-                title="Schimbă orașele"
+                title={t('search.swapCities')}
               >
                 <ArrowLeftRight className="h-4 w-4 lg:h-5 lg:w-5 text-white group-hover:rotate-180 transition-transform duration-300" />
               </button>
             </div>
 
             {/* To City */}
-            <div className="lg:col-span-5 space-y-2">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-2 h-2 bg-red-400 rounded-full"></div>
-                <span className="text-white text-sm font-medium">Unde</span>
+            <div className="lg:col-span-5 space-y-2 relative z-40 lg:pt-0"> {/* removed extra mobile padding */}
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 bg-red-300 rounded-full"></div>
+                <span className="text-white text-xs font-medium uppercase tracking-wide">{t('search.to')}</span>
               </div>
-              <div className="relative z-[100]">
+              <div className="relative">
                 <BussystemAutocomplete
-                  placeholder="Orașul de destinație"
+                  placeholder={t('search.toPlaceholder')}
                   value={toCity}
                   onSelect={handleToPointSelect}
                   lang="ru"
@@ -240,7 +253,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
             <div className="lg:col-span-4 space-y-2">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <span className="text-white text-sm font-medium">Data plecării</span>
+                <span className="text-white text-sm font-medium">{t('search.departure')}</span>
               </div>
               <Popover>
                 <PopoverTrigger asChild>
@@ -250,7 +263,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
                   >
                     <CalendarIcon className="mr-3 h-5 w-5 text-blue-500" />
                     <span>
-                      {departureDate ? format(departureDate, "dd MMM yyyy", { locale: undefined }) : "Selectează data"}
+                      {departureDate ? format(departureDate, "dd MMM yyyy", { locale: undefined }) : t('search.selectDate')}
                     </span>
                   </Button>
                 </PopoverTrigger>
@@ -272,7 +285,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
               <div className="lg:col-span-4 space-y-2">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                  <span className="text-white text-sm font-medium">Data întoarcerii</span>
+                  <span className="text-white text-sm font-medium">{t('search.return')}</span>
                 </div>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -282,7 +295,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
                     >
                       <CalendarIcon className="mr-3 h-5 w-5 text-purple-500" />
                       <span>
-                        {returnDate ? format(returnDate, "dd MMM yyyy", { locale: undefined }) : "Selectează data"}
+                        {returnDate ? format(returnDate, "dd MMM yyyy", { locale: undefined }) : t('search.selectDate')}
                       </span>
                     </Button>
                   </PopoverTrigger>
@@ -308,7 +321,7 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
                 onClick={handleSearch}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  Caută Bilete
+                  {t('search.searchTickets')}
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 </span>
               </Button>

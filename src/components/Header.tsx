@@ -14,7 +14,6 @@ import {
   Shield,
   Star,
   ChevronDown,
-  Search,
   Ticket,
   Clock,
   HelpCircle,
@@ -63,19 +62,19 @@ const Header = () => {
       title: t('header.home'),
       href: "/",
       icon: <Star className="h-4 w-4" />,
-      description: "Pagina principală"
+      description: t('header.homeDesc')
     },
     {
       title: t('header.timetable'),
       href: "/timetable",
       icon: <Clock className="h-4 w-4" />,
-      description: "Orarul autobuzelor"
+      description: t('header.timetableDesc')
     },
     {
       title: t('header.myTickets'),
       href: "/my-tickets",
       icon: <Ticket className="h-4 w-4" />,
-      description: "Gestionează rezervările"
+      description: t('header.myTicketsDesc')
     }
   ];
 
@@ -228,7 +227,7 @@ const Header = () => {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-lg lg:text-xl font-bold text-foreground">Starlines</h1>
-              <p className="text-xs text-foreground/70 hidden lg:block">Transport Internațional</p>
+              <p className="text-xs text-foreground/70 hidden lg:block">{t('header.tagline')}</p>
             </div>
           </Link>
 
@@ -266,7 +265,7 @@ const Header = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56">
-                <DropdownMenuLabel>Pagini Informaționale</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('header.infoPages')}</DropdownMenuLabel>
                 {additionalPages.map((item) => (
                   <DropdownMenuItem key={item.href} asChild>
                     <Link to={item.href} className="flex items-center gap-3 p-2">
@@ -309,7 +308,7 @@ const Header = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/admin/routes">
                         <Shield className="h-4 w-4 mr-2" />
-                        Admin Panel
+                        {t('admin.title')}
                       </Link>
                     </DropdownMenuItem>
                   )}
@@ -320,12 +319,17 @@ const Header = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button asChild variant="outline" size="sm" className="ml-2">
-                <Link to="/login" className="hidden sm:inline">{t('auth.login.button')}</Link>
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="ml-2 hidden sm:inline-flex items-center justify-center h-9 px-4 min-w-[108px]"
+              >
+                <Link to="/login" className="leading-none">{t('auth.login.button')}</Link>
               </Button>
             )}
             {!user && (
-              <Button asChild variant="outline" size="sm" className="ml-2 sm:hidden">
+              <Button asChild variant="outline" size="sm" className="ml-2 sm:hidden" aria-label={t('a11y.login')}>
                 <Link to="/login">
                   <Users className="h-4 w-4" />
                 </Link>
@@ -335,7 +339,7 @@ const Header = () => {
           {/* Mobile controls now outside desktop nav */}
           <div className="flex items-center gap-2 lg:hidden">
             {!user && (
-              <Button asChild variant="outline" size="sm" aria-label="Login">
+              <Button asChild variant="outline" size="sm" aria-label={t('a11y.login')}>
                 <Link to="/login">
                   <Users className="h-4 w-4" />
                 </Link>
@@ -344,7 +348,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="sm"
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-label={isMobileMenuOpen ? t('a11y.closeMenu') : t('a11y.openMenu')}
               onClick={toggleMobileMenu}
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -382,7 +386,7 @@ const Header = () => {
 
               {/* Additional Pages */}
               <div className="pt-2 border-t border-border space-y-2">
-                <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">Informații</h4>
+                <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">{t('header.info')}</h4>
                 {additionalPages.map((item) => (
                   <Link
                     key={item.href}
@@ -401,7 +405,7 @@ const Header = () => {
 
               {/* Legal Pages */}
               <div className="pt-2 border-t border-border space-y-2">
-                <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">Legal</h4>
+                <h4 className="px-4 py-2 text-sm font-semibold text-foreground/70">{t('header.legal')}</h4>
                 {legalPages.map((item) => (
                   <Link
                     key={item.href}
@@ -433,7 +437,7 @@ const Header = () => {
                         className="flex items-center gap-3 px-4 py-3 rounded-lg text-foreground/70 hover:text-foreground hover:bg-muted"
                       >
                         <Shield className="h-4 w-4" />
-                        <span className="font-medium">Admin Panel</span>
+                        <span className="font-medium">{t('admin.title')}</span>
                       </Link>
                     )}
                     <Button

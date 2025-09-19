@@ -138,11 +138,22 @@ const Footer = () => {
             
             {/* Quick Actions */}
             <div className="flex items-center gap-3">
-              <Link to="/search">
-                <Button size="sm" variant="secondary" className="bg-background text-foreground hover:bg-background/90">
-                  {t('index.readyBookNow')}
-                </Button>
-              </Link>
+              <Button
+                size="sm"
+                variant="secondary"
+                className="bg-background text-foreground hover:bg-background/90"
+                onClick={() => {
+                  const el = document.getElementById('search-form');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  } else {
+                    // fallback navigation if search form not on page
+                    window.location.href = '/search';
+                  }
+                }}
+              >
+                {t('index.readyBookNow')}
+              </Button>
               <Link to="/contacts">
                 <Button size="sm" variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-foreground font-medium">
                   {t('contacts.title')}

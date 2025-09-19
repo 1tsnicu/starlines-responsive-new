@@ -185,6 +185,14 @@ const SearchResults = () => {
     return comfort.split(',').map(item => item.trim());
   };
 
+  // Format time strings (HH:MM:SS -> HH:MM)
+  const formatTimeNoSeconds = (time?: string) => {
+    if (!time) return '';
+    const parts = time.split(':');
+    if (parts.length >= 2) return `${parts[0].padStart(2,'0')}:${parts[1].padStart(2,'0')}`;
+    return time;
+  };
+
   const filteredResults = routes.filter(route => {
     // Skip routes with missing essential data
     if (!route || !route.time_from) {
@@ -531,7 +539,7 @@ const SearchResults = () => {
                         <div className="lg:col-span-4">
                           <div className="flex items-center gap-3 mb-2">
                             <div className="text-2xl font-bold text-primary">
-                              {route.time_from}
+                              {formatTimeNoSeconds(route.time_from)}
                             </div>
                             <div className="flex-1">
                               <div className="w-full h-0.5 bg-muted relative">
@@ -541,7 +549,7 @@ const SearchResults = () => {
                               </div>
                             </div>
                             <div className="text-2xl font-bold text-primary">
-                              {route.time_to}
+                              {formatTimeNoSeconds(route.time_to)}
                             </div>
                           </div>
                           <div className="text-sm text-foreground/70 text-center">
