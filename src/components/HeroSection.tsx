@@ -68,15 +68,6 @@ const HeroSection = () => {
 
         {/* Enhanced USP Bar removed per request */}
 
-        {/* Floating trust badges */}
-        <div className="absolute top-10 right-10 pointer-events-none">
-          <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-white/20">
-            <div className="flex items-center gap-2">
-              <Award className="h-4 w-4 text-yellow-500" />
-              <span className="text-xs font-medium text-foreground">{t('hero.trustedBy2M')}</span>
-            </div>
-          </div>
-        </div>
         
         <div className="absolute bottom-20 left-10 pointer-events-none">
           <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-white/20">

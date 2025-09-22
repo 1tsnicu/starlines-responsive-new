@@ -16,7 +16,7 @@ import { useLocalization } from "@/contexts/LocalizationContext";
 import { BaggageSelection } from "@/components/BaggageSelection";
 
 const SearchResults = () => {
-  const { t, formatPrice } = useLocalization();
+  const { t, formatPrice, currentLanguage, currentCurrency } = useLocalization();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -55,8 +55,8 @@ const SearchResults = () => {
     id_to: toPointId,
     date: date,
     trans: "bus",
-    currency: "EUR",
-    lang: "ru"
+    currency: currentCurrency,
+    lang: currentLanguage
   });
 
   // Nu mai este necesar hook-ul pentru return routes separate
@@ -95,8 +95,8 @@ const SearchResults = () => {
             returnDate,
             fromPointId,
             toPointId,
-            currency: 'EUR',
-            lang: 'ru'
+            currency: currentCurrency,
+            lang: currentLanguage
           }
         }
       });
@@ -117,8 +117,8 @@ const SearchResults = () => {
               date,
               fromPointId,
               toPointId,
-              currency: 'EUR',
-              lang: 'ru'
+              currency: currentCurrency,
+              lang: currentLanguage
             }
           }
         });
@@ -141,8 +141,8 @@ const SearchResults = () => {
           date,
           fromPointId,
           toPointId,
-          currency: 'EUR',
-          lang: 'ru'
+          currency: currentCurrency,
+          lang: currentLanguage
         }
       }
     });
@@ -318,7 +318,7 @@ const SearchResults = () => {
       <div>
         <h3 className="font-semibold text-foreground mb-3">{t('search.amenities')}</h3>
         <div className="space-y-2">
-          {["WiFi", "USB", "WC", "AC", "Entertainment"].map((amenity) => (
+          {[t('amenities.wifi'), t('amenities.usb'), t('amenities.wc'), t('amenities.ac'), t('amenities.entertainment')].map((amenity) => (
             <div key={amenity} className="flex items-center space-x-2">
               <Checkbox
                 id={amenity}
@@ -333,20 +333,6 @@ const SearchResults = () => {
         </div>
       </div>
 
-      {/* Operator */}
-      <div>
-        <h3 className="font-semibold text-foreground mb-3">{t('search.operator')}</h3>
-        <Select value={filters.operator} onValueChange={(value) => handleFilterChange("operator", value)}>
-          <SelectTrigger>
-            <SelectValue placeholder={t('search.allOperators')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('search.allOperators')}</SelectItem>
-            <SelectItem value="Starlines Express">Starlines Express</SelectItem>
-            <SelectItem value="Starlines Premium">Starlines Premium</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
 
       {/* Stops */}
       <div>
@@ -480,20 +466,20 @@ const SearchResults = () => {
                 className="xl:hidden"
               >
                 <Filter className="h-4 w-4 mr-2" />
-                Filters
+                {t('search.filters')}
               </Button>
             </div>
 
             {error ? (
               <div className="text-center py-12">
                 <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Eroare la căutarea rutelor
+                  {t('search.errorSearchingRoutes')}
                 </h3>
                 <p className="text-foreground/70 mb-4">
                   {error}
                 </p>
                 <Button onClick={() => window.location.reload()}>
-                  Încearcă din nou
+                  {t('common.tryAgain')}
                 </Button>
               </div>
             ) : sortedResults.length === 0 ? (
@@ -522,10 +508,10 @@ const SearchResults = () => {
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <h3 className="font-semibold text-blue-900">Călătorie Dus-Întors</h3>
+                      <h3 className="font-semibold text-blue-900">{t('search.roundTripJourneyTitle')}</h3>
                     </div>
                     <p className="text-sm text-blue-700">
-                      Alegeți ruta dus-întors. Locurile pentru dus și întors se vor selecta în pagina următoare.
+                      {t('search.roundTripJourneyDesc')}
                     </p>
                   </div>
                 )}
@@ -574,11 +560,11 @@ const SearchResults = () => {
                           </div>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge variant="outline" className="text-xs">
-                              {route.trans === 'bus' ? 'Autobus' : route.trans}
+                              {route.trans === 'bus' ? t('transport.bus') : route.trans}
                             </Badge>
                             {route.date_from !== route.date_to && (
                               <Badge variant="secondary" className="text-xs">
-                                Peste noapte
+                                {t('search.overnight')}
                               </Badge>
                             )}
                           </div>
@@ -601,7 +587,7 @@ const SearchResults = () => {
                             {route.request_get_baggage === 1 && (
                               <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                                 <Luggage className="h-3 w-3 mr-1" />
-                                Bagaje disponibile
+                                {t('search.baggageAvailable')}
                               </Badge>
                             )}
                           </div>
@@ -610,7 +596,7 @@ const SearchResults = () => {
                         {/* Price & CTA */}
                         <div className="lg:col-span-2 text-right">
                           <div className="mb-2">
-                            <span className="text-xs text-foreground/70">de la</span>
+                            <span className="text-xs text-foreground/70">{t('common.from')}</span>
                             <div className="text-xl lg:text-2xl font-bold text-primary">
                               {formatPrice(parseFloat(route.price_one_way || "0"), undefined, route.currency || 'EUR')}
                             </div>
@@ -621,8 +607,8 @@ const SearchResults = () => {
                             onClick={() => handleSelectRoute(route)}
                           >
                             {isRoundTrip ? 
-                              (route.request_get_baggage === 1 ? 'Selectează Dus-Întors & Bagaje' : 'Selectează Dus-Întors') :
-                              (route.request_get_baggage === 1 ? 'Selectează & Bagaje' : 'Selectează')
+                              (route.request_get_baggage === 1 ? `${t('search.selectRoundTrip')} & ${t('search.baggage')}` : t('search.selectRoundTrip')) :
+                              (route.request_get_baggage === 1 ? `${t('search.select')} & ${t('search.baggage')}` : t('search.select'))
                             }
                           </Button>
                         </div>
@@ -641,7 +627,7 @@ const SearchResults = () => {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Selectează bagajele pentru {selectedRoute?.point_from} → {selectedRoute?.point_to}
+              {t('baggage.selectForRoute')} {selectedRoute?.point_from} → {selectedRoute?.point_to}
             </DialogTitle>
           </DialogHeader>
           
@@ -667,10 +653,10 @@ const SearchResults = () => {
                 setSelectedRoute(null);
               }}
             >
-              Anulează
+              {t('common.cancel')}
             </Button>
             <Button onClick={() => handleContinueWithBaggage()}>
-              Continuă fără bagaje
+              {t('baggage.continueWithout')}
             </Button>
           </div>
         </DialogContent>

@@ -108,10 +108,10 @@ const SearchForm = ({ onSearch, showResults }: SearchFormProps = {}) => {
   };
 
   const quickRoutes = [
-    { from: "Chișinău", to: "București" },
-    { from: "Chișinău", to: "Istanbul" },
-    { from: "Chișinău", to: "Moscow" },
-    { from: "Chișinău", to: "Kiev" },
+    { from: t('cities.chisinau'), to: t('cities.bucharest') },
+    { from: t('cities.chisinau'), to: t('cities.istanbul') },
+    { from: t('cities.chisinau'), to: t('cities.moscow') },
+    { from: t('cities.chisinau'), to: t('cities.kiev') },
   ];
 
   const handleQuickRoute = (route: { from: string; to: string }) => {

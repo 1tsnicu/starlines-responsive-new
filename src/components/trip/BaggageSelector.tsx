@@ -29,6 +29,7 @@ import {
   getBaggageDimensions, 
   getBaggageWeight 
 } from '@/lib/tripDetailApi';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 export interface BaggageSelectorProps {
   baggageItems: BaggageItem[];
@@ -54,6 +55,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
   loading = false
 }) => {
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const { t } = useLocalization();
 
   if (loading) {
     return (
@@ -61,12 +63,12 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Luggage className="h-5 w-5" />
-            Loading Baggage Options...
+            {t('baggage.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4 text-muted-foreground">
-            Loading available baggage options...
+            {t('baggage.loading')}
           </div>
         </CardContent>
       </Card>
@@ -79,12 +81,12 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Luggage className="h-5 w-5" />
-            Baggage - {segmentName}
+            {t('baggage.title')} - {segmentName}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center py-4 text-muted-foreground">
-            No baggage options available for this segment
+            {t('baggage.noneAvailable')}
           </div>
         </CardContent>
       </Card>
@@ -138,17 +140,17 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Luggage className="h-5 w-5" />
-          Baggage - {segmentName}
+          {t('baggage.title')} - {segmentName}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Select baggage for {passengers} passenger{passengers > 1 ? 's' : ''}
+          {t('baggage.selectForPassengers')} {passengers}
         </p>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {/* Available Baggage Options */}
           <div className="space-y-3">
-            <h4 className="font-medium text-sm text-muted-foreground">Available Options</h4>
+            <h4 className="font-medium text-sm text-muted-foreground">{t('baggage.availableOptions')}</h4>
             {baggageItems.map((baggage) => {
               const isSelected = selectedBaggage[baggage.baggage_id];
               const quantity = quantities[baggage.baggage_id] || 0;
@@ -182,25 +184,25 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
                       <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                         <div className="flex items-center gap-1">
                           <Ruler className="h-3 w-3" />
-                          <span className="text-muted-foreground">Size:</span>
+                          <span className="text-muted-foreground">{t('baggage.size')}:</span>
                           <span className="font-medium">{getBaggageDimensions(baggage)}</span>
                         </div>
                         
                         <div className="flex items-center gap-1">
                           <Weight className="h-3 w-3" />
-                          <span className="text-muted-foreground">Weight:</span>
+                          <span className="text-muted-foreground">{t('baggage.weight')}:</span>
                           <span className="font-medium">{getBaggageWeight(baggage)}</span>
                         </div>
                         
                         <div>
-                          <span className="text-muted-foreground">Price per item:</span>
+                          <span className="text-muted-foreground">{t('baggage.pricePerItem')}:</span>
                           <div className="font-medium">
-                            {baggage.price === 0 ? 'Free' : formatBaggagePrice(baggage.price, baggage.currency)}
+                            {baggage.price === 0 ? t('common.free') : formatBaggagePrice(baggage.price, baggage.currency)}
                           </div>
                         </div>
                         
                         <div>
-                          <span className="text-muted-foreground">Max per person:</span>
+                          <span className="text-muted-foreground">{t('baggage.maxPerPerson')}:</span>
                           <div className="font-medium">{maxPerPerson}</div>
                         </div>
                       </div>
@@ -208,7 +210,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
                       {/* Quantity Selection */}
                       <div className="flex items-center gap-2">
                         <Label htmlFor={`quantity-${baggage.baggage_id}`} className="text-sm">
-                          Quantity:
+                          {t('baggage.quantity')}:
                         </Label>
                         <div className="flex items-center gap-1">
                           <Button
@@ -244,7 +246,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
                           disabled={quantity <= 0}
                         >
                           <Package className="h-3 w-3 mr-1" />
-                          Add
+                          {t('baggage.add')}
                         </Button>
                       </div>
                     </div>
@@ -261,7 +263,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
               <div className="space-y-3">
                 <h4 className="font-medium text-sm text-muted-foreground flex items-center gap-2">
                   <ShoppingCart className="h-4 w-4" />
-                  Selected Baggage
+                  {t('baggage.selected')}
                 </h4>
                 {Object.values(selectedBaggage).map((baggage) => (
                   <div key={baggage.baggage_id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
@@ -280,7 +282,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
                           {formatBaggagePrice(baggage.price * baggage.quantity, baggage.currency)}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          {baggage.quantity} item{baggage.quantity > 1 ? 's' : ''}
+                          {baggage.quantity} {t('baggage.items')}
                         </div>
                       </div>
                       <Button
@@ -295,7 +297,7 @@ export const BaggageSelector: React.FC<BaggageSelectorProps> = ({
                 ))}
                 
                 <div className="flex justify-between items-center pt-2 border-t">
-                  <span className="font-medium">Total Baggage:</span>
+                  <span className="font-medium">{t('baggage.total')}:</span>
                   <span className="font-bold text-lg">
                     {formatBaggagePrice(totalSelectedPrice, currency)}
                   </span>

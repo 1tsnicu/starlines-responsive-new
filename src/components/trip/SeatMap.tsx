@@ -9,6 +9,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import { SeatMapProps, SeatInfo, SeatStatus, SeatStyle } from '@/types/tripDetail';
 import { normalizeSeatNumber, isSeatAvailable, getSeatPrice } from '@/lib/tripDetailApi';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 // ===============================
 // Seat Status Styles
@@ -189,10 +190,11 @@ const SeatMap: React.FC<SeatMapProps> = ({
   onSeatDeselect,
   loading = false,
 }) => {
+  const { t } = useLocalization();
   if (!seatMapData) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No seat map data available
+        {t('seatMap.noData')}
       </div>
     );
   }
@@ -228,12 +230,8 @@ const SeatMap: React.FC<SeatMapProps> = ({
     if (plan && hasPlan === 1) {
       // Use plan data
       const floor = plan.floors[0]; // Use first floor
-      if (floor && floor.rows && floor.rows.row) {
-        return floor.rows.row.map((row, rowIndex) =>
-          row.seat.map((seatNumber, seatIndex) =>
-            getSeatInfo(seatNumber, rowIndex, seatIndex)
-          )
-        );
+      if (floor && floor.rows) {
+        return floor.rows.map((row, rowIndex) => row.seats);
       }
     }
 
@@ -320,7 +318,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-2 text-gray-600">Loading seat map...</span>
+        <span className="ml-2 text-gray-600">{t('seatMap.loading')}</span>
       </div>
     );
   }
@@ -328,8 +326,8 @@ const SeatMap: React.FC<SeatMapProps> = ({
   if (seatRows.length === 0) {
     return (
       <div className="text-center p-8 text-gray-500">
-        <p>No seats available</p>
-        <p className="text-sm mt-2">All seats are currently occupied</p>
+        <p>{t('seatMap.noSeatsAvailable')}</p>
+        <p className="text-sm mt-2">{t('seatMap.allSeatsOccupied')}</p>
       </div>
     );
   }
@@ -339,13 +337,13 @@ const SeatMap: React.FC<SeatMapProps> = ({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold">Select Seats</h3>
+          <h3 className="text-lg font-semibold">{t('seatMap.selectSeats')}</h3>
           <p className="text-sm text-gray-600">
-            {freeSeats.filter(seat => seat.seat_free === 1).length} seats available
+            {freeSeats.filter(seat => seat.seat_free === 1).length} {t('seatMap.seatsAvailable')}
           </p>
         </div>
         <div className="text-sm text-gray-600">
-          {selectedSeats.length} / {maxSeats} selected
+          {selectedSeats.length} / {maxSeats} {t('seatMap.selectedCount')}
         </div>
       </div>
 
@@ -353,7 +351,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
       <div className="bg-gray-50 p-4 rounded-lg">
         {/* Driver area indicator */}
         <div className="text-center mb-4">
-          <div className="text-xs text-gray-500 mb-2">Driver</div>
+          <div className="text-xs text-gray-500 mb-2">{t('seatMap.driver')}</div>
           <div className="w-16 h-2 bg-gray-300 mx-auto rounded"></div>
         </div>
 
@@ -407,7 +405,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
         {/* Aisle indicator */}
         <div className="text-center mt-4">
           <div className="w-16 h-2 bg-gray-300 mx-auto rounded"></div>
-          <div className="text-xs text-gray-500 mt-2">Aisle</div>
+          <div className="text-xs text-gray-500 mt-2">{t('seatMap.aisle')}</div>
         </div>
       </div>
 
@@ -415,7 +413,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
       {selectedSeats.length > 0 && (
         <div className="mt-4 p-3 bg-blue-50 rounded-lg">
           <p className="text-sm font-medium text-blue-900">
-            Selected seats: {selectedSeats.join(', ')}
+            {t('seatMap.selectedSeatsLabel')}: {selectedSeats.join(', ')}
           </p>
         </div>
       )}

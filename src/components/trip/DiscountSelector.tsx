@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Percent, Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { Discount, DiscountSelection } from '@/types/tripDetail';
 import { calculateDiscountPrice, formatDiscountPrice } from '@/lib/tripDetailApi';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 export interface DiscountSelectorProps {
   discounts: Discount[];
@@ -37,6 +38,7 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
   loading = false
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const { t } = useLocalization();
 
   if (loading) {
     return (
@@ -44,12 +46,12 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Percent className="h-4 w-4" />
-            Loading Discounts...
+            {t('discounts.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-center py-2 text-muted-foreground text-sm">
-            Loading available discounts...
+            {t('discounts.loading')}
           </div>
         </CardContent>
       </Card>
@@ -62,12 +64,12 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-base">
             <Percent className="h-4 w-4" />
-            Discounts - {segmentName}
+            {t('discounts.title')} - {segmentName}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-center py-2 text-muted-foreground text-sm">
-            No discounts available for this segment
+            {t('discounts.noneAvailable')}
           </div>
         </CardContent>
       </Card>
@@ -94,11 +96,11 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Percent className="h-4 w-4" />
-            Discounts - {segmentName}
+            {t('discounts.title')} - {segmentName}
             {selectedDiscount && (
               <Badge variant="default" className="bg-primary text-xs">
                 <Check className="h-3 w-3 mr-1" />
-                Selected
+                {t('discounts.selected')}
               </Badge>
             )}
           </CardTitle>
@@ -110,9 +112,9 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
         {selectedDiscount && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Users className="h-3 w-3" />
-            <span>Selected: {selectedDiscount.discount_name}</span>
+            <span>{t('discounts.selected')}: {selectedDiscount.discount_name}</span>
             <span className="text-green-600 font-medium">
-              Save {formatDiscountPrice(totalSavings, currency)}
+              {t('discounts.youSave')} {formatDiscountPrice(totalSavings, currency)}
             </span>
           </div>
         )}
@@ -144,21 +146,21 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
                         {isSelected && (
                           <Badge variant="default" className="bg-primary text-xs">
                             <Check className="h-2 w-2 mr-1" />
-                            Selected
+                            {t('discounts.selected')}
                           </Badge>
                         )}
                       </div>
                       
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
-                          <span className="text-muted-foreground">Per passenger:</span>
+                          <span className="text-muted-foreground">{t('discounts.perPassenger')}</span>
                           <div className="font-medium">
                             {formatDiscountPrice(discount.discount_price, discount.discount_currency || currency)}
                           </div>
                         </div>
                         
                         <div>
-                          <span className="text-muted-foreground">You save:</span>
+                          <span className="text-muted-foreground">{t('discounts.youSave')}</span>
                           <div className="font-medium text-green-600">
                             {formatDiscountPrice(savings, currency)}
                           </div>
@@ -176,7 +178,7 @@ export const DiscountSelector: React.FC<DiscountSelectorProps> = ({
                           handleDiscountSelect(discount);
                         }}
                       >
-                        {isSelected ? 'Deselect' : 'Select'}
+                        {isSelected ? t('discounts.deselect') : t('discounts.select')}
                       </Button>
                     </div>
                   </div>

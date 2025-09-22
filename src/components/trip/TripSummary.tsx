@@ -32,6 +32,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { TripSummaryProps } from '@/types/tripDetail';
 import { cn } from '@/lib/utils';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 // ===============================
 // Amenity Icons
@@ -51,15 +52,15 @@ const getAmenityIcon = (amenity: string) => {
   return iconMap[amenity.toLowerCase()] || <div className="w-4 h-4 text-center">✨</div>;
 };
 
-const getAmenityLabel = (amenity: string) => {
+const getAmenityLabel = (amenity: string, t: any) => {
   const labelMap: Record<string, string> = {
-    wifi: 'WiFi',
-    '220v': 'Power Outlets',
-    conditioner: 'Air Conditioning',
-    wc: 'Toilet',
-    music: 'Music',
-    tv: 'TV',
-    luggage: 'Luggage Storage',
+    wifi: t('amenities.wifi'),
+    '220v': t('amenities.powerOutlets'),
+    conditioner: t('amenities.airConditioning'),
+    wc: t('amenities.toilet'),
+    music: t('amenities.music'),
+    tv: t('amenities.tv'),
+    luggage: t('amenities.luggage'),
   };
   
   return labelMap[amenity.toLowerCase()] || amenity;
@@ -76,6 +77,7 @@ const TripCard: React.FC<{
   passengers: number;
   onPassengersChange: (count: number) => void;
 }> = ({ trip, title, isReturn = false, passengers, onPassengersChange }) => {
+  const { t, currentLanguage } = useLocalization();
   const {
     route_name,
     carrier,
@@ -101,16 +103,26 @@ const TripCard: React.FC<{
   } = trip;
 
   const formatPrice = (price?: number) => {
-    if (!price) return 'N/A';
-    return `${price.toFixed(2)} ${currency}`;
+    if (!price && price !== 0) return 'N/A';
+    return `${Number(price).toFixed(2)} ${currency}`;
   };
 
   const formatTime = (time: string) => {
     return time.slice(0, 5); // Remove seconds if present
   };
 
+  const getLocale = (lang: string) => {
+    switch (lang) {
+      case 'ro': return 'ro-RO';
+      case 'ru': return 'ru-RU';
+      case 'uk': return 'uk-UA';
+      case 'en':
+      default: return 'en-GB';
+    }
+  };
+
   const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString(getLocale(currentLanguage), {
       weekday: 'short',
       month: 'short',
       day: 'numeric',
@@ -124,7 +136,7 @@ const TripCard: React.FC<{
       : [];
 
   return (
-    <Card className={cn("w-full", isReturn ? "border-blue-200 bg-blue-50/30" : "border-gray-200")}>
+    <Card className={cn("w-full", isReturn ? "border-blue-200 bg-blue-50/30" : "border-gray-200")}> 
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-2">
@@ -161,7 +173,7 @@ const TripCard: React.FC<{
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-blue-500" />
-              <span className="font-medium">Departure</span>
+              <span className="font-medium">{t('tripDetails.departure')}</span>
             </div>
             <div className="pl-6 space-y-1">
               <div className="flex items-center gap-2">
@@ -184,7 +196,7 @@ const TripCard: React.FC<{
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-green-500" />
-              <span className="font-medium">Arrival</span>
+              <span className="font-medium">{t('tripDetails.arrival')}</span>
             </div>
             <div className="pl-6 space-y-1">
               <div className="flex items-center gap-2">
@@ -209,21 +221,21 @@ const TripCard: React.FC<{
         {time_in_way && (
           <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
             <Timer className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium">Duration: {time_in_way}</span>
+            <span className="text-sm font-medium">{t('tripDetails.duration')}: {time_in_way}</span>
           </div>
         )}
 
         {/* Pricing */}
         <div className="p-3 bg-green-50 rounded-lg">
           <div className="flex items-center justify-between">
-            <span className="font-medium text-green-800">Price</span>
+            <span className="font-medium text-green-800">{t('tripDetails.price') || 'Preț'}</span>
             <div className="text-right">
               <div className="text-lg font-bold text-green-900">
                 {formatPrice(price_one_way)}
               </div>
               {price_one_way_max && price_one_way_max !== price_one_way && (
                 <div className="text-xs text-green-700">
-                  Up to {formatPrice(price_one_way_max)}
+                  {t('tripDetails.upTo') || 'Până la'} {formatPrice(price_one_way_max)}
                 </div>
               )}
             </div>
@@ -235,7 +247,7 @@ const TripCard: React.FC<{
           <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-blue-500" />
-              <span className="font-medium">Passengers</span>
+              <span className="font-medium">{t('booking.passengers')}</span>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -274,6 +286,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
   onPassengersChange,
   isRoundTrip = false,
 }) => {
+  const { t } = useLocalization();
   const {
     comfort: comfortRaw = [],
     luggage,
@@ -295,7 +308,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
       {/* Outbound Trip */}
       <TripCard
         trip={route}
-        title="Outbound Journey"
+        title={t('tripDetails.outboundJourney') || 'Călătorie Dus'}
         passengers={passengers}
         onPassengersChange={onPassengersChange}
       />
@@ -306,13 +319,13 @@ const TripSummary: React.FC<TripSummaryProps> = ({
           <div className="flex items-center justify-center py-2">
             <div className="flex items-center gap-2 text-blue-600">
               <ArrowRight className="w-4 h-4" />
-              <span className="text-sm font-medium">Return Journey</span>
+              <span className="text-sm font-medium">{t('tripDetails.returnJourney') || 'Călătorie Întors'}</span>
               <ArrowLeft className="w-4 h-4" />
             </div>
           </div>
           <TripCard
             trip={returnRoute}
-            title="Return Journey"
+            title={t('tripDetails.returnJourney') || 'Călătorie Întors'}
             isReturn={true}
             passengers={passengers}
             onPassengersChange={onPassengersChange}
@@ -327,18 +340,18 @@ const TripSummary: React.FC<TripSummaryProps> = ({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Euro className="w-5 h-5 text-green-600" />
-                <span className="text-lg font-semibold text-green-800">Base Price</span>
+                <span className="text-lg font-semibold text-green-800">{t('tripDetails.basePrice') || 'Preț de bază'}</span>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-green-900">
                   {((route.price_one_way || 0) + (returnRoute.price_one_way || 0)).toFixed(2)} {route.currency}
                 </div>
                 <div className="text-sm text-green-700">
-                  Outbound: {route.price_one_way?.toFixed(2)} {route.currency} + 
-                  Return: {returnRoute.price_one_way?.toFixed(2)} {route.currency}
+                  {t('tripDetails.outboundJourney') || 'Dus'}: {route.price_one_way?.toFixed(2)} {route.currency} + 
+                  {t('tripDetails.returnJourney') || 'Întors'}: {returnRoute.price_one_way?.toFixed(2)} {route.currency}
                 </div>
                 <div className="text-xs text-green-600 mt-1">
-                  * Final price includes baggage and discounts
+                  * {t('tripDetails.baggageAllowance') || 'Bagaje Permise'} & {t('checkout.review.priceBreakdown.discount') || 'Reduceri'}
                 </div>
               </div>
             </div>
@@ -350,14 +363,14 @@ const TripSummary: React.FC<TripSummaryProps> = ({
       {comfortAmenities.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Amenities</CardTitle>
+            <CardTitle className="text-lg">{t('tripDetails.amenities') || 'Facilități'}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {comfortAmenities.map((amenity) => (
                 <Badge key={amenity} variant="secondary" className="flex items-center gap-1">
                   {getAmenityIcon(amenity)}
-                  {getAmenityLabel(amenity)}
+                  {getAmenityLabel(amenity, t)}
                 </Badge>
               ))}
             </div>
@@ -371,7 +384,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Luggage className="w-5 h-5" />
-              Luggage Policy
+              {t('tripDetails.luggagePolicy') || t('tripDetails.baggageAllowance') || 'Politica bagajelor'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -384,7 +397,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
       {route_info && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Additional Information</CardTitle>
+            <CardTitle className="text-lg">{t('tripDetails.additionalInformation') || 'Informații suplimentare'}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-gray-600">{route_info}</p>
@@ -398,7 +411,7 @@ const TripSummary: React.FC<TripSummaryProps> = ({
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              Cancellation Policy
+              {t('tripDetails.cancellationPolicy') || 'Politica de anulare'}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -408,17 +421,17 @@ const TripSummary: React.FC<TripSummaryProps> = ({
                   <div className="text-sm">
                     <span className="font-medium">
                       {policy.hours_before_depar === "0" 
-                        ? "Less than 24 hours" 
-                        : `${policy.hours_before_depar} hours before departure`
+                        ? (t('tripDetails.lessThan24h') || 'Mai puțin de 24 de ore') 
+                        : `${policy.hours_before_depar} ${t('tripDetails.hoursBeforeDeparture') || 'ore înainte de plecare'}`
                       }
                     </span>
                   </div>
                   <div className="text-right">
                     <div className="font-medium text-red-600">
-                      {policy.cancel_rate}% cancellation fee
+                      {policy.cancel_rate}% {t('tripDetails.cancellationFee')}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {policy.money_back}% refund
+                      {policy.money_back}% {t('refunds.refund')}
                     </div>
                   </div>
                 </div>

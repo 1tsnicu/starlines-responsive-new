@@ -5,28 +5,31 @@
  */
 
 import React from 'react';
+
 import { cn } from '@/lib/utils';
 import { LegendProps } from '@/types/tripDetail';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 const Legend: React.FC<LegendProps> = ({ className }) => {
+  const { t } = useLocalization();
   const legendItems = [
     {
-      label: 'Available',
+      label: t('legend.available'),
       color: 'bg-green-100 border-green-300 text-green-800',
       icon: '◻️',
     },
     {
-      label: 'Selected',
+      label: t('legend.selected'),
       color: 'bg-blue-100 border-blue-300 text-blue-800',
       icon: '✅',
     },
     {
-      label: 'Occupied',
+      label: t('legend.occupied'),
       color: 'bg-red-100 border-red-300 text-red-800',
       icon: '⬛',
     },
     {
-      label: 'Not Available',
+      label: t('legend.notAvailable'),
       color: 'bg-gray-100 border-gray-300 text-gray-500',
       icon: '⬜',
     },

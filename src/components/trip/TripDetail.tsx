@@ -79,12 +79,18 @@ const convertPlanResponseToBusPlan = (planResponse: PlanResponse, bustypeId: str
   };
 };
 
+// Map UI language to API-supported language codes (fallback to 'ru')
+const apiLangOptions = ['ru','en','ua','de','pl','cz'] as const;
+type ApiLang = typeof apiLangOptions[number];
+const mapLanguageForApi = (lang?: string): ApiLang =>
+  apiLangOptions.includes((lang as any)) ? (lang as ApiLang) : 'ru';
+
 // ===============================
 // Main Component
 // ===============================
 
 const TripDetailContent: React.FC<TripDetailProps> = (props) => {
-  const { t } = useLocalization();
+  const { t, currentLanguage, currentCurrency } = useLocalization();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -144,7 +150,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       }
     } catch (error) {
       console.error('Error loading route from API:', error);
-      throw new Error('Eroare la încărcarea datelor rutei din API');
+      throw new Error(t('tripDetails.errors.routeLoadFailed'));
     }
   };
 
@@ -161,7 +167,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         login: 'your_login', // Va fi injectat de server
         password: 'your_password', // Va fi injectat de server
         timetable_id: tripData.timetableId,
-        lang: tripData.searchContext?.lang || 'ru',
+        lang: mapLanguageForApi(tripData.searchContext?.lang || currentLanguage || 'ru'),
       };
 
       const detailedInfo = await apiGetAllRoutes(request);
@@ -253,7 +259,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         } else {
           // Pentru rute simple
           const seatMapData: SeatMapData = {
-            bustype_id: routeData.bustype_id || 'default',
+            bustype_id: 'default',
             hasPlan: routeData.has_plan || 0,
             freeSeats: routeData.free_seats?.map(seatNumber => {
               const price = routeData.price_one_way ? parseFloat(routeData.price_one_way) : undefined;
@@ -262,7 +268,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 seat_number: seatNumber,
                 seat_free: 1,
                 seat_price: price,
-                seat_curency: routeData.currency || 'EUR',
+                seat_curency: (routeData.currency || 'EUR') as Currency,
               };
             }) || [],
           };
@@ -271,11 +277,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           if (routeData.has_plan === 1) {
             try {
               const planResponse = await apiPlan({
-                bustype_id: routeData.bustype_id || 'default',
+                bustype_id: 'default',
                 position: 'h',
                 v: '2.0',
               });
-              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, routeData.bustype_id || 'default');
+              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, 'default');
             } catch (planError) {
               console.warn('Failed to load plan for default bustype_id:', planError);
             }
@@ -325,7 +331,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         } else {
           // Pentru rute simple
           const seatMapData: SeatMapData = {
-            bustype_id: routeData.bustype_id || 'default',
+            bustype_id: 'default',
             hasPlan: routeData.has_plan || 0,
             freeSeats: routeData.free_seats?.map(seatNumber => {
               const price = routeData.price_one_way ? parseFloat(routeData.price_one_way) : undefined;
@@ -334,7 +340,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 seat_number: seatNumber,
                 seat_free: 1,
                 seat_price: price,
-                seat_curency: routeData.currency || 'EUR',
+                seat_curency: (routeData.currency || 'EUR') as Currency,
               };
             }) || [],
           };
@@ -343,11 +349,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           if (routeData.has_plan === 1) {
             try {
               const planResponse = await apiPlan({
-                bustype_id: routeData.bustype_id || 'default',
+                bustype_id: 'default',
                 position: 'h',
                 v: '2.0',
               });
-              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, routeData.bustype_id || 'default');
+              seatMapData.plan = convertPlanResponseToBusPlan(planResponse, 'default');
             } catch (planError) {
               console.warn('Failed to load plan for default bustype_id:', planError);
             }
@@ -392,8 +398,8 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         interval_id: [tripData.intervalIdMain], // Interval ID din ruta dus
         trans: "bus",
         change: "auto",
-        currency: "EUR",
-        lang: "ru",
+        currency: currentCurrency || 'EUR',
+        lang: currentLanguage || 'ru',
         v: "1.1"
       };
 
@@ -458,13 +464,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       }
 
       // If request_get_discount is true or 1, fetch discounts via API
-      if (routeData.request_get_discount === 1 || routeData.request_get_discount === true) {
+      if (routeData.request_get_discount === 1) {
         console.log('Fetching discounts via API for interval:', tripData.intervalIdMain);
         
         const discountResponse = await apiGetDiscounts({
           interval_id: tripData.intervalIdMain || '',
-          currency: routeData.currency || 'EUR',
-          lang: 'ru'
+          currency: routeData.currency || currentCurrency || 'EUR',
+          lang: currentLanguage || 'ru'
         });
 
         console.log('Discounts response:', discountResponse);
@@ -493,13 +499,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       }
 
       // If request_get_discount is true or 1, fetch discounts via API
-      if (returnRouteData.request_get_discount === 1 || returnRouteData.request_get_discount === true) {
+      if (returnRouteData.request_get_discount === 1) {
         console.log('Fetching return discounts via API for interval:', returnRouteData.interval_id);
         
         const discountResponse = await apiGetDiscounts({
           interval_id: returnRouteData.interval_id,
-          currency: returnRouteData.currency || 'EUR',
-          lang: 'ru'
+          currency: returnRouteData.currency || currentCurrency || 'EUR',
+          lang: currentLanguage || 'ru'
         });
 
         console.log('Return discounts response:', discountResponse);
@@ -527,15 +533,15 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       }
 
       // If request_get_baggage is true or 1, fetch baggage via API
-      if (routeData.request_get_baggage === 1 || routeData.request_get_baggage === true) {
+      if (routeData.request_get_baggage === 1) {
         console.log('Fetching baggage via API for interval:', tripData.intervalIdMain);
         
         const baggageResponse = await apiGetBaggage({
           interval_id: tripData.intervalIdMain || '',
           station_from_id: routeData.station_from || '',
           station_to_id: routeData.station_to || '',
-          currency: routeData.currency || 'EUR',
-          lang: 'ru'
+          currency: routeData.currency || currentCurrency || 'EUR',
+          lang: currentLanguage || 'ru'
         });
 
         console.log('Baggage response:', baggageResponse);
@@ -563,15 +569,15 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       }
 
       // If request_get_baggage is true or 1, fetch baggage via API
-      if (returnRouteData.request_get_baggage === 1 || returnRouteData.request_get_baggage === true) {
+      if (returnRouteData.request_get_baggage === 1) {
         console.log('Fetching return baggage via API for interval:', returnRouteData.interval_id);
         
         const baggageResponse = await apiGetBaggage({
           interval_id: returnRouteData.interval_id,
           station_from_id: returnRouteData.station_from || '',
           station_to_id: returnRouteData.station_to || '',
-          currency: returnRouteData.currency || 'EUR',
-          lang: 'ru'
+          currency: returnRouteData.currency || currentCurrency || 'EUR',
+          lang: currentLanguage || 'ru'
         });
 
         console.log('Return baggage response:', baggageResponse);
@@ -765,7 +771,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         const tripData = getRouteData();
         if (!tripData) {
           console.error('Failed to get trip data. URL params:', Object.fromEntries(searchParams));
-          throw new Error('Parametrii rutei lipsesc din URL. Asigură-te că incluzi intervalIdMain sau interval_id în URL.');
+          throw new Error(t('tripDetails.errors.missingRouteParams'));
         }
 
         // Set passengers from navigation state or URL
@@ -1016,7 +1022,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-            <p className="text-gray-600">Loading trip details...</p>
+            <p className="text-gray-600">{t('tripDetails.loading') || t('common.loading')}</p>
           </div>
         </div>
       </div>
@@ -1035,7 +1041,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 {error.retryable && (
                   <Button onClick={handleRetry} variant="outline" size="sm">
                     <RefreshCw className="w-4 h-4 mr-2" />
-                    Try Again
+                    {t('common.tryAgain')}
                   </Button>
                 )}
               </div>
@@ -1044,7 +1050,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           <div className="mt-4">
             <Button onClick={() => navigate('/')} variant="outline">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Search
+              {t('tripDetails.backToSearch')}
             </Button>
           </div>
         </div>
@@ -1056,11 +1062,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Route Not Found</h2>
-          <p className="text-gray-600 mb-4">The requested route could not be found.</p>
-          <Button onClick={() => navigate('/')}>
+          <h2 className="text-2xl font-bold">{t('tripDetails.error.routeNotFound')}</h2>
+          <p className="text-gray-600 mb-4">{t('tripDetails.error.failedToLoad')}</p>
+          <Button onClick={() => navigate('/')}> 
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Search
+            {t('tripDetails.backToSearch')}
           </Button>
         </div>
       </div>
@@ -1075,15 +1081,14 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       <div className="flex items-center gap-4 mb-6">
         <Button onClick={() => navigate(-1)} variant="outline" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back
+          {t('common.back')}
         </Button>
         <div>
           <h1 className="text-2xl font-bold">
-            {isRoundTrip ? 'Dus-Întors' : 
+            {isRoundTrip ? t('search.roundTrip') : 
              route.point_from && route.point_to ? 
               `${route.point_from} - ${route.point_to}` : 
-              route.route_name || 'Route Details'
-            }
+              t('tripDetails.selectYourSeats')}
           </h1>
           <p className="text-gray-600">
             {isRoundTrip ? 
@@ -1161,11 +1166,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         <div className="xl:col-span-2">
           <Card>
             <CardHeader>
-              <CardTitle>Select Your Seats</CardTitle>
+              <CardTitle>{t('tripDetails.selectYourSeats')}</CardTitle>
               <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span>Passengers: {passengers}</span>
+                <span>{t('booking.passengers')}: {passengers}</span>
                 <Separator orientation="vertical" className="h-4" />
-                <span>Select {passengers} seat{passengers > 1 ? 's' : ''} for each journey</span>
+                <span>
+                  {t('seatMap.selectSeats')} {passengers} {t('checkout.passengers')}
+                </span>
               </div>
             </CardHeader>
             <CardContent>
@@ -1175,9 +1182,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   {/* Călătoria Dus */}
                   <div>
                     <div className="mb-4 p-3 bg-blue-50 rounded-lg">
-                      <h3 className="font-semibold text-blue-900">Călătorie Dus</h3>
+                      <h3 className="font-semibold text-blue-900">{t('tripDetails.outboundJourney')}</h3>
                       <p className="text-sm text-blue-700">
-                        Selectați {passengers} loc{passengers > 1 ? 'uri' : ''} pentru călătoria dus
+                        {t('seatMap.selectSeats')} {passengers} {t('bookingForm.passengers').toLowerCase()} {t('tripDetails.outboundJourney').toLowerCase()}
                       </p>
                     </div>
                     {/* Pentru dus, afișează doar o singură secțiune */}
@@ -1191,12 +1198,12 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                       />
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
-                        No seat map data available
+                        {t('seatMap.noData')}
                       </div>
                     )}
                     
                     {/* Discount Selector pentru călătoria dus */}
-                    {(route?.request_get_discount === 1 || route?.request_get_discount === true) && outboundDiscounts['default'] && outboundDiscounts['default'].length > 0 && (
+                    {(route?.request_get_discount === 1) && outboundDiscounts['default'] && outboundDiscounts['default'].length > 0 && (
                       <div className="mt-6">
                         <DiscountSelector
                           discounts={outboundDiscounts['default']}
@@ -1204,7 +1211,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                           basePrice={outboundBasePrice}
                           passengers={passengers}
                           currency={currency}
-                          segmentName="Outbound Journey"
+                          segmentName={t('tripDetails.outboundJourney')}
                           onSelectDiscount={(discount) => outboundDiscountSelection.selectDiscount(discount, 'default')}
                           onDeselectDiscount={() => outboundDiscountSelection.deselectDiscount('default')}
                           loading={loadingDiscounts}
@@ -1219,9 +1226,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   {/* Călătoria Întors */}
                   <div>
                     <div className="mb-4 p-3 bg-green-50 rounded-lg">
-                      <h3 className="font-semibold text-green-900">Călătorie Întors</h3>
+                      <h3 className="font-semibold text-green-900">{t('tripDetails.returnJourney')}</h3>
                       <p className="text-sm text-green-700">
-                        Selectați {passengers} loc{passengers > 1 ? 'uri' : ''} pentru călătoria întors
+                        {t('seatMap.selectSeats')} {passengers} {t('bookingForm.passengers').toLowerCase()} {t('tripDetails.returnJourney').toLowerCase()}
                       </p>
                     </div>
                     {/* Pentru întors, afișează segmentele conform documentației API-ului */}
@@ -1235,16 +1242,16 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                           <TabsList className="grid w-full grid-cols-2">
                               {Object.entries(returnSeatMaps).map(([bustype_id, seatMapData], index) => (
                                 <TabsTrigger key={bustype_id} value={bustype_id}>
-                                  Întors {index + 1}
+                                  {t('tripDetails.returnJourney')} {index + 1}
                                 </TabsTrigger>
                               ))}
                           </TabsList>
                           {Object.entries(returnSeatMaps).map(([bustype_id, seatMapData], index) => (
                             <TabsContent key={bustype_id} value={bustype_id}>
                               <div className="mb-4 p-3 bg-green-50 rounded-lg">
-                                <h4 className="font-medium text-green-900">Întors {index + 1} - Seat Selection</h4>
+                                <h4 className="font-medium text-green-900">{t('tripDetails.returnJourney')} {index + 1} - {t('seatMap.selectSeats')}</h4>
                                 <p className="text-sm text-green-700">
-                                  Select {passengers} seat{passengers > 1 ? 's' : ''} for this part of the return journey
+                                  {t('seatMap.selectSeats')} {passengers} {t('bookingForm.passengers').toLowerCase()} {t('tripDetails.returnJourney').toLowerCase()}
                                 </p>
                               </div>
                               <SeatMap
@@ -1268,7 +1275,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                       )
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
-                        No return seat map data available
+                        {t('seatMap.noData')}
                       </div>
                     )}
                     
@@ -1281,7 +1288,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                           basePrice={returnBasePrice}
                           passengers={passengers}
                           currency={currency}
-                          segmentName="Return Journey"
+                          segmentName={t('tripDetails.returnJourney')}
                           onSelectDiscount={(discount) => returnDiscountSelection.selectDiscount(discount, 'default')}
                           onDeselectDiscount={() => returnDiscountSelection.deselectDiscount('default')}
                           loading={loadingDiscounts}
@@ -1297,7 +1304,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                           selectedBaggage={returnBaggageSelection.selectedBaggage}
                           passengers={passengers}
                           currency={currency}
-                          segmentName="Return Journey"
+                          segmentName={t('tripDetails.returnJourney')}
                           onAddBaggage={returnBaggageSelection.addBaggage}
                           onRemoveBaggage={returnBaggageSelection.removeBaggage}
                           onUpdateQuantity={returnBaggageSelection.updateBaggageQuantity}
@@ -1319,7 +1326,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   />
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    No seat map data available
+                    {t('seatMap.noData')}
                   </div>
                 )
               )}
@@ -1338,13 +1345,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                     <div className="flex items-center gap-2">
                       <CheckCircle className={`w-5 h-5 ${isOutboundSelectionValid ? 'text-green-600' : 'text-yellow-600'}`} />
                       <span className={`font-medium ${isOutboundSelectionValid ? 'text-green-800' : 'text-yellow-800'}`}>
-                        Dus: {isOutboundSelectionValid ? 'Complete' : 'Incomplete'}
+                        {t('tripDetails.outboundJourney')}: {isOutboundSelectionValid ? t('tripDetails.selectionComplete') : t('tripDetails.selectionIncomplete')}
                       </span>
                     </div>
                     <p className={`text-sm mt-1 ${isOutboundSelectionValid ? 'text-green-700' : 'text-yellow-700'}`}>
                       {Object.keys(seatMaps).reduce((total, bustype_id) => 
                         total + outboundSelectedSeats(bustype_id).length, 0
-                      )} of {passengers} seat{passengers > 1 ? 's' : ''} selected
+                      )} {t('seatMap.selectedCount')} / {passengers}
                     </p>
                   </div>
 
@@ -1353,20 +1360,20 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                     <div className="flex items-center gap-2">
                       <CheckCircle className={`w-5 h-5 ${isReturnSelectionValid ? 'text-green-600' : 'text-yellow-600'}`} />
                       <span className={`font-medium ${isReturnSelectionValid ? 'text-green-800' : 'text-yellow-800'}`}>
-                        Întors: {isReturnSelectionValid ? 'Complete' : 'Incomplete'}
+                        {t('tripDetails.returnJourney')}: {isReturnSelectionValid ? t('tripDetails.selectionComplete') : t('tripDetails.selectionIncomplete')}
                       </span>
                     </div>
                     <p className={`text-sm mt-1 ${isReturnSelectionValid ? 'text-green-700' : 'text-yellow-700'}`}>
                       {Object.keys(returnSeatMaps).reduce((total, bustype_id) => 
                         total + returnSelectedSeats(bustype_id).length, 0
-                      )} of {passengers} seat{passengers > 1 ? 's' : ''} selected
+                      )} {t('seatMap.selectedCount')} / {passengers}
                     </p>
                   </div>
 
                   {/* Total Price */}
                   <div className="p-4 bg-blue-50 rounded-lg">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-blue-800">Total Price:</span>
+                      <span className="font-medium text-blue-800">{t('booking.total')}:</span>
                       <span className="text-lg font-bold text-blue-900">
                         {(outboundTotalPrice + returnTotalPrice).toFixed(2)} {outboundCurrency}
                       </span>
@@ -1379,30 +1386,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   <div className="mt-6 p-4 bg-green-50 rounded-lg">
                     <div className="flex items-center gap-2 text-green-800">
                       <CheckCircle className="w-5 h-5" />
-                      <span className="font-medium">Selection Complete</span>
+                      <span className="font-medium">{t('tripDetails.selectYourSeats')} ✓</span>
                     </div>
                     <p className="text-sm text-green-700 mt-1">
-                      {passengers} seat{passengers > 1 ? 's' : ''} selected
+                      {passengers} {t('bookingForm.passengers')}
                     </p>
                   </div>
                 )
-              )}
-
-              {/* Baggage Selection - After seat selection, before checkout */}
-              {(route?.request_get_baggage === 1 || route?.request_get_baggage === true) && outboundBaggage['default'] && outboundBaggage['default'].length > 0 && (
-                <div className="mt-6">
-                  <BaggageSelector
-                    baggageItems={outboundBaggage['default']}
-                    selectedBaggage={outboundBaggageSelection.selectedBaggage}
-                    passengers={passengers}
-                    currency={currency}
-                    segmentName="Outbound Journey"
-                    onAddBaggage={outboundBaggageSelection.addBaggage}
-                    onRemoveBaggage={outboundBaggageSelection.removeBaggage}
-                    onUpdateQuantity={outboundBaggageSelection.updateBaggageQuantity}
-                    loading={loadingBaggage}
-                  />
-                </div>
               )}
 
               {/* Continue Button */}
@@ -1413,7 +1403,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                   className="w-full"
                   size="lg"
                 >
-                  Continue to Checkout
+                  {t('tripDetails.continueToCheckout')}
                   <Badge variant="secondary" className="ml-2">
                     {bookingData.bookingSummary.totalPrice.toFixed(2)} {bookingData.bookingSummary.currency}
                   </Badge>
@@ -1430,9 +1420,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Complete Your Booking</h2>
+                <h2 className="text-2xl font-bold">{t('bookingForm.completeYourBooking')}</h2>
                 <Button variant="ghost" onClick={handleBackToSeats}>
-                  ← Back to Seats
+                  ← {t('bookingForm.backToSeats')}
                 </Button>
               </div>
               
@@ -1456,9 +1446,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">Booking Confirmed</h2>
+                <h2 className="text-2xl font-bold">{t('bookingForm.bookingConfirmed')}</h2>
                 <Button variant="ghost" onClick={handleBackToSeats}>
-                  Close
+                  {t('bookingForm.close')}
                 </Button>
               </div>
               
@@ -1479,17 +1469,17 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
             <div className="p-6">
               <div className="flex items-center gap-2 mb-4">
                 <AlertCircle className="h-5 w-5 text-red-500" />
-                <h2 className="text-xl font-bold">Booking Error</h2>
+                <h2 className="text-xl font-bold">{t('bookingForm.bookingError')}</h2>
               </div>
               
               <p className="text-gray-600 mb-4">{bookingError}</p>
               
               <div className="flex gap-2">
                 <Button onClick={handleBackToSeats} className="flex-1">
-                  Try Again
+                  {t('common.tryAgain')}
                 </Button>
                 <Button variant="outline" onClick={handleBackToSeats}>
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
               </div>
             </div>

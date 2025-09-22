@@ -36,6 +36,7 @@ import {
   validateBookingData, 
   formatBookingPrice 
 } from '@/lib/tripDetailApi';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 export interface BookingFormProps {
   passengers: number;
@@ -56,6 +57,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   onBookingSuccess,
   onBookingError
 }) => {
+  const { t } = useLocalization();
   // Debug logging
   console.log('BookingForm - route data:', route);
   console.log('BookingForm - need_doc:', route?.need_doc);
@@ -135,39 +137,39 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     const errors: string[] = [];
     
     passengerData.forEach((passenger, index) => {
-      if (!passenger.name.trim()) errors.push(`Passenger ${index + 1}: Name is required`);
-      if (!passenger.surname.trim()) errors.push(`Passenger ${index + 1}: Surname is required`);
+      if (!passenger.name.trim()) errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.nameRequired')}`);
+      if (!passenger.surname.trim()) errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.surnameRequired')}`);
       
       // Enhanced birth date validation
       if (!passenger.birth_date) {
-        errors.push(`Passenger ${index + 1}: Birth date is required`);
+        errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.birthDateRequired')}`);
       } else if (!validateBirthDate(passenger.birth_date)) {
-        errors.push(`Passenger ${index + 1}: Birth date must be a valid date (between 1 and 120 years old)`);
+        errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.birthDateInvalid')}`);
       }
       
       // Document validation based on route requirements
       if (route?.need_doc === 1 || true) {
-        if (!passenger.document_type?.trim()) errors.push(`Passenger ${index + 1}: Document type is required`);
-        if (!passenger.document_number?.trim()) errors.push(`Passenger ${index + 1}: Document number is required`);
+        if (!passenger.document_type?.trim()) errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.documentTypeRequired')}`);
+        if (!passenger.document_number?.trim()) errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.documentNumberRequired')}`);
       }
       
       if ((route?.need_gender === 1 || true) && !passenger.gender?.trim()) {
-        errors.push(`Passenger ${index + 1}: Gender is required`);
+        errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.genderRequired')}`);
       }
       
       if ((route?.need_citizenship === 1 || true) && !passenger.citizenship?.trim()) {
-        errors.push(`Passenger ${index + 1}: Citizenship is required`);
+        errors.push(`${t('bookingForm.passenger')} ${index + 1}: ${t('bookingForm.validation.citizenshipRequired')}`);
       }
     });
 
     // Enhanced phone validation
     if (!contactInfo.phone.trim()) {
-      errors.push('Phone number is required');
+      errors.push(t('bookingForm.validation.phoneRequired'));
     } else if (!validatePhoneNumber(contactInfo.phone)) {
-      errors.push('Phone number must start with + followed by country code (e.g., +373, +383, +375)');
+      errors.push(t('bookingForm.validation.phoneInvalid'));
     }
     
-    if (!contactInfo.email.trim()) errors.push('Email address is required');
+    if (!contactInfo.email.trim()) errors.push(t('bookingForm.validation.emailRequired'));
 
     if (errors.length > 0) {
       setValidationErrors(errors);
@@ -180,7 +182,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     try {
       // Check if we have a prepared booking request
       if (!preparedBookingRequest) {
-        setValidationErrors(['Booking data is not ready. Please ensure you have selected seats for your trip.']);
+        setValidationErrors([t('bookingForm.errors.dataNotReady')]);
         setIsSubmitting(false);
         return;
       }
@@ -237,7 +239,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
     } catch (error) {
       console.error('Booking error:', error);
-      onBookingError(error instanceof Error ? error.message : 'Booking failed');
+      onBookingError(error instanceof Error ? error.message : t('bookingForm.errors.bookingFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -248,10 +250,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
-          Complete Your Booking
+          {t('bookingForm.completeYourBooking')}
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Please provide passenger and contact information to complete your reservation
+          {t('bookingForm.providePassengerInfo')}
         </p>
       </CardHeader>
       <CardContent>
@@ -274,40 +276,40 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           <div className="space-y-4">
             <h3 className="text-lg font-medium flex items-center gap-2">
               <User className="h-4 w-4" />
-              Passenger Information
+              {t('bookingForm.passengerInformation')}
             </h3>
             
             {passengerData.map((passenger, index) => (
               <div key={index} className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline">Passenger {index + 1}</Badge>
+                  <Badge variant="outline">{t('bookingForm.passenger')} {index + 1}</Badge>
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor={`name-${index}`}>First Name *</Label>
+                    <Label htmlFor={`name-${index}`}>{t('bookingForm.firstName')} *</Label>
                     <Input
                       id={`name-${index}`}
                       value={passenger.name}
                       onChange={(e) => updatePassengerData(index, 'name', e.target.value)}
-                      placeholder="Enter first name"
+                      placeholder={t('bookingForm.placeholders.firstName')}
                       required
                     />
                   </div>
                   
                   <div>
-                    <Label htmlFor={`surname-${index}`}>Last Name *</Label>
+                    <Label htmlFor={`surname-${index}`}>{t('bookingForm.lastName')} *</Label>
                     <Input
                       id={`surname-${index}`}
                       value={passenger.surname}
                       onChange={(e) => updatePassengerData(index, 'surname', e.target.value)}
-                      placeholder="Enter last name"
+                      placeholder={t('bookingForm.placeholders.lastName')}
                       required
                     />
                   </div>
                   
                   <div className="lg:col-span-2">
-                    <Label htmlFor={`birth-${index}`}>Birth Date *</Label>
+                    <Label htmlFor={`birth-${index}`}>{t('bookingForm.birthDate')} *</Label>
                     <Input
                       id={`birth-${index}`}
                       type="date"
@@ -318,7 +320,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                     />
                     {passenger.birth_date && !validateBirthDate(passenger.birth_date) && (
                       <p className="text-sm text-red-500 mt-1">
-                        Birth date must be between 1 and 120 years old
+                        {t('bookingForm.validation.birthDateInvalid')}
                       </p>
                     )}
                   </div>
@@ -327,40 +329,40 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                 {/* Document Information - Show if required by route */}
                 {(route?.need_doc === 1 || true) && (
                   <div className="space-y-4">
-                    <h4 className="text-md font-medium text-gray-700">Document Information</h4>
+                    <h4 className="text-md font-medium text-gray-700">{t('bookingForm.documentInformation')}</h4>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor={`docType-${index}`}>Document Type *</Label>
+                        <Label htmlFor={`docType-${index}`}>{t('bookingForm.documentType')} *</Label>
                         <Select 
                           value={passenger.document_type || ''} 
                           onValueChange={(value) => updatePassengerData(index, 'document_type', value)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select document type" />
+                            <SelectValue placeholder={t('bookingForm.placeholders.selectDocumentType')} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="passport">Passport</SelectItem>
-                            <SelectItem value="id_card">ID Card</SelectItem>
-                            <SelectItem value="birth_certificate">Birth Certificate</SelectItem>
-                            <SelectItem value="drivers_license">Driver's License</SelectItem>
+                            <SelectItem value="passport">{t('bookingForm.documentTypes.passport')}</SelectItem>
+                            <SelectItem value="id_card">{t('bookingForm.documentTypes.idCard')}</SelectItem>
+                            <SelectItem value="birth_certificate">{t('bookingForm.documentTypes.birthCertificate')}</SelectItem>
+                            <SelectItem value="drivers_license">{t('bookingForm.documentTypes.driversLicense')}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       
                       <div>
-                        <Label htmlFor={`docNumber-${index}`}>Document Number *</Label>
+                        <Label htmlFor={`docNumber-${index}`}>{t('bookingForm.documentNumber')} *</Label>
                         <Input
                           id={`docNumber-${index}`}
                           value={passenger.document_number || ''}
                           onChange={(e) => updatePassengerData(index, 'document_number', e.target.value)}
-                          placeholder="Enter document number"
+                          placeholder={t('bookingForm.placeholders.documentNumber')}
                           required
                         />
                       </div>
                       
                       {route?.need_doc_expire_date === 1 && (
                         <div>
-                          <Label htmlFor={`docExpire-${index}`}>Document Expiry Date</Label>
+                          <Label htmlFor={`docExpire-${index}`}>{t('bookingForm.documentExpiryDate')}</Label>
                           <Input
                             id={`docExpire-${index}`}
                             type="date"
@@ -376,18 +378,18 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                 {/* Gender - Show if required by route */}
                 {(route?.need_gender === 1 || true) && (
                   <div>
-                    <Label htmlFor={`gender-${index}`}>Gender *</Label>
+                    <Label htmlFor={`gender-${index}`}>{t('bookingForm.gender')} *</Label>
                     <Select 
                       value={passenger.gender || ''} 
                       onValueChange={(value) => updatePassengerData(index, 'gender', value)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
+                        <SelectValue placeholder={t('bookingForm.placeholders.selectGender')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="M">Male</SelectItem>
-                        <SelectItem value="F">Female</SelectItem>
-                        <SelectItem value="O">Other</SelectItem>
+                        <SelectItem value="M">{t('bookingForm.genders.male')}</SelectItem>
+                        <SelectItem value="F">{t('bookingForm.genders.female')}</SelectItem>
+                        <SelectItem value="O">{t('bookingForm.genders.other')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -396,12 +398,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
                 {/* Citizenship - Show if required by route */}
                 {(route?.need_citizenship === 1 || true) && (
                   <div>
-                    <Label htmlFor={`citizenship-${index}`}>Citizenship *</Label>
+                    <Label htmlFor={`citizenship-${index}`}>{t('bookingForm.citizenship')} *</Label>
                     <Input
                       id={`citizenship-${index}`}
                       value={passenger.citizenship || ''}
                       onChange={(e) => updatePassengerData(index, 'citizenship', e.target.value)}
-                      placeholder="Enter citizenship (e.g., US, UK, DE)"
+                      placeholder={t('bookingForm.placeholders.citizenship')}
                       required
                     />
                   </div>
@@ -416,36 +418,36 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           <div className="space-y-4">
             <h3 className="text-lg font-medium flex items-center gap-2">
               <Phone className="h-4 w-4" />
-              Contact Information
+              {t('bookingForm.contactInformation')}
             </h3>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="phone">Phone Number *</Label>
+                <Label htmlFor="phone">{t('bookingForm.phoneNumber')} *</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={contactInfo.phone}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+373291234567"
+                  placeholder={t('bookingForm.placeholders.phone')}
                   required
                   className={!validatePhoneNumber(contactInfo.phone) && contactInfo.phone ? 'border-red-500' : ''}
                 />
                 {contactInfo.phone && !validatePhoneNumber(contactInfo.phone) && (
                   <p className="text-sm text-red-500 mt-1">
-                    Phone must start with + followed by country code (e.g., +373, +383, +375)
+                    {t('bookingForm.validation.phoneInvalid')}
                   </p>
                 )}
               </div>
               
               <div>
-                <Label htmlFor="email">Email Address *</Label>
+                <Label htmlFor="email">{t('bookingForm.emailAddress')} *</Label>
                 <Input
                   id="email"
                   type="email"
                   value={contactInfo.email}
                   onChange={(e) => setContactInfo(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="info@test-mail.ru"
+                  placeholder={t('bookingForm.placeholders.email')}
                   required
                 />
               </div>
@@ -458,16 +460,16 @@ export const BookingForm: React.FC<BookingFormProps> = ({
           <div className="space-y-4">
             <h3 className="text-lg font-medium flex items-center gap-2">
               <CreditCard className="h-4 w-4" />
-              Promocode (Optional)
+              {t('bookingForm.promocodeOptional')}
             </h3>
             
             <div>
-              <Label htmlFor="promocode">Promocode</Label>
+              <Label htmlFor="promocode">{t('bookingForm.promocode')}</Label>
               <Input
                 id="promocode"
                 value={promocode}
                 onChange={(e) => setPromocode(e.target.value)}
-                placeholder="Enter promocode"
+                placeholder={t('bookingForm.placeholders.promocode')}
               />
             </div>
           </div>
@@ -476,19 +478,19 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
           {/* Booking Summary */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium">Booking Summary</h3>
+            <h3 className="text-lg font-medium">{t('bookingForm.bookingSummary')}</h3>
             
             <div className="bg-muted/50 rounded-lg p-4 space-y-2">
               <div className="flex justify-between">
-                <span>Passengers:</span>
+                <span>{t('bookingForm.passengers')}:</span>
                 <span>{passengers}</span>
               </div>
               <div className="flex justify-between">
-                <span>Trips:</span>
-                <span>{isRoundTrip ? 'Round Trip' : 'One Way'}</span>
+                <span>{t('bookingForm.trips')}:</span>
+                <span>{isRoundTrip ? t('bookingForm.roundTrip') : t('bookingForm.oneWay')}</span>
               </div>
               <div className="flex justify-between">
-                <span>Total Price:</span>
+                <span>{t('bookingForm.totalPrice')}:</span>
                 <span className="font-bold">{formatBookingPrice(bookingSummary.totalPrice, bookingSummary.currency)}</span>
               </div>
             </div>
@@ -504,12 +506,12 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Processing Booking...
+                {t('bookingForm.processingBooking')}
               </>
             ) : (
               <>
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Complete Booking
+                {t('bookingForm.completeBooking')}
               </>
             )}
           </Button>

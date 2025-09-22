@@ -119,12 +119,14 @@ const translations = {
     'header.legal': 'Informații Legale',
     'header.trust.safe': 'Transport Sigur',
     'header.trust.experience': '10+ ani experiență',
+    'header.tagline': 'Transport de încredere în toată Europa de Est',
     'header.language': 'Limba',
     'header.currency': 'Moneda',
     
     // Common actions
     'common.viewRoutes': 'Vezi Rutele',
     'common.viewTimetable': 'Vezi Programul',
+    'common.from': 'De la',
     'common.viewTickets': 'Vezi Biletele',
     'common.searchRoutes': 'Caută Rute',
     'common.allPrices': 'Toate prețurile',
@@ -141,7 +143,7 @@ const translations = {
     'common.continue': 'Continuă',
     
     // Hero Section
-    'hero.title': 'Călătorește în Siguranță prin Europa',
+    'hero.title': 'Călătorește în Siguranță',
     'hero.subtitle': 'Transport internațional de încredere cu peste 10 ani de experiență',
     'hero.searchPlaceholder': 'De unde pleci?',
     'hero.searchButton': 'Caută Bilete',
@@ -167,11 +169,157 @@ const translations = {
     'search.roundTrip': 'Dus-întors',
     'search.searchTickets': 'Caută Bilete',
     'search.popularRoutes': 'Rute Populare',
+    'search.overnight': 'Noaptea',
+    'search.select': 'Selectează',
     'search.selectDate': 'Selectează data',
     'search.selectPassengers': 'Selectează numărul de pasageri',
     'search.selectBaggage': 'Selectează bagajele',
     'search.swapCities': 'Schimbă orașele',
     
+    // Baggage
+    '1_baggage_free': '1 bagaj gratuit',
+    
+    // Citizenship
+    'need_citizenship': 'Cetățenie necesară',
+
+    // Trip Details
+    'tripDetails.title': 'Detalii Călătorie',
+    'tripDetails.selectSeats': 'Selectează Locuri',
+    'tripDetails.passengers': 'Pasageri',
+    'tripDetails.seatSelection': 'Selecția Locurilor',
+    'tripDetails.continue': 'Continuă',
+    'tripDetails.back': 'Înapoi',
+    'tripDetails.total': 'Total',
+    'tripDetails.price': 'Preț',
+    'tripDetails.discount': 'Reducere',
+    'tripDetails.baggage': 'Bagaj',
+    'tripDetails.departure': 'Plecare',
+    'tripDetails.arrival': 'Sosire',
+    'tripDetails.selectYourSeats': 'Selectează locurile tale',
+    'tripDetails.error.routeNotFound': 'Ruta nu a fost găsită',
+    'tripDetails.errors.routeLoadFailed': 'Eroare la încărcarea datelor rutei din API',
+    'tripDetails.errors.missingRouteParams': 'Parametrii rutei lipsesc din URL. Asigură-te că incluzi intervalIdMain sau interval_id în URL.',
+
+    // Legend
+    'legend.available': 'Disponibil',
+    'legend.selected': 'Selectat',
+    'legend.occupied': 'Ocupat',
+    'legend.notAvailable': 'Indisponibil',
+
+    // Discounts
+    'discounts.title': 'Reduceri',
+    'discounts.loading': 'Se încarcă reducerile...',
+    'discounts.noDiscounts': 'Nu sunt disponibile reduceri',
+    'discounts.selectDiscount': 'Selectează reducerea',
+    'discounts.removeDiscount': 'Elimină reducerea',
+    'discounts.viewAll': 'Vezi toate',
+    'discounts.showLess': 'Arată mai puțin',
+
+    // Baggage
+    'baggage.title': 'Bagaje',
+    'baggage.loading': 'Se încarcă bagajele...',
+    'baggage.noBaggage': 'Nu sunt disponibile bagaje suplimentare',
+    'baggage.addBaggage': 'Adaugă bagaj',
+    'baggage.removeBaggage': 'Elimină bagaj',
+    'baggage.quantity': 'Cantitate',
+    'baggage.weight': 'Greutate',
+    'baggage.dimensions': 'Dimensiuni',
+
+    // Booking Form
+    'bookingForm.completeYourBooking': 'Completează rezervarea',
+    'bookingForm.passenger': 'Pasager',
+    'bookingForm.validation.nameRequired': 'Numele este obligatoriu',
+    'bookingForm.validation.surnameRequired': 'Prenumele este obligatoriu',
+    'bookingForm.validation.birthDateRequired': 'Data nașterii este obligatorie',
+    'bookingForm.validation.birthDateInvalid': 'Data nașterii este invalidă',
+    'bookingForm.validation.documentTypeRequired': 'Tipul documentului este obligatoriu',
+    'bookingForm.validation.documentNumberRequired': 'Numărul documentului este obligatoriu',
+    'bookingForm.validation.genderRequired': 'Genul este obligatoriu',
+    'bookingForm.validation.citizenshipRequired': 'Cetățenia este obligatorie',
+    'bookingForm.validation.phoneRequired': 'Numărul de telefon este obligatoriu',
+    'bookingForm.validation.phoneInvalid': 'Numărul de telefon este invalid',
+    'bookingForm.validation.emailRequired': 'Adresa de email este obligatorie',
+    'bookingForm.errors.dataNotReady': 'Datele de rezervare nu sunt pregătite',
+    'bookingForm.errors.bookingFailed': 'Rezervarea a eșuat',
+
+    // Trip Details additional
+    'tripDetails.duration': 'Durata',
+    'tripDetails.amenities': 'Facilități',
+    'tripDetails.luggagePolicy': 'Politica de bagaje',
+    'tripDetails.additionalInformation': 'Informații suplimentare',
+    'tripDetails.cancellationPolicy': 'Politica de anulare',
+    'tripDetails.hoursBeforeDeparture': 'ore înainte de plecare',
+
+    // Seat Map
+    'seatMap.seatsAvailable': 'Locuri disponibile',
+    'seatMap.driver': 'Șofer',
+    'seatMap.aisle': 'Culoar',
+
+    // Booking Form additional
+    'bookingForm.providePassengerInfo': 'Completează rezervarea',
+    'bookingForm.passengerInformation': 'Informații pasager',
+    'bookingForm.firstName': 'Prenume',
+    'bookingForm.placeholders.firstName': 'Introduceți prenumele',
+    'bookingForm.lastName': 'Nume',
+    'bookingForm.placeholders.lastName': 'Introduceți numele',
+    'bookingForm.birthDate': 'Data nașterii',
+    'bookingForm.placeholders.birthDate': 'zz.ll.aaaa',
+    'bookingForm.documentInformation': 'Informații document',
+    'bookingForm.documentType': 'Tipul documentului',
+    'bookingForm.placeholders.selectDocumentType': 'Selectați tipul documentului',
+    'bookingForm.documentNumber': 'Numărul documentului',
+    'bookingForm.placeholders.documentNumber': 'Introduceți numărul documentului',
+    'bookingForm.gender': 'Genul',
+    'bookingForm.placeholders.selectGender': 'Selectați genul',
+    'bookingForm.citizenship': 'Cetățenia',
+    'bookingForm.placeholders.citizenship': 'Selectați cetățenia',
+    'bookingForm.contactInformation': 'Informații de contact',
+    'bookingForm.phoneNumber': 'Numărul de telefon',
+    'bookingForm.placeholders.phone': 'Introduceți numărul de telefon',
+    'bookingForm.emailAddress': 'Adresa de email',
+    'bookingForm.placeholders.email': 'Introduceți adresa de email',
+    'bookingForm.promocodeOptional': 'Promocod (opțional)',
+    'bookingForm.promocode': 'Promocod',
+    'bookingForm.placeholders.promocode': 'Introduceți promocodul',
+    'bookingForm.bookingSummary': 'Rezumatul rezervării',
+    'bookingForm.trips': 'Călătorii:',
+    'bookingForm.oneWay': 'Dus',
+    'bookingForm.totalPrice': 'Prețul total:',
+    'bookingForm.completeBooking': 'Completează rezervarea',
+
+    // Document Types
+    'bookingForm.documentTypes.passport': 'Pașaport',
+    'bookingForm.documentTypes.idCard': 'Carte de identitate',
+    'bookingForm.documentTypes.birthCertificate': 'Certificat de naștere',
+    'bookingForm.documentTypes.driversLicense': 'Permis de conducere',
+
+    // Gender Types
+    'bookingForm.genders.male': 'Masculin',
+    'bookingForm.genders.female': 'Feminin',
+    'bookingForm.genders.other': 'Altul',
+
+    // Booking Confirmed
+    'bookingConfirmed.title': 'Rezervare Confirmată',
+    'bookingConfirmed.orderId': 'ID Comandă',
+    'bookingConfirmed.totalPrice': 'Preț Total',
+    'bookingConfirmed.reservationStatus': 'Status Rezervare - Plată Necesară',
+    'bookingConfirmed.reservationUntil': 'Rezervare Până La',
+    'bookingConfirmed.minutes': 'minute',
+    'bookingConfirmed.defaultCarrier': 'Operator implicit • AUTOBUZ',
+    'bookingConfirmed.departure': 'Plecare',
+    'bookingConfirmed.arrival': 'Sosire',
+    'bookingConfirmed.birth': 'Naștere:',
+    'bookingConfirmed.price': 'Preț:',
+    'bookingConfirmed.discount': 'Reducere:',
+    'bookingConfirmed.seat': 'Loc',
+    'bookingConfirmed.pay': 'Plătește',
+    'bookingConfirmed.close': 'Închide',
+    'bookingConfirmed.bookingConfirmed': 'Rezervare Confirmată',
+    'bookingConfirmed.reservationConfirmed': 'Rezervare Confirmată - Plată Necesară',
+    'bookingConfirmed.needCitizenship': 'cetățenie necesară',
+    'bookingConfirmed.at': 'la',
+    'bookingConfirmed.passengers': 'Pasageri',
+
     // Index Page
     'index.whatToDo': 'Ce vrei să faci?',
     'index.chooseAction': 'Alege acțiunea principală pe care vrei să o faci. Toate sunt simple și clare!',
@@ -204,6 +352,14 @@ const translations = {
     'index.readyToStart': 'Gata să începi călătoria?',
     'index.readyDesc': 'Rezervă-ți locul în autobuz în câteva clicuri simple. Procesul este rapid și sigur!',
     'index.readyBookNow': 'Rezervă Acum',
+    
+    // Help Section
+    'index.needHelp': 'Ai nevoie de ajutor?',
+    'index.helpDescription': 'Suntem aici să te ajutăm să faci rezervarea perfectă',
+    
+    // Timetable
+    'timetable.book': 'Rezervă',
+    
     'index.readyViewRoutes': 'Vezi Rutele',
     'index.viewMyTickets': 'Vezi Biletele Mele',
     
@@ -240,7 +396,11 @@ const translations = {
     'search.routeFound': 'rută găsită',
     'search.noRoutesFound': 'Nu s-au găsit rute',
     'search.tryAdjusting': 'Încearcă să ajustezi filtrele sau criteriile de căutare',
-    'search.select': 'Selectează',
+    
+    // Seat Map
+    'seatMap.selectSeats': 'Selectează Locuri',
+    'seatMap.selectedCount': 'selectate',
+    'seatMap.noData': 'Nu există date disponibile',
     
     // Checkout Process
     'checkout.title': 'Checkout',
@@ -354,6 +514,7 @@ const translations = {
     // Transport Routes
     'transport.title': 'Rute de Transport',
     'transport.description': 'Descoperă și rezervă rute de autobuz prin Europa cu Starlines și partenerii InfoBus',
+    'transport.bus': 'Autobuz',
     'transport.home': 'Acasă',
     'transport.routes': 'Rute de Transport',
     'transport.busRoutes': 'Rute de Autobuz',
@@ -400,24 +561,17 @@ const translations = {
     
     // Trip Details Page
     'tripDetails.loading': 'Se încarcă detaliile rutei...',
-    'tripDetails.error.routeNotFound': 'Ruta nu a fost găsită',
-    'tripDetails.error.failedToLoad': 'Nu s-au putut încărca detaliile rutei',
-    'tripDetails.error.noRouteId': 'Nu a fost furnizat ID-ul rutei',
-    'tripDetails.backToRoutes': 'Înapoi la Rute',
-    'tripDetails.backToSearch': 'Înapoi la Căutare',
     'tripDetails.bookNow': 'Rezervă Acum',
     'tripDetails.continueToCheckout': 'Continuă la Checkout',
     'tripDetails.selectYourFare': 'Selectează Tariful Tău',
     'tripDetails.numberOfPassengers': 'Numărul de pasageri',
     'tripDetails.farePerPerson': 'Tarif per persoană',
     'tripDetails.serviceFee': 'Taxă serviciu',
-    'tripDetails.total': 'Total',
     'tripDetails.journeyTimeline': 'Cronologia Călătoriei',
     'tripDetails.interactiveMapComingSoon': 'Hartă interactivă în curând',
     'tripDetails.fareRulesPolicies': 'Reguli și Politici Tarifare',
     'tripDetails.baggageAllowance': 'Bagaje Permise',
     'tripDetails.changesCancellations': 'Modificări și Anulări',
-    'tripDetails.refundPolicy': 'Politica de Rambursare',
     'tripDetails.handLuggage': 'Bagaj de mână',
     'tripDetails.checkedBaggage': 'Bagaj înregistrat',
     'tripDetails.oversizedItems': 'Articole supradimensionate',
@@ -429,15 +583,11 @@ const translations = {
     'tripDetails.sameDay': 'în aceeași zi',
     'tripDetails.noShow': 'Nu s-a prezentat',
     'tripDetails.ofFare': 'din tarif',
-    'tripDetails.departure': 'Plecare',
-    'tripDetails.arrival': 'Sosire',
     'tripDetails.dailyService': 'Serviciu zilnic',
     'tripDetails.reviews': 'recenzii',
     'tripDetails.standardSeat': 'Loc standard',
     'tripDetails.basicAmenities': 'Facilități de bază',
     'tripDetails.premiumSeat': 'Loc premium',
-    'tripDetails.extraLegroom': 'Spațiu extra pentru picioare',
-    'tripDetails.priorityBoarding': 'Îmbarcare prioritară',
     'tripDetails.refreshments': 'Răcoritoare',
     'tripDetails.businessSeat': 'Loc business',
     'tripDetails.maximumComfort': 'Confort maxim',
@@ -447,6 +597,10 @@ const translations = {
     'tripDetails.changeable': 'Modificabil',
     'tripDetails.securePayment': 'Plată Securizată',
     'tripDetails.multiplePaymentMethods': 'Metode multiple de plată acceptate',
+    'tripDetails.outboundJourney': 'Călătoria Dus',
+    'tripDetails.returnJourney': 'Călătoria Întors',
+    'tripDetails.selectionComplete': 'Complet',
+    'tripDetails.selectionIncomplete': 'Incomplet',
     'transport.to': 'Către',
     
     // Timetable Page
@@ -463,7 +617,6 @@ const translations = {
     'timetable.duration': 'Durata',
     'timetable.stops': 'Opriri',
     'timetable.stop': 'oprire',
-    'timetable.book': 'Rezervă',
     'timetable.bookNow': 'Rezervă Acum',
     'timetable.from': 'De la',
     'timetable.noRoutesOperating': 'Nu sunt rute în funcțiune la această oră',
@@ -556,6 +709,47 @@ const translations = {
     'features.multilingual': 'Suport Multilingv',
     'features.multilingualDesc': 'Asistență în română, rusă și engleză',
     
+    // Hero Section additional
+    'hero.fastBooking': 'Rezervare rapidă',
+    
+    // Amenities
+    'amenities.wifi': 'Wi-Fi',
+    'amenities.usb': 'USB',
+    'amenities.wc': 'Toaletă',
+    'amenities.ac': 'Aer condiționat',
+    'amenities.entertainment': 'Divertisment',
+    'amenities.powerOutlets': 'Prize',
+    'amenities.airConditioning': 'Aer condiționat',
+    'amenities.toilet': 'Toaletă',
+    'amenities.music': 'Muzică',
+    'amenities.tv': 'TV',
+    'amenities.luggage': 'Depozitare bagaje',
+
+    // Operators
+    'operators.starlinesExpress': 'Starlines Express',
+    'operators.starlinesPremium': 'Starlines Premium',
+
+    // Popularity levels
+    'routes.popularity.veryPopular': 'Foarte popular',
+    'routes.popularity.popular': 'Rută populară',
+    'routes.popularity.regular': 'Rută obișnuită',
+
+    // Countries
+    'countries.md': 'Moldova',
+    'countries.ro': 'România',
+    'countries.ua': 'Ucraina',
+    'countries.ru': 'Rusia',
+    'countries.eu': 'Alte țări EU',
+    
+    // Cities
+    'cities.chisinau': 'Chișinău',
+    'cities.kiev': 'Kiev',
+    'cities.vinnytsia': 'Vinnița',
+    'cities.zhytomyr': 'Jîtomîr',
+    'cities.bucharest': 'București',
+    'cities.istanbul': 'Istanbul',
+    'cities.moscow': 'Moscow',
+    
     // Popular Routes
     'routes.title': 'Destinații Populare',
     'routes.subtitle': 'Descoperă rutele noastre cele mai iubite',
@@ -575,6 +769,17 @@ const translations = {
     'booking.price': 'Preț',
     'booking.total': 'Total',
     'booking.serviceFee': 'Taxă serviciu',
+
+    // Booking Form
+    'bookingForm.passengers': 'Pasageri',
+    'bookingForm.backToSeats': 'Înapoi la Locuri',
+    'bookingForm.bookingConfirmed': 'Rezervare Confirmată',
+    'bookingForm.close': 'Închide',
+    'bookingForm.bookingError': 'Eroare la Rezervare',
+
+    // Seat Selection Segments
+    'seatSelection.outboundSegment': 'Dus - Segment',
+    'seatSelection.returnSegment': 'Întors - Segment',
     
     // About
     'about.title': 'Despre Noi',
@@ -1412,6 +1617,8 @@ const translations = {
     'myTickets.confirmPassword': 'Confirmă Parola',
     'myTickets.processing': 'Se procesează...',
     'myTickets.cancel': 'Anulează',
+    'myTickets.noTicketsTitle': 'Nu ai bilete',
+    'myTickets.noTicketsDescription': 'Nu ai niciun bilet rezervat în acest moment. Rezervă-ți primul bilet pentru a începe să călătorești cu noi!',
     
     // Terms of Service
     'terms.title': 'Termeni și Condiții',
@@ -1661,12 +1868,14 @@ const translations = {
     'header.legal': 'Правовая информация',
     'header.trust.safe': 'Безопасный транспорт',
     'header.trust.experience': '10+ лет опыта',
+    'header.tagline': 'Надежный транспорт по всей Восточной Европе',
     'header.language': 'Язык',
     'header.currency': 'Валюта',
     
     // Common actions
     'common.viewRoutes': 'Посмотреть маршруты',
     'common.viewTimetable': 'Посмотреть расписание',
+    'common.from': 'От',
     'common.viewTickets': 'Посмотреть билеты',
     'common.searchRoutes': 'Поиск маршрутов',
     'common.allPrices': 'Все цены',
@@ -1683,7 +1892,7 @@ const translations = {
     'common.continue': 'Продолжить',
     
     // Hero Section
-    'hero.title': 'Безопасные Путешествия по Европе',
+    'hero.title': 'Безопасные Путешествия',
     'hero.subtitle': 'Надежный международный транспорт с более чем 10-летним опытом',
     'hero.searchPlaceholder': 'Откуда вы едете?',
     'hero.searchButton': 'Найти Билеты',
@@ -1709,23 +1918,182 @@ const translations = {
     'search.roundTrip': 'Туда-обратно',
     'search.searchTickets': 'Найти Билеты',
     'search.popularRoutes': 'Популярные Маршруты',
+    'search.overnight': 'Ночью',
+    'search.select': 'Выберите',
     'search.selectDate': 'Выберите дату',
     'search.selectPassengers': 'Выберите количество пассажиров',
     'search.selectBaggage': 'Выберите багаж',
     'search.swapCities': 'Поменять города',
     
+    // Baggage
+    '1_baggage_free': '1 багаж бесплатно',
+    
+    // Citizenship
+    'need_citizenship': 'Требуется гражданство',
+
+    // Trip Details
+    'tripDetails.title': 'Детали поездки',
+    'tripDetails.outboundJourney': 'Поездка туда',
+    'tripDetails.selectSeats': 'Выбрать места',
+    'seatMap.selectSeats': 'Выберите места',
+    'seatMap.selectedSeatsLabel': 'Выбранные места:',
+    'seatMap.selectedCount': 'выбрано',
+    'tripDetails.passengers': 'Пассажиры',
+    'tripDetails.seatSelection': 'Выбор мест',
+    'tripDetails.continue': 'Продолжить',
+    'tripDetails.back': 'Назад',
+    'tripDetails.total': 'Итого',
+    'tripDetails.price': 'Цена',
+    'tripDetails.discount': 'Скидка',
+    'tripDetails.baggage': 'Багаж',
+    'tripDetails.departure': 'Отправление',
+    'tripDetails.arrival': 'Прибытие',
+    'tripDetails.selectYourSeats': 'Выберите ваши места',
+    'tripDetails.error.routeNotFound': 'Маршрут не найден',
+    'tripDetails.errors.routeLoadFailed': 'Ошибка загрузки данных маршрута из API',
+    'tripDetails.errors.missingRouteParams': 'Параметры маршрута отсутствуют в URL. Убедитесь, что включили intervalIdMain или interval_id в URL.',
+
+    // Legend
+    'legend.available': 'Доступно',
+    'legend.selected': 'Выбрано',
+    'legend.occupied': 'Занято',
+    'legend.notAvailable': 'Недоступно',
+
+    // Discounts
+    'discounts.title': 'Скидки',
+    'discounts.loading': 'Загрузка скидок...',
+    'discounts.noDiscounts': 'Скидки недоступны',
+    'discounts.selectDiscount': 'Выбрать скидку',
+    'discounts.removeDiscount': 'Удалить скидку',
+    'discounts.viewAll': 'Посмотреть все',
+    'discounts.showLess': 'Показать меньше',
+
+    // Baggage
+    'baggage.title': 'Багаж',
+    'baggage.loading': 'Загрузка багажа...',
+    'baggage.noBaggage': 'Дополнительный багаж недоступен',
+    'baggage.addBaggage': 'Добавить багаж',
+    'baggage.removeBaggage': 'Удалить багаж',
+    'baggage.quantity': 'Количество',
+    'baggage.weight': 'Вес',
+    'baggage.dimensions': 'Размеры',
+
+    // Booking Form
+    'bookingForm.completeYourBooking': 'Завершите бронирование',
+    'bookingForm.passenger': 'Пассажир',
+    'bookingForm.validation.nameRequired': 'Имя обязательно',
+    'bookingForm.validation.surnameRequired': 'Фамилия обязательна',
+    'bookingForm.validation.birthDateRequired': 'Дата рождения обязательна',
+    'bookingForm.validation.birthDateInvalid': 'Дата рождения недействительна',
+    'bookingForm.validation.documentTypeRequired': 'Тип документа обязателен',
+    'bookingForm.validation.documentNumberRequired': 'Номер документа обязателен',
+    'bookingForm.validation.genderRequired': 'Пол обязателен',
+    'bookingForm.validation.citizenshipRequired': 'Гражданство обязательно',
+    'bookingForm.validation.phoneRequired': 'Номер телефона обязателен',
+    'bookingForm.validation.phoneInvalid': 'Номер телефона недействителен',
+    'bookingForm.validation.emailRequired': 'Адрес электронной почты обязателен',
+    'bookingForm.errors.dataNotReady': 'Данные бронирования не готовы',
+    'bookingForm.errors.bookingFailed': 'Бронирование не удалось',
+
+    // Trip Details additional
+    'tripDetails.duration': 'Продолжительность',
+    'tripDetails.amenities': 'Удобства',
+    'tripDetails.luggagePolicy': 'Политика багажа',
+    'tripDetails.additionalInformation': 'Дополнительная информация',
+    'tripDetails.cancellationPolicy': 'Политика отмены',
+    'tripDetails.hoursBeforeDeparture': 'часов до отправления',
+
+    // Seat Map
+    'seatMap.seatsAvailable': 'Доступные места',
+    'seatMap.driver': 'Водитель',
+    'seatMap.aisle': 'Проход',
+
+    // Booking Form additional
+    'bookingForm.providePassengerInfo': 'Завершите бронирование',
+    'bookingForm.passengerInformation': 'Информация о пассажире',
+    'bookingForm.firstName': 'Имя',
+    'bookingForm.placeholders.firstName': 'Введите имя',
+    'bookingForm.lastName': 'Фамилия',
+    'bookingForm.placeholders.lastName': 'Введите фамилию',
+    'bookingForm.birthDate': 'Дата рождения',
+    'bookingForm.placeholders.birthDate': 'дд.мм.гггг',
+    'bookingForm.documentInformation': 'Информация о документе',
+    'bookingForm.documentType': 'Тип документа',
+    'bookingForm.placeholders.selectDocumentType': 'Выберите тип документа',
+    'bookingForm.documentNumber': 'Номер документа',
+    'bookingForm.placeholders.documentNumber': 'Введите номер документа',
+    'bookingForm.gender': 'Пол',
+    'bookingForm.placeholders.selectGender': 'Выберите пол',
+    'bookingForm.citizenship': 'Гражданство',
+    'bookingForm.placeholders.citizenship': 'Выберите гражданство',
+    'bookingForm.contactInformation': 'Контактная информация',
+    'bookingForm.phoneNumber': 'Номер телефона',
+    'bookingForm.placeholders.phone': 'Введите номер телефона',
+    'bookingForm.emailAddress': 'Адрес электронной почты',
+    'bookingForm.placeholders.email': 'Введите адрес электронной почты',
+    'bookingForm.promocodeOptional': 'Промокод (необязательно)',
+    'bookingForm.promocode': 'Промокод',
+    'bookingForm.placeholders.promocode': 'Введите промокод',
+    'bookingForm.bookingSummary': 'Сводка бронирования',
+    'bookingForm.trips': 'Поездки:',
+    'bookingForm.oneWay': 'В одну сторону',
+    'bookingForm.totalPrice': 'Общая цена:',
+    'bookingForm.completeBooking': 'Завершить бронирование',
+
+    // Document Types
+    'bookingForm.documentTypes.passport': 'Паспорт',
+    'bookingForm.documentTypes.idCard': 'Удостоверение личности',
+    'bookingForm.documentTypes.birthCertificate': 'Свидетельство о рождении',
+    'bookingForm.documentTypes.driversLicense': 'Водительские права',
+
+    // Gender Types
+    'bookingForm.genders.male': 'Мужской',
+    'bookingForm.genders.female': 'Женский',
+    'bookingForm.genders.other': 'Другой',
+
+    // Booking Confirmed
+    'bookingConfirmed.title': 'Бронирование Подтверждено',
+    'bookingConfirmed.orderId': 'ID Заказа',
+    'bookingConfirmed.totalPrice': 'Общая Цена',
+    'bookingConfirmed.reservationStatus': 'Статус Бронирования - Требуется Оплата',
+    'bookingConfirmed.reservationUntil': 'Бронирование До',
+    'bookingConfirmed.minutes': 'минут',
+    'bookingConfirmed.defaultCarrier': 'Перевозчик по умолчанию • АВТОБУС',
+    'bookingConfirmed.departure': 'Отправление',
+    'bookingConfirmed.arrival': 'Прибытие',
+    'bookingConfirmed.birth': 'Рождение:',
+    'bookingConfirmed.price': 'Цена:',
+    'bookingConfirmed.discount': 'Скидка:',
+    'bookingConfirmed.seat': 'Место',
+    'bookingConfirmed.pay': 'Оплатить',
+    'bookingConfirmed.close': 'Закрыть',
+    'bookingConfirmed.bookingConfirmed': 'Бронирование Подтверждено',
+    'bookingConfirmed.reservationConfirmed': 'Бронирование Подтверждено - Требуется Оплата',
+    'bookingConfirmed.needCitizenship': 'требуется гражданство',
+    'bookingConfirmed.at': 'в',
+    'bookingConfirmed.passengers': 'Пассажиры',
+
     // Index Page
     'index.whatToDo': 'Что вы хотите сделать?',
     'index.chooseAction': 'Выберите основное действие, которое хотите выполнить. Все просто и понятно!',
     'index.bookTicket': 'Забронировать Билет',
     'index.bookTicketDesc': 'Забронируйте место в автобусе для вашей поездки',
     'index.readyBookNow': 'Забронировать Сейчас',
+    
+    // Help Section
+    'index.needHelp': 'Нужна помощь?',
+    'index.helpDescription': 'Мы здесь, чтобы помочь вам сделать идеальное бронирование',
+    
+    // Timetable
+    'timetable.book': 'Забронировать',
+    
     'index.readyViewRoutes': 'Посмотреть Маршруты',
     'index.viewMyTickets': 'Мои Билеты',
     
     // Transport Routes
     'transport.title': 'Маршруты Транспорта',
     'transport.description': 'Откройте для себя и забронируйте автобусные маршруты по Европе с Starlines и партнерами InfoBus',
+    'transport.bus': 'Автобус',
     'transport.home': 'Главная',
     'transport.routes': 'Маршруты Транспорта',
     'transport.busRoutes': 'Автобусные Маршруты',
@@ -1772,9 +2140,6 @@ const translations = {
     
     // Trip Details Page
     'tripDetails.loading': 'Загрузка деталей маршрута...',
-    'tripDetails.error.routeNotFound': 'Маршрут не найден',
-    'tripDetails.error.failedToLoad': 'Не удалось загрузить детали маршрута',
-    'tripDetails.error.noRouteId': 'ID маршрута не предоставлен',
     'tripDetails.backToRoutes': 'Назад к Маршрутам',
     'tripDetails.backToSearch': 'Назад к Поиску',
     'tripDetails.bookNow': 'Забронировать Сейчас',
@@ -1783,10 +2148,6 @@ const translations = {
     'tripDetails.numberOfPassengers': 'Количество пассажиров',
     'tripDetails.farePerPerson': 'Тариф за человека',
     'tripDetails.serviceFee': 'Плата за обслуживание',
-    'tripDetails.total': 'Итого',
-    'tripDetails.journeyTimeline': 'Временная Линия Путешествия',
-    'tripDetails.interactiveMapComingSoon': 'Интерактивная карта скоро',
-    'tripDetails.fareRulesPolicies': 'Правила и Политика Тарифов',
     'tripDetails.baggageAllowance': 'Разрешенный Багаж',
     'tripDetails.changesCancellations': 'Изменения и Отмены',
     'tripDetails.refundPolicy': 'Политика Возврата',
@@ -1801,11 +2162,8 @@ const translations = {
     'tripDetails.sameDay': 'в тот же день',
     'tripDetails.noShow': 'Не явился',
     'tripDetails.ofFare': 'от тарифа',
-    'tripDetails.departure': 'Отправление',
-    'tripDetails.arrival': 'Прибытие',
     'tripDetails.dailyService': 'Ежедневный сервис',
     'tripDetails.reviews': 'отзывов',
-    'tripDetails.standardSeat': 'Стандартное место',
     'tripDetails.basicAmenities': 'Базовые удобства',
     'tripDetails.premiumSeat': 'Премиум место',
     'tripDetails.extraLegroom': 'Дополнительное место для ног',
@@ -1834,7 +2192,6 @@ const translations = {
     'timetable.duration': 'Продолжительность',
     'timetable.stops': 'Остановки',
     'timetable.stop': 'остановка',
-    'timetable.book': 'Забронировать',
     'timetable.bookNow': 'Забронировать Сейчас',
     'timetable.from': 'От',
     'timetable.noRoutesOperating': 'В это время маршруты не работают',
@@ -1963,7 +2320,6 @@ const translations = {
     'search.routeFound': 'маршрут найден',
     'search.noRoutesFound': 'Маршруты не найдены',
     'search.tryAdjusting': 'Попробуйте скорректировать фильтры или критерии поиска',
-    'search.select': 'Выбрать',
     
     // Checkout Process
     'checkout.title': 'Оформление заказа',
@@ -2100,6 +2456,47 @@ const translations = {
     'features.multilingual': 'Многоязычная Поддержка',
     'features.multilingualDesc': 'Помощь на румынском, русском и английском языках',
     
+    // Hero Section additional
+    'hero.fastBooking': 'Быстрое бронирование',
+    
+    // Amenities
+    'amenities.wifi': 'Wi-Fi',
+    'amenities.usb': 'USB',
+    'amenities.wc': 'Туалет',
+    'amenities.ac': 'Кондиционер',
+    'amenities.entertainment': 'Развлечения',
+    'amenities.powerOutlets': 'Розетки',
+    'amenities.airConditioning': 'Кондиционер',
+    'amenities.toilet': 'Туалет',
+    'amenities.music': 'Музыка',
+    'amenities.tv': 'ТВ',
+    'amenities.luggage': 'Хранение багажа',
+
+    // Operators
+    'operators.starlinesExpress': 'Starlines Express',
+    'operators.starlinesPremium': 'Starlines Premium',
+
+    // Popularity levels
+    'routes.popularity.veryPopular': 'Очень популярный',
+    'routes.popularity.popular': 'Популярный маршрут',
+    'routes.popularity.regular': 'Обычный маршрут',
+
+    // Countries
+    'countries.md': 'Молдова',
+    'countries.ro': 'Румыния',
+    'countries.ua': 'Украина',
+    'countries.ru': 'Россия',
+    'countries.eu': 'Другие страны ЕС',
+    
+    // Cities
+    'cities.chisinau': 'Кишинёв',
+    'cities.kiev': 'Киев',
+    'cities.vinnytsia': 'Винница',
+    'cities.zhytomyr': 'Житомир',
+    'cities.bucharest': 'Бухарест',
+    'cities.istanbul': 'Стамбул',
+    'cities.moscow': 'Москва',
+    
     // Popular Routes
     'routes.title': 'Популярные Направления',
     'routes.subtitle': 'Откройте для себя наши самые любимые маршруты',
@@ -2119,6 +2516,13 @@ const translations = {
     'booking.price': 'Цена',
     'booking.total': 'Итого',
     'booking.serviceFee': 'Плата за обслуживание',
+    
+    // Booking Form
+    'bookingForm.passengers': 'Пассажиры',
+    'bookingForm.backToSeats': 'Назад к местам',
+    'bookingForm.bookingConfirmed': 'Бронирование подтверждено',
+    'bookingForm.close': 'Закрыть',
+    'bookingForm.bookingError': 'Ошибка бронирования',
     
     // About
     'about.title': 'О Нас',
@@ -2866,6 +3270,8 @@ const translations = {
     'myTickets.confirmPassword': 'Подтвердите Пароль',
     'myTickets.processing': 'Обработка...',
     'myTickets.cancel': 'Отмена',
+    'myTickets.noTicketsTitle': 'У вас нет билетов',
+    'myTickets.noTicketsDescription': 'У вас пока нет забронированных билетов. Забронируйте свой первый билет, чтобы начать путешествовать с нами!',
     
     // Contacts
     'contacts.title': 'Контакты',
@@ -3215,12 +3621,14 @@ const translations = {
     'header.legal': 'Legal Information',
     'header.trust.safe': 'Safe Transport',
     'header.trust.experience': '10+ years experience',
+    'header.tagline': 'Reliable transport across Eastern Europe',
     'header.language': 'Language',
     'header.currency': 'Currency',
     
     // Common actions
     'common.viewRoutes': 'View Routes',
     'common.viewTimetable': 'View Timetable',
+    'common.from': 'From',
     'common.viewTickets': 'View Tickets',
     'common.searchRoutes': 'Search Routes',
     'common.allPrices': 'All Prices',
@@ -3237,7 +3645,7 @@ const translations = {
     'common.continue': 'Continue',
     
     // Hero Section
-    'hero.title': 'Travel Safely Across Europe',
+    'hero.title': 'Travel Safely',
     'hero.subtitle': 'Reliable international transport with over 10 years of experience',
     'hero.searchPlaceholder': 'Where are you departing from?',
     'hero.searchButton': 'Search Tickets',
@@ -3263,23 +3671,182 @@ const translations = {
     'search.roundTrip': 'Round Trip',
     'search.searchTickets': 'Search Tickets',
     'search.popularRoutes': 'Popular Routes',
+    'search.overnight': 'Overnight',
+    'search.select': 'Select',
     'search.selectDate': 'Select date',
     'search.selectPassengers': 'Select number of passengers',
     'search.selectBaggage': 'Select baggage',
     'search.swapCities': 'Swap cities',
     
+    // Baggage
+    '1_baggage_free': '1 baggage free',
+    
+    // Citizenship
+    'need_citizenship': 'Citizenship required',
+
+    // Trip Details
+    'tripDetails.title': 'Trip Details',
+    'tripDetails.outboundJourney': 'Outbound Journey',
+    'tripDetails.selectSeats': 'Select Seats',
+    'seatMap.selectSeats': 'Select Seats',
+    'seatMap.selectedSeatsLabel': 'Selected Seats:',
+    'seatMap.selectedCount': 'selected',
+    'tripDetails.passengers': 'Passengers',
+    'tripDetails.seatSelection': 'Seat Selection',
+    'tripDetails.continue': 'Continue',
+    'tripDetails.back': 'Back',
+    'tripDetails.total': 'Total',
+    'tripDetails.price': 'Price',
+    'tripDetails.discount': 'Discount',
+    'tripDetails.baggage': 'Baggage',
+    'tripDetails.departure': 'Departure',
+    'tripDetails.arrival': 'Arrival',
+    'tripDetails.selectYourSeats': 'Select your seats',
+    'tripDetails.error.routeNotFound': 'Route not found',
+    'tripDetails.errors.routeLoadFailed': 'Error loading route data from API',
+    'tripDetails.errors.missingRouteParams': 'Route parameters are missing from URL. Make sure to include intervalIdMain or interval_id in URL.',
+
+    // Legend
+    'legend.available': 'Available',
+    'legend.selected': 'Selected',
+    'legend.occupied': 'Occupied',
+    'legend.notAvailable': 'Not Available',
+
+    // Discounts
+    'discounts.title': 'Discounts',
+    'discounts.loading': 'Loading discounts...',
+    'discounts.noDiscounts': 'No discounts available',
+    'discounts.selectDiscount': 'Select discount',
+    'discounts.removeDiscount': 'Remove discount',
+    'discounts.viewAll': 'View all',
+    'discounts.showLess': 'Show less',
+
+    // Baggage
+    'baggage.title': 'Baggage',
+    'baggage.loading': 'Loading baggage...',
+    'baggage.noBaggage': 'No additional baggage available',
+    'baggage.addBaggage': 'Add baggage',
+    'baggage.removeBaggage': 'Remove baggage',
+    'baggage.quantity': 'Quantity',
+    'baggage.weight': 'Weight',
+    'baggage.dimensions': 'Dimensions',
+
+    // Booking Form
+    'bookingForm.completeYourBooking': 'Complete your booking',
+    'bookingForm.passenger': 'Passenger',
+    'bookingForm.validation.nameRequired': 'Name is required',
+    'bookingForm.validation.surnameRequired': 'Surname is required',
+    'bookingForm.validation.birthDateRequired': 'Birth date is required',
+    'bookingForm.validation.birthDateInvalid': 'Birth date is invalid',
+    'bookingForm.validation.documentTypeRequired': 'Document type is required',
+    'bookingForm.validation.documentNumberRequired': 'Document number is required',
+    'bookingForm.validation.genderRequired': 'Gender is required',
+    'bookingForm.validation.citizenshipRequired': 'Citizenship is required',
+    'bookingForm.validation.phoneRequired': 'Phone number is required',
+    'bookingForm.validation.phoneInvalid': 'Phone number is invalid',
+    'bookingForm.validation.emailRequired': 'Email address is required',
+    'bookingForm.errors.dataNotReady': 'Booking data is not ready',
+    'bookingForm.errors.bookingFailed': 'Booking failed',
+
+    // Trip Details additional
+    'tripDetails.duration': 'Duration',
+    'tripDetails.amenities': 'Amenities',
+    'tripDetails.luggagePolicy': 'Luggage Policy',
+    'tripDetails.additionalInformation': 'Additional Information',
+    'tripDetails.cancellationPolicy': 'Cancellation Policy',
+    'tripDetails.hoursBeforeDeparture': 'hours before departure',
+
+    // Seat Map
+    'seatMap.seatsAvailable': 'Seats Available',
+    'seatMap.driver': 'Driver',
+    'seatMap.aisle': 'Aisle',
+
+    // Booking Form additional
+    'bookingForm.providePassengerInfo': 'Complete your booking',
+    'bookingForm.passengerInformation': 'Passenger Information',
+    'bookingForm.firstName': 'First Name',
+    'bookingForm.placeholders.firstName': 'Enter your first name',
+    'bookingForm.lastName': 'Last Name',
+    'bookingForm.placeholders.lastName': 'Enter your last name',
+    'bookingForm.birthDate': 'Birth Date',
+    'bookingForm.placeholders.birthDate': 'dd.mm.yyyy',
+    'bookingForm.documentInformation': 'Document Information',
+    'bookingForm.documentType': 'Document Type',
+    'bookingForm.placeholders.selectDocumentType': 'Select document type',
+    'bookingForm.documentNumber': 'Document Number',
+    'bookingForm.placeholders.documentNumber': 'Enter document number',
+    'bookingForm.gender': 'Gender',
+    'bookingForm.placeholders.selectGender': 'Select gender',
+    'bookingForm.citizenship': 'Citizenship',
+    'bookingForm.placeholders.citizenship': 'Select citizenship',
+    'bookingForm.contactInformation': 'Contact Information',
+    'bookingForm.phoneNumber': 'Phone Number',
+    'bookingForm.placeholders.phone': 'Enter phone number',
+    'bookingForm.emailAddress': 'Email Address',
+    'bookingForm.placeholders.email': 'Enter email address',
+    'bookingForm.promocodeOptional': 'Promocode (optional)',
+    'bookingForm.promocode': 'Promocode',
+    'bookingForm.placeholders.promocode': 'Enter promocode',
+    'bookingForm.bookingSummary': 'Booking Summary',
+    'bookingForm.trips': 'Trips:',
+    'bookingForm.oneWay': 'One Way',
+    'bookingForm.totalPrice': 'Total Price:',
+    'bookingForm.completeBooking': 'Complete Booking',
+
+    // Document Types
+    'bookingForm.documentTypes.passport': 'Passport',
+    'bookingForm.documentTypes.idCard': 'ID Card',
+    'bookingForm.documentTypes.birthCertificate': 'Birth Certificate',
+    'bookingForm.documentTypes.driversLicense': 'Driver\'s License',
+
+    // Gender Types
+    'bookingForm.genders.male': 'Male',
+    'bookingForm.genders.female': 'Female',
+    'bookingForm.genders.other': 'Other',
+
+    // Booking Confirmed
+    'bookingConfirmed.title': 'Booking Confirmed',
+    'bookingConfirmed.orderId': 'Order ID',
+    'bookingConfirmed.totalPrice': 'Total Price',
+    'bookingConfirmed.reservationStatus': 'Reservation Confirmed - Payment Required',
+    'bookingConfirmed.reservationUntil': 'Reservation Until',
+    'bookingConfirmed.minutes': 'minutes',
+    'bookingConfirmed.defaultCarrier': 'Default carrier • BUS',
+    'bookingConfirmed.departure': 'Departure',
+    'bookingConfirmed.arrival': 'Arrival',
+    'bookingConfirmed.birth': 'Birth:',
+    'bookingConfirmed.price': 'Price:',
+    'bookingConfirmed.discount': 'Discount:',
+    'bookingConfirmed.seat': 'Seat',
+    'bookingConfirmed.pay': 'Pay',
+    'bookingConfirmed.close': 'Close',
+    'bookingConfirmed.bookingConfirmed': 'Booking Confirmed',
+    'bookingConfirmed.reservationConfirmed': 'Reservation Confirmed - Payment Required',
+    'bookingConfirmed.needCitizenship': 'citizenship required',
+    'bookingConfirmed.at': 'at',
+    'bookingConfirmed.passengers': 'Passengers',
+
     // Index Page
     'index.whatToDo': 'What do you want to do?',
     'index.chooseAction': 'Choose the main action you want to perform. All are simple and clear!',
     'index.bookTicket': 'Book Ticket',
     'index.bookTicketDesc': 'Book your seat on the bus for your journey',
     'index.readyBookNow': 'Book Now',
+    
+    // Help Section
+    'index.needHelp': 'Need Help?',
+    'index.helpDescription': 'We are here to help you make the perfect booking',
+    
+    // Timetable
+    'timetable.book': 'Book',
+    
     'index.readyViewRoutes': 'View Routes',
     'index.viewMyTickets': 'My Tickets',
     
     // Transport Routes
     'transport.title': 'Transport Routes',
     'transport.description': 'Discover and book bus routes across Europe with Starlines and InfoBus partners',
+    'transport.bus': 'Bus',
     'transport.home': 'Home',
     'transport.routes': 'Transport Routes',
     'transport.busRoutes': 'Bus Routes',
@@ -3324,10 +3891,8 @@ const translations = {
 
     // Trip Details Page
     'tripDetails.loading': 'Loading route details...',
-    'tripDetails.error.routeNotFound': 'Route not found',
     'tripDetails.error.failedToLoad': 'Failed to load route details',
     'tripDetails.error.noRouteId': 'No route ID provided',
-    'tripDetails.backToRoutes': 'Back to Routes',
     'tripDetails.backToSearch': 'Back to Search',
     'tripDetails.bookNow': 'Book Now',
     'tripDetails.continueToCheckout': 'Continue to Checkout',
@@ -3335,13 +3900,9 @@ const translations = {
     'tripDetails.numberOfPassengers': 'Number of Passengers',
     'tripDetails.farePerPerson': 'Fare per person',
     'tripDetails.serviceFee': 'Service fee',
-    'tripDetails.total': 'Total',
     'tripDetails.journeyTimeline': 'Journey Timeline',
-    'tripDetails.interactiveMapComingSoon': 'Interactive map coming soon',
     'tripDetails.fareRulesPolicies': 'Fare Rules & Policies',
-    'tripDetails.baggageAllowance': 'Baggage Allowance',
     'tripDetails.changesCancellations': 'Changes & Cancellations',
-    'tripDetails.refundPolicy': 'Refund Policy',
     'tripDetails.handLuggage': 'Hand luggage',
     'tripDetails.checkedBaggage': 'Checked baggage',
     'tripDetails.oversizedItems': 'Oversized items',
@@ -3353,15 +3914,11 @@ const translations = {
     'tripDetails.sameDay': 'same day',
     'tripDetails.noShow': 'No-show',
     'tripDetails.ofFare': 'of fare',
-    'tripDetails.departure': 'Departure',
-    'tripDetails.arrival': 'Arrival',
     'tripDetails.dailyService': 'Daily service',
     'tripDetails.reviews': 'reviews',
     'tripDetails.standardSeat': 'Standard seat',
     'tripDetails.basicAmenities': 'Basic amenities',
     'tripDetails.premiumSeat': 'Premium seat',
-    'tripDetails.extraLegroom': 'Extra legroom',
-    'tripDetails.priorityBoarding': 'Priority boarding',
     'tripDetails.refreshments': 'Refreshments',
     'tripDetails.businessSeat': 'Business seat',
     'tripDetails.maximumComfort': 'Maximum comfort',
@@ -3386,11 +3943,10 @@ const translations = {
     'timetable.duration': 'Duration',
     'timetable.stops': 'Stops',
     'timetable.stop': 'stop',
-    'timetable.book': 'Book',
     'timetable.bookNow': 'Book Now',
     'timetable.from': 'From',
     'timetable.noRoutesOperating': 'No routes operating at this time',
-    'timetable.routesOperating': '{count} routes operating on {date}',
+        'timetable.routesOperating': '{count} routes operating on {date}',
     'timetable.scheduleTitle': 'SCHEDULE',
     'timetable.busSchedule': 'bus schedule for route',
     'timetable.routeTitle': 'Chișinău (Republic of Moldova) – Kyiv (Ukraine)',
@@ -3512,7 +4068,6 @@ const translations = {
     'search.routeFound': 'route found',
     'search.noRoutesFound': 'No routes found',
     'search.tryAdjusting': 'Try adjusting your filters or search criteria',
-    'search.select': 'Select',
     
     // Checkout Process
     'checkout.title': 'Checkout',
@@ -3699,6 +4254,8 @@ const translations = {
     'myTickets.confirmPassword': 'Confirm Password',
     'myTickets.processing': 'Processing...',
     'myTickets.cancel': 'Cancel',
+    'myTickets.noTicketsTitle': 'You have no tickets',
+    'myTickets.noTicketsDescription': 'You don\'t have any booked tickets at the moment. Book your first ticket to start traveling with us!',
     
     // Features
     'features.title': 'Why Choose Starlines?',
@@ -3726,6 +4283,47 @@ const translations = {
     'features.multilingual': 'Multilingual Support',
     'features.multilingualDesc': 'Assistance in Romanian, Russian, and English',
     
+    // Hero Section additional
+    'hero.fastBooking': 'Fast booking',
+    
+    // Amenities
+    'amenities.wifi': 'Wi-Fi',
+    'amenities.usb': 'USB',
+    'amenities.wc': 'Toilet',
+    'amenities.ac': 'Air Conditioning',
+    'amenities.entertainment': 'Entertainment',
+    'amenities.powerOutlets': 'Power Outlets',
+    'amenities.airConditioning': 'Air Conditioning',
+    'amenities.toilet': 'Toilet',
+    'amenities.music': 'Music',
+    'amenities.tv': 'TV',
+    'amenities.luggage': 'Luggage Storage',
+
+    // Operators
+    'operators.starlinesExpress': 'Starlines Express',
+    'operators.starlinesPremium': 'Starlines Premium',
+
+    // Popularity levels
+    'routes.popularity.veryPopular': 'Very Popular',
+    'routes.popularity.popular': 'Popular Route',
+    'routes.popularity.regular': 'Regular Route',
+
+    // Countries
+    'countries.md': 'Moldova',
+    'countries.ro': 'Romania',
+    'countries.ua': 'Ukraine',
+    'countries.ru': 'Russia',
+    'countries.eu': 'Other EU Countries',
+    
+    // Cities
+    'cities.chisinau': 'Chișinău',
+    'cities.kiev': 'Kyiv',
+    'cities.vinnytsia': 'Vinnytsia',
+    'cities.zhytomyr': 'Zhytomyr',
+    'cities.bucharest': 'Bucharest',
+    'cities.istanbul': 'Istanbul',
+    'cities.moscow': 'Moscow',
+    
     // Popular Routes
     'routes.title': 'Popular Destinations',
     'routes.subtitle': 'Discover our most beloved routes',
@@ -3745,6 +4343,13 @@ const translations = {
     'booking.price': 'Price',
     'booking.total': 'Total',
     'booking.serviceFee': 'Service Fee',
+    
+    // Booking Form
+    'bookingForm.passengers': 'Passengers',
+    'bookingForm.backToSeats': 'Back to Seats',
+    'bookingForm.bookingConfirmed': 'Booking Confirmed',
+    'bookingForm.close': 'Close',
+    'bookingForm.bookingError': 'Booking Error',
     
     // About
     'about.title': 'About Us',
@@ -4717,6 +5322,698 @@ const translations = {
     // Contact Info
     'refunds.phone': 'Phone',
     'refunds.email': 'Email',
+    'refunds.phoneNumber': '+373 22 123 456',
+    'refunds.emailAddress': 'refunds@starlines.md'
+  },
+  
+  uk: {
+    // Authentication
+    'auth.login.title': 'Вхід',
+    'auth.login.description': 'Увійдіть до свого акаунту',
+    'auth.login.button': 'Увійти',
+    'auth.signUp.title': 'Реєстрація',
+    'auth.signUp.description': 'Створіть новий акаунт',
+    'auth.signUp.button': 'Зареєструватися',
+    'auth.signUp.success.title': 'Акаунт створено успішно!',
+    'auth.signUp.success.description': 'Перевірте електронну пошту для підтвердження акаунту',
+    'auth.signUp.success.login': 'Увійти',
+    'auth.email': 'Електронна пошта',
+    'auth.emailPlaceholder': 'Введіть вашу електронну пошту',
+    'auth.password': 'Пароль',
+    'auth.passwordPlaceholder': 'Введіть ваш пароль',
+    'auth.confirmPassword': 'Підтвердіть пароль',
+    'auth.confirmPasswordPlaceholder': 'Підтвердіть ваш пароль',
+    'auth.firstName': 'Ім\'я',
+    'auth.firstNamePlaceholder': 'Введіть ваше ім\'я',
+    'auth.lastName': 'Прізвище',
+    'auth.lastNamePlaceholder': 'Введіть ваше прізвище',
+    'auth.profile': 'Профіль',
+    'auth.logout': 'Вийти',
+    'auth.welcome': 'Ласкаво просимо',
+    'auth.welcomeBack': 'З поверненням',
+    'auth.createAccount': 'Створити акаунт',
+    'auth.alreadyHaveAccount': 'Вже маєте акаунт?',
+    'auth.dontHaveAccount': 'Не маєте акаунту?',
+    'auth.forgotPassword': 'Забули пароль?',
+    'auth.rememberMe': 'Запам\'ятати мене',
+    'auth.or': 'або',
+    'auth.continueWith': 'Продовжити з',
+    'auth.termsAgreement': 'Реєструючись, ви погоджуєтесь з',
+    'auth.termsOfService': 'Умовами використання',
+    'auth.and': 'та',
+    'auth.privacyPolicy': 'Політикою конфіденційності',
+
+    // Header
+    'header.home': 'Головна',
+    'header.homeDesc': 'Повернутися на головну',
+    'header.timetable': 'Розклад',
+    'header.timetableDesc': 'Переглянути розклад автобусів',
+    'header.myTickets': 'Мої квитки',
+    'header.myTicketsDesc': 'Керувати бронюваннями',
+    'header.more': 'Більше',
+    'header.legal': 'Правові',
+    'header.trust.safe': 'Безпечний транспорт',
+    'header.trust.experience': 'Досвід роботи',
+    'header.tagline': 'Надійний транспорт по всій Східній Європі',
+    
+    // Common actions
+    'common.from': 'Звідки',
+
+    // Hero Section
+    'hero.title': 'Подорожуйте безпечно',
+    'hero.subtitle': 'Надійні автобусні маршрути по всій Східній Європі',
+    'hero.routes': 'Маршрути',
+    'hero.passengers': 'Пасажири',
+    'hero.support': 'Підтримка',
+    'hero.secure': 'Безпечно',
+    'hero.popularRoutes': 'Популярні маршрути',
+    'hero.fastBooking': 'Швидке бронювання',
+
+    // Search
+    'search.from': 'Звідки',
+    'search.to': 'Куди',
+    'search.fromPlaceholder': 'Місто відправлення',
+    'search.toPlaceholder': 'Місто призначення',
+    'search.departure': 'Дата відправлення',
+    'search.return': 'Дата повернення',
+    'search.departureDate': 'Дата відправлення',
+    'search.returnDate': 'Дата повернення',
+    'search.passengers': 'Пасажири',
+    'search.search': 'Пошук',
+    'search.searchTickets': 'Пошук квитків',
+    'search.searchTrips': 'Пошук поїздок',
+    'search.popularRoutes': 'Популярні маршрути',
+    'search.filters': 'Фільтри',
+    'search.departureTime': 'Час відправлення',
+    'search.duration': 'Тривалість',
+    'search.price': 'Ціна',
+    'search.amenities': 'Зручності',
+    'search.operator': 'Перевізник',
+    'search.stops': 'Зупинки',
+    'search.sortBy': 'Сортувати за',
+    'search.recommended': 'Рекомендовані',
+    'search.priceLow': 'Ціна (зростання)',
+    'search.priceHigh': 'Ціна (спадання)',
+    'search.rating': 'Рейтинг',
+    'search.routeFound': 'маршрут знайдено',
+    'search.routesFound': 'маршрутів знайдено',
+    'search.noRoutesFound': 'Маршрути не знайдено',
+    'search.tryAdjusting': 'Спробуйте змінити фільтри',
+    'search.resetFilters': 'Скинути фільтри',
+    'search.overnight': 'Вночі',
+    'search.select': 'Оберіть',
+    'search.selectDate': 'Оберіть дату',
+    'search.selectPassengers': 'Оберіть кількість пасажирів',
+    'search.selectBaggage': 'Оберіть багаж',
+    'search.swapCities': 'Поміняти міста',
+    
+    // Baggage
+    '1_baggage_free': '1 багаж безкоштовно',
+    
+    // Citizenship
+    'need_citizenship': 'Потрібне громадянство',
+
+    // Trip Details
+    'tripDetails.title': 'Деталі поїздки',
+    'tripDetails.continueToCheckout': 'Продовжити до оформлення',
+    'tripDetails.cancellationFee': 'Плата за скасування',
+    'tripDetails.selectSeats': 'Обрати місця',
+    'tripDetails.passengers': 'Пасажири',
+    'tripDetails.seatSelection': 'Вибір місць',
+    'tripDetails.continue': 'Продовжити',
+    'tripDetails.back': 'Назад',
+    'tripDetails.total': 'Всього',
+    'tripDetails.price': 'Ціна',
+    'tripDetails.discount': 'Знижка',
+    'tripDetails.baggage': 'Багаж',
+    'tripDetails.departure': 'Відправлення',
+    'tripDetails.arrival': 'Прибуття',
+    'tripDetails.selectYourSeats': 'Оберіть ваші місця',
+    'tripDetails.error.routeNotFound': 'Маршрут не знайдено',
+    'tripDetails.errors.routeLoadFailed': 'Помилка завантаження даних маршруту з API',
+    'tripDetails.errors.missingRouteParams': 'Параметри маршруту відсутні в URL. Переконайтеся, що включили intervalIdMain або interval_id в URL.',
+
+    // Legend
+    'legend.available': 'Доступно',
+    'legend.selected': 'Обрано',
+    'legend.occupied': 'Зайнято',
+    'legend.notAvailable': 'Недоступно',
+
+    // Discounts
+    'discounts.title': 'Знижки',
+    'discounts.loading': 'Завантаження знижок...',
+    'discounts.noDiscounts': 'Знижки недоступні',
+    'discounts.selectDiscount': 'Обрати знижку',
+    'discounts.removeDiscount': 'Видалити знижку',
+    'discounts.viewAll': 'Переглянути всі',
+    'discounts.showLess': 'Показати менше',
+
+    // Baggage
+    'baggage.title': 'Багаж',
+    'baggage.loading': 'Завантаження багажу...',
+    'baggage.noBaggage': 'Додатковий багаж недоступний',
+    'baggage.addBaggage': 'Додати багаж',
+    'baggage.removeBaggage': 'Видалити багаж',
+    'baggage.quantity': 'Кількість',
+    'baggage.weight': 'Вага',
+    'baggage.dimensions': 'Розміри',
+
+    // Booking Form
+    'bookingForm.completeYourBooking': 'Завершіть бронювання',
+    'bookingForm.passenger': 'Пасажир',
+    'bookingForm.validation.nameRequired': "Ім'я обов'язкове",
+    'bookingForm.validation.surnameRequired': "Прізвище обов'язкове",
+    'bookingForm.validation.birthDateRequired': "Дата народження обов'язкова",
+    'bookingForm.validation.birthDateInvalid': 'Дата народження недійсна',
+    'bookingForm.validation.documentTypeRequired': "Тип документа обов'язковий",
+    'bookingForm.validation.documentNumberRequired': "Номер документа обов'язковий",
+    'bookingForm.validation.genderRequired': "Стать обов'язкова",
+    'bookingForm.validation.citizenshipRequired': "Громадянство обов'язкове",
+    'bookingForm.validation.phoneRequired': "Номер телефону обов'язковий",
+    'bookingForm.validation.phoneInvalid': 'Номер телефону недійсний',
+    'bookingForm.validation.emailRequired': "Адреса електронної пошти обов'язкова",
+    'bookingForm.errors.dataNotReady': 'Дані бронювання не готові',
+    'bookingForm.errors.bookingFailed': 'Бронювання не вдалося',
+
+    // Trip Details additional
+    'tripDetails.duration': 'Тривалість',
+    'tripDetails.amenities': 'Зручності',
+    'tripDetails.luggagePolicy': 'Політика багажу',
+    'tripDetails.additionalInformation': 'Додаткова інформація',
+    'tripDetails.cancellationPolicy': 'Політика скасування',
+    'tripDetails.hoursBeforeDeparture': 'годин до відправлення',
+
+    // Seat Map
+    'seatMap.seatsAvailable': 'Доступні місця',
+    'seatMap.driver': 'Водій',
+    'seatMap.aisle': 'Прохід',
+
+    // Booking Form additional
+    'bookingForm.providePassengerInfo': 'Завершіть бронювання',
+    'bookingForm.passengerInformation': 'Інформація про пасажира',
+    'bookingForm.firstName': "Ім'я",
+    'bookingForm.placeholders.firstName': "Введіть ім'я",
+    'bookingForm.lastName': 'Прізвище',
+    'bookingForm.placeholders.lastName': 'Введіть прізвище',
+    'bookingForm.birthDate': 'Дата народження',
+    'bookingForm.placeholders.birthDate': 'дд.мм.рррр',
+    'bookingForm.documentInformation': 'Інформація про документ',
+    'bookingForm.documentType': 'Тип документа',
+    'bookingForm.placeholders.selectDocumentType': 'Оберіть тип документа',
+    'bookingForm.documentNumber': 'Номер документа',
+    'bookingForm.placeholders.documentNumber': 'Введіть номер документа',
+    'bookingForm.gender': 'Стать',
+    'bookingForm.placeholders.selectGender': 'Оберіть стать',
+    'bookingForm.citizenship': 'Громадянство',
+    'bookingForm.placeholders.citizenship': 'Оберіть громадянство',
+    'bookingForm.contactInformation': 'Контактна інформація',
+    'bookingForm.phoneNumber': 'Номер телефону',
+    'bookingForm.placeholders.phone': 'Введіть номер телефону',
+    'bookingForm.emailAddress': 'Адреса електронної пошти',
+    'bookingForm.placeholders.email': 'Введіть адресу електронної пошти',
+    'bookingForm.promocodeOptional': 'Промокод (необов\'язково)',
+    'bookingForm.promocode': 'Промокод',
+    'bookingForm.placeholders.promocode': 'Введіть промокод',
+    'bookingForm.bookingSummary': 'Підсумок бронювання',
+    'bookingForm.trips': 'Поїздки:',
+    'bookingForm.oneWay': 'В один бік',
+    'bookingForm.totalPrice': 'Загальна ціна:',
+    'bookingForm.completeBooking': 'Завершити бронювання',
+
+    // Document Types
+    'bookingForm.documentTypes.passport': 'Паспорт',
+    'bookingForm.documentTypes.idCard': 'Посвідчення особи',
+    'bookingForm.documentTypes.birthCertificate': 'Свідоцтво про народження',
+    'bookingForm.documentTypes.driversLicense': 'Посвідчення водія',
+
+    // Gender Types
+    'bookingForm.genders.male': 'Чоловічий',
+    'bookingForm.genders.female': 'Жіночий',
+    'bookingForm.genders.other': 'Інший',
+
+    // Booking Confirmed
+    'bookingConfirmed.title': 'Бронювання Підтверджено',
+    'bookingConfirmed.orderId': 'ID Замовлення',
+    'bookingConfirmed.totalPrice': 'Загальна Ціна',
+    'bookingConfirmed.reservationStatus': 'Статус Бронювання - Потрібна Оплата',
+    'bookingConfirmed.reservationUntil': 'Бронювання До',
+    'bookingConfirmed.minutes': 'хвилин',
+    'bookingConfirmed.defaultCarrier': 'Перевізник за замовчуванням • АВТОБУС',
+    'bookingConfirmed.departure': 'Відправлення',
+    'bookingConfirmed.arrival': 'Прибуття',
+    'bookingConfirmed.birth': 'Народження:',
+    'bookingConfirmed.price': 'Ціна:',
+    'bookingConfirmed.discount': 'Знижка:',
+    'bookingConfirmed.seat': 'Місце',
+    'bookingConfirmed.pay': 'Сплатити',
+    'bookingConfirmed.close': 'Закрити',
+    'bookingConfirmed.bookingConfirmed': 'Бронювання Підтверджено',
+    'bookingConfirmed.reservationConfirmed': 'Бронювання Підтверджено - Потрібна Оплата',
+    'bookingConfirmed.needCitizenship': 'потрібне громадянство',
+    'bookingConfirmed.at': 'о',
+    'bookingConfirmed.passengers': 'Пасажири',
+
+    // My Tickets
+    'myTickets.title': 'Мої квитки',
+    'myTickets.subtitle': 'Знайдіть свої квитки, завантажте PDF-файли та керуйте бронюваннями',
+    'myTickets.lookupTab': 'Знайти квиток',
+    'myTickets.accountTab': 'Мій акаунт',
+    'myTickets.findTicket': 'Знайдіть свій квиток',
+    'myTickets.orderNumber': 'Номер замовлення',
+    'myTickets.orderNumberPlaceholder': 'наприклад, STL-2024-001',
+    'myTickets.securityCode': 'Код безпеки',
+    'myTickets.securityCodePlaceholder': 'Введіть код безпеки',
+    'myTickets.findTicketButton': 'Знайти квиток',
+    'myTickets.searching': 'Пошук...',
+    'myTickets.helpText1': 'Немає ваших деталей?',
+    'myTickets.helpText2': 'Перевірте електронний лист підтвердження або зверніться до підтримки',
+    'myTickets.ticketDetails': 'Деталі квитка',
+    'myTickets.enterOrderDetails': 'Введіть деталі замовлення, щоб знайти квиток',
+    'myTickets.downloadTicket': 'Завантажити квиток',
+    'myTickets.cancelTicket': 'Скасувати квиток',
+    'myTickets.modifyTicket': 'Змінити квиток',
+    'myTickets.ticketStatus': 'Статус квитка',
+    'myTickets.active': 'Активний',
+    'myTickets.cancelled': 'Скасований',
+    'myTickets.used': 'Використаний',
+    'myTickets.expired': 'Прострочений',
+    'myTickets.createAccount': 'Створити акаунт',
+    'myTickets.signIn': 'Увійти',
+    'myTickets.signUp': 'Зареєструватися',
+    'myTickets.signOut': 'Вийти',
+    'myTickets.accountCreated': 'Акаунт створено',
+    'myTickets.accountCreatedSuccess': 'Ваш акаунт було успішно створено!',
+    'myTickets.signInSuccess': 'Успішний вхід',
+    'myTickets.signedIn': 'Ви успішно увійшли в систему.',
+    'myTickets.signUpSuccess': 'Успішна реєстрація',
+    'myTickets.signedUp': 'Ви успішно зареєструвалися.',
+    'myTickets.signInError': 'Помилка входу',
+    'myTickets.signInErrorDesc': 'Не вдалося увійти в систему. Спробуйте ще раз.',
+    'myTickets.signUpError': 'Помилка реєстрації',
+    'myTickets.signUpErrorDesc': 'Не вдалося зареєструватися. Спробуйте ще раз.',
+    'myTickets.signOutError': 'Помилка виходу',
+    'myTickets.signOutErrorDesc': 'Спробуйте ще раз.',
+    'myTickets.signOutSuccess': 'Успішний вихід',
+    'myTickets.signedOut': 'Ви успішно вийшли з системи.',
+    'myTickets.welcomeMessage': 'Ласкаво просимо до вашого акаунту!',
+    'myTickets.accountActive': 'Ваш акаунт активний, і ви можете отримати доступ до всіх функцій.',
+    'myTickets.signInDescription': 'Увійдіть, щоб отримати доступ до ваших квитків.',
+    'myTickets.signUpDescription': 'Створіть новий акаунт, щоб почати користуватися нашими послугами.',
+    'myTickets.firstName': 'Ім\'я',
+    'myTickets.lastName': 'Прізвище',
+    'myTickets.password': 'Пароль',
+    'myTickets.confirmPassword': 'Підтвердіть пароль',
+    'myTickets.processing': 'Обробка...',
+    'myTickets.cancel': 'Скасувати',
+    'myTickets.noTicketsTitle': 'У вас немає квитків',
+    'myTickets.noTicketsDescription': 'У вас поки немає заброньованих квитків. Забронюйте свій перший квиток, щоб почати подорожувати з нами!',
+    'myTickets.bookNewTrip': 'Забронювати нову поїздку',
+
+    'search.oneWay': 'В один бік',
+    'search.roundTrip': 'Туди і назад',
+
+    // Trip Details
+    'trip.selectSeats': 'Оберіть місця',
+    'tripDetails.outboundJourney': 'Поїздка туди',
+    'seatMap.selectSeats': 'Оберіть місця',
+    'seatMap.selectedSeatsLabel': 'Обрані місця:',
+    'seatMap.selectedCount': 'обрано',
+    'booking.passengers': 'Пасажири',
+    
+    // Booking Form
+    'bookingForm.passengers': 'Пасажири',
+    'bookingForm.backToSeats': 'Назад до місць',
+    'bookingForm.bookingConfirmed': 'Бронювання підтверджено',
+    'bookingForm.close': 'Закрити',
+    'bookingForm.bookingError': 'Помилка бронювання',
+    
+    'trip.selectSeatsDesc': 'Оберіть місця для вашої поїздки',
+    'trip.passengers': 'Пасажири',
+    'trip.seatSelection': 'Вибір місць',
+    'trip.seat': 'Місце',
+    'trip.seats': 'Місця',
+    'trip.available': 'Доступне',
+    'trip.occupied': 'Зайняте',
+    'trip.selected': 'Обране',
+    'trip.continue': 'Продовжити',
+    'trip.back': 'Назад',
+    'trip.total': 'Всього',
+    'trip.price': 'Ціна',
+    'trip.discount': 'Знижка',
+    'trip.baggage': 'Багаж',
+
+    // Booking
+    'booking.title': 'Бронювання',
+    'booking.passengerInfo': 'Інформація про пасажира',
+    'booking.contactInfo': 'Контактна інформація',
+    'booking.payment': 'Оплата',
+    'booking.confirmation': 'Підтвердження',
+    'booking.firstName': 'Ім\'я',
+    'booking.lastName': 'Прізвище',
+    'booking.birthDate': 'Дата народження',
+    'booking.documentType': 'Тип документа',
+    'booking.documentNumber': 'Номер документа',
+    'booking.phone': 'Телефон',
+    'booking.email': 'Електронна пошта',
+    'booking.promocode': 'Промокод',
+    'booking.optional': 'Необов\'язково',
+    'booking.summary': 'Підсумок бронювання',
+    'booking.totalPrice': 'Загальна ціна',
+    'booking.completeBooking': 'Завершити бронювання',
+    'booking.processing': 'Обробка...',
+
+    // Checkout
+    'checkout.title': 'Оформлення замовлення',
+    'checkout.passengers': 'Пасажири',
+    'checkout.passengerDetails': 'Деталі пасажирів',
+    'checkout.contactInformation': 'Контактна інформація',
+    'checkout.paymentMethod': 'Спосіб оплати',
+    'checkout.billingAddress': 'Адреса для рахунків',
+    'checkout.orderSummary': 'Підсумок замовлення',
+    'checkout.priceBreakdown': 'Розбивка ціни',
+    'checkout.basePrice': 'Базова ціна',
+    'checkout.taxes': 'Податки',
+    'checkout.fees': 'Збори',
+    'checkout.total': 'Всього',
+    'checkout.placeOrder': 'Оформити замовлення',
+    'checkout.processing': 'Обробка замовлення...',
+
+    // Footer
+    'footer.transport': 'Транспорт',
+    'footer.info': 'Інформація',
+    'footer.support': 'Підтримка',
+    'footer.copyright': 'Всі права захищені',
+
+    // Features
+    'features.safeTransport': 'Безпечний транспорт',
+    'features.comfortableSeats': 'Зручні місця',
+    'features.wifi': 'Wi-Fi',
+    'features.airConditioning': 'Кондиціонер',
+    'features.entertainment': 'Розваги',
+    'features.powerOutlets': 'Розетки',
+    'features.toilet': 'Туалет',
+    'features.refreshments': 'Напої та закуски',
+
+    // Amenities
+    'amenities.wifi': 'Wi-Fi',
+    'amenities.usb': 'USB',
+    'amenities.wc': 'Туалет',
+    'amenities.ac': 'Кондиціонер',
+    'amenities.entertainment': 'Розваги',
+    'amenities.powerOutlets': 'Розетки',
+    'amenities.airConditioning': 'Кондиціонер',
+    'amenities.toilet': 'Туалет',
+    'amenities.music': 'Музика',
+    'amenities.tv': 'ТВ',
+    'amenities.luggage': 'Зберігання багажу',
+
+    // Operators
+    'operators.starlinesExpress': 'Starlines Express',
+    'operators.starlinesPremium': 'Starlines Premium',
+
+    // Popularity levels
+    'routes.popularity.veryPopular': 'Дуже популярний',
+    'routes.popularity.popular': 'Популярний маршрут',
+    'routes.popularity.regular': 'Звичайний маршрут',
+
+    // Countries
+    'countries.md': 'Молдова',
+    'countries.ro': 'Румунія',
+    'countries.ua': 'Україна',
+    'countries.ru': 'Росія',
+    'countries.eu': 'Інші країни ЄС',
+    
+    // Cities
+    'cities.chisinau': 'Кишинів',
+    'cities.kiev': 'Київ',
+    'cities.vinnytsia': 'Вінниця',
+    'cities.zhytomyr': 'Житомир',
+    'cities.bucharest': 'Бухарест',
+    'cities.istanbul': 'Стамбул',
+    'cities.moscow': 'Москва',
+    
+    // Popular Routes
+    'routes.title': 'Популярні маршрути',
+    'routes.subtitle': 'Відкрийте для себе наші найулюбленіші маршрути',
+    'routes.viewAll': 'Переглянути всі маршрути',
+    'routes.perPerson': 'з людини',
+    'routes.viewDetails': 'Переглянути деталі',
+    'routes.readyToExplore': 'Готові досліджувати?',
+    'routes.findPerfectRoute': 'Знайдіть ідеальний маршрут',
+    'routes.browseAll': 'Переглянути всі',
+
+    // Index Page
+    'index.timetable': 'Розклад',
+    'index.timetableDesc': 'Переглянути розклад автобусів',
+    'index.myTicketsDesc': 'Керувати вашими бронюваннями',
+    'index.contactUs': 'Зв\'яжіться з нами',
+    'index.contactDesc': 'Отримайте допомогу та підтримку',
+    'index.viewTimetable': 'Переглянути розклад',
+    'index.viewMyTickets': 'Мої квитки',
+    'index.viewAllContacts': 'Всі контакти',
+    'index.faq': 'Часті питання',
+    'index.faqDesc': 'Знайдіть відповіді на популярні питання',
+    'index.whatToDo': 'Що ви хочете зробити?',
+    'index.chooseAction': 'Оберіть основну дію, яку ви хочете виконати. Все просто і зрозуміло!',
+    'index.phone': 'Телефон',
+    'index.workingHours': 'Години роботи',
+    'index.howToBook': 'Як забронювати?',
+    'index.canCancel': 'Чи можу я скасувати квиток?',
+    'index.whatIfLate': 'Що робити, якщо я запізнився?',
+    'index.viewAllQuestions': 'Переглянути всі питання',
+    'index.readyToStart': 'Готові розпочати подорож?',
+    'index.readyDesc': 'Забронюйте місце в автобусі за кілька простих кліків. Процес швидкий і безпечний!',
+    'index.readyBookNow': 'Забронювати зараз',
+    'index.needHelp': 'Потрібна допомога?',
+    'index.helpDescription': 'Ми тут, щоб допомогти вам зробити ідеальне бронювання',
+    
+    // Timetable
+    'timetable.book': 'Забронювати',
+    
+    // Transport Routes
+    'transport.bus': 'Автобус',
+
+    // About
+    'about.title': 'Про нас',
+    'about.subtitle': 'Дізнайтеся більше про Starlines',
+
+    // Blog
+    'blog.title': 'Блог',
+    'blog.subtitle': 'Останні новини та статті',
+
+    // Contact
+    'contact.title': 'Контакти',
+    'contact.subtitle': 'Зв\'яжіться з нами',
+
+    // Legal
+    'legal.terms': 'Умови використання',
+    'legal.termsDesc': 'Умови та положення',
+    'legal.privacy': 'Політика конфіденційності',
+    'legal.privacyDesc': 'Як ми захищаємо ваші дані',
+    'legal.refund': 'Політика повернення',
+    'legal.refundDesc': 'Умови повернення коштів',
+
+    // Terms of Service
+    'terms.title': 'Умови використання',
+    'terms.subtitle': 'Будь ласка, уважно прочитайте ці умови перед використанням наших послуг. Використовуючи Starlines, ви погоджуєтесь дотримуватися цих умов.',
+    'terms.lastUpdated': 'Останнє оновлення: 1 січня 2024',
+    'terms.version': 'Версія 2.1',
+    'terms.quickNavigation': 'Швидка навігація',
+    'terms.questionsAboutTerms': 'Питання про наші умови?',
+    'terms.legalTeamHelp': 'Наша юридична команда готова допомогти роз\'яснити будь-які питання, які у вас можуть виникнути щодо цих умов.',
+    'terms.contactLegal': 'Зв\'яжіться з нами за адресою',
+    'terms.orCall': 'або зателефонуйте',
+
+    // Terms Sections
+    'terms.section1.title': '1. Прийняття умов',
+    'terms.section1.content': 'Отримуючи доступ до веб-сайту Starlines, мобільного додатку або послуг, ви визнаєте, що прочитали, зрозуміли та погоджуєтесь дотримуватися цих Умов використання. Якщо ви не погоджуєтесь з цими умовами, будь ласка, не використовуйте наші послуги.',
+
+    'terms.section2.title': '2. Опис послуг',
+    'terms.section2.content': 'Starlines надає послуги автобусних перевезень по всій Східній Європі. Наші послуги включають онлайн-бронювання квитків, інформацію про маршрути, підтримку клієнтів та пов\'язані послуги подорожей. Ми залишаємо за собою право змінювати, призупиняти або припиняти будь-який аспект наших послуг у будь-який час.',
+
+    'terms.section3.title': '3. Бронювання та оплата',
+    'terms.section3.content': 'Всі бронювання підлягають наявності та підтвердженню. Оплата повинна бути завершена на момент бронювання. Ми приймаємо основні кредитні картки, дебетові картки та інші способи оплати, як показано під час оформлення замовлення. Ціни можуть змінюватися без попередження до підтвердження оплати.',
+
+    'terms.section4.title': '4. Квитки та подорожі',
+    'terms.section4.content': 'Для подорожі потрібен дійсний документ, що посвідчує особу. Пасажири повинні прибути до місця відправлення принаймні за 30 хвилин до запланованого відправлення. Квитки не підлягають передачі, якщо не зазначено інше. Втрачені або вкрадені квитки не можуть бути замінені без належної документації.',
+
+    'terms.section5.title': '5. Скасування та повернення',
+    'terms.section5.content': 'Скасування, зроблені більше ніж за 24 години до відправлення, мають право на повернення коштів мінус комісія за обробку. Скасування протягом 24 годин до відправлення можуть не мати права на повернення. Неявка не має права на повернення. Повернення обробляються протягом 7-10 робочих днів.',
+
+    'terms.section6.title': '6. Багаж та особисті речі',
+    'terms.section6.content': 'Кожному пасажиру дозволено один ручний багаж (максимум 10 кг) та один зареєстрований багаж (максимум 20 кг). Додаткові збори за багаж застосовуються за надлишкову вагу або додаткові сумки. Starlines не несе відповідальності за втрачені, пошкоджені або вкрадені особисті речі, якщо це не спричинено нашою недбаливістю.',
+
+    'terms.section7.title': '7. Поведінка пасажирів',
+    'terms.section7.content': 'Пасажири повинні дотримуватися всіх правил безпеки та інструкцій екіпажу. Непристойна, образлива або небезпечна поведінка може призвести до видалення з транспортного засобу без повернення коштів. Куріння, вживання алкоголю та заборонених речовин заборонено у всіх транспортних засобах.',
+
+    'terms.section8.title': '8. Обмеження відповідальності',
+    'terms.section8.content': 'Відповідальність Starlines обмежена в межах, дозволених законом. Ми не несемо відповідальності за затримки, спричинені погодою, рухом, механічними проблемами або іншими обставинами поза нашим контролем. Максимальна відповідальність за будь-яку претензію обмежена ціною оплаченого квитка.',
+
+    'terms.section9.title': '9. Конфіденційність та захист даних',
+    'terms.section9.content': 'Ми збираємо та обробляємо персональні дані відповідно до нашої Політики конфіденційності та застосовного законодавства про захист даних. Використовуючи наші послуги, ви погоджуєтесь на збір та використання вашої інформації, як описано в нашій Політиці конфіденційності.',
+
+    'terms.section10.title': '10. Зміни в умовах',
+    'terms.section10.content': 'Starlines залишає за собою право змінювати ці Умови використання у будь-який час. Зміни будуть опубліковані на нашому веб-сайті та набудуть чинності негайно. Продовження використання наших послуг після змін означає прийняття змінених умов.',
+
+    'terms.section11.title': '11. Застосовне право',
+    'terms.section11.content': 'Ці Умови використання регулюються законами Молдови. Будь-які спори, що виникають з цих умов або наших послуг, повинні вирішуватися в судах Молдови. Якщо будь-який пункт визнається недійсним, інші пункти залишаються в повній силі.',
+
+    'terms.section12.title': '12. Контактна інформація',
+    'terms.section12.content': 'З питаннями про ці Умови використання, будь ласка, зв\'яжіться з нами за адресою legal@starlines.md або зателефонуйте в нашу службу підтримки клієнтів за номером +373 22 123 456. Наш юридичний відділ працює з понеділка по п\'ятницю з 9:00 до 18:00.',
+
+    // Privacy Policy
+    'privacy.title': 'Політика конфіденційності',
+    'privacy.subtitle': 'Ми цінуємо вашу конфіденційність та зобов\'язуємося захищати ваші персональні дані. Ця політика пояснює, як ми збираємо, використовуємо та захищаємо вашу інформацію.',
+    'privacy.lastUpdated': 'Останнє оновлення: 1 січня 2024',
+    'privacy.gdprCompliant': 'Відповідність GDPR',
+    'privacy.typesOfData': 'Типи даних, які ми збираємо',
+    'privacy.quickNavigation': 'Швидка навігація',
+    'privacy.exerciseYourRights': 'Реалізуйте свої права на конфіденційність',
+    'privacy.rightsDescription': 'Ви маєте контроль над своїми персональними даними. Зв\'яжіться з нами, щоб реалізувати будь-яке з цих прав:',
+    'privacy.contactDPO': 'Зв\'яжіться з нашим Спеціалістом з захисту даних за адресою',
+    'privacy.orCall': 'або зателефонуйте',
+
+    // Data Types
+    'privacy.personalInformation': 'Персональна інформація',
+    'privacy.paymentInformation': 'Платіжна інформація',
+    'privacy.travelInformation': 'Інформація про подорожі',
+    'privacy.technicalInformation': 'Технічна інформація',
+    'privacy.name': 'Ім\'я',
+    'privacy.emailAddress': 'Адреса електронної пошти',
+    'privacy.phoneNumber': 'Номер телефону',
+    'privacy.dateOfBirth': 'Дата народження',
+    'privacy.creditCardDetails': 'Деталі кредитної картки',
+    'privacy.billingAddress': 'Адреса для рахунків',
+    'privacy.paymentHistory': 'Історія платежів',
+    'privacy.bookingHistory': 'Історія бронювань',
+    'privacy.travelPreferences': 'Вподобання подорожей',
+    'privacy.specialRequirements': 'Особливі вимоги',
+    'privacy.ipAddress': 'IP-адреса',
+    'privacy.browserType': 'Тип браузера',
+    'privacy.deviceInformation': 'Інформація про пристрій',
+    'privacy.usageAnalytics': 'Аналітика використання',
+
+    // Privacy Rights
+    'privacy.accessData': 'Доступ до ваших даних',
+    'privacy.rectifyInaccuracies': 'Виправлення неточностей',
+    'privacy.eraseData': 'Видалення ваших даних',
+    'privacy.restrictProcessing': 'Обмеження обробки',
+    'privacy.dataPortability': 'Портативність даних',
+    'privacy.objectToProcessing': 'Заперечення проти обробки',
+    'privacy.withdrawConsent': 'Відкликання згоди',
+    'privacy.fileComplaint': 'Подача скарги',
+
+    // Privacy Sections
+    'privacy.section1.title': '1. Вступ',
+    'privacy.section1.content': 'Starlines ("ми", "наш" або "нас") зобов\'язується захищати вашу конфіденційність та персональні дані. Ця Політика конфіденційності пояснює, як ми збираємо, використовуємо, обробляємо та захищаємо вашу інформацію при використанні нашого веб-сайту, мобільного додатку та послуг. Ми дотримуємося застосовного законодавства про захист даних, включаючи GDPR.',
+
+    'privacy.section2.title': '2. Інформація, яку ми збираємо',
+    'privacy.section2.content': 'Ми збираємо інформацію, яку ви надаєте безпосередньо (ім\'я, електронна пошта, телефон, платіжні деталі), інформацію, зібрану автоматично (IP-адреса, тип браузера, інформація про пристрій, дані використання), та інформацію від третіх сторін (платіжні процесори, платформи соціальних мереж, якщо ви вибрали підключення).',
+
+    'privacy.section3.title': '3. Як ми використовуємо вашу інформацію',
+    'privacy.section3.content': 'Ми використовуємо вашу інформацію для обробки бронювань та платежів, надання підтримки клієнтів, надсилання підтверджень бронювань та оновлень подорожей, покращення наших послуг, дотримання правових зобов\'язань, запобігання шахрайству та забезпечення безпеки, а також надсилання маркетингових повідомлень (з вашої згоди).',
+
+    'privacy.section4.title': '4. Обмін та розкриття інформації',
+    'privacy.section4.content': 'Ми не продаємо вашу персональну інформацію. Ми можемо ділитися вашою інформацією з постачальниками послуг (платіжні процесори, IT-підтримка), діловими партнерами (автобусні оператори), правоохоронними органами, коли це вимагається законом, та у випадку передачі бізнесу (злиття, придбання).',
+
+    'privacy.section5.title': '5. Безпека даних',
+    'privacy.section5.content': 'Ми впроваджуємо відповідні технічні та організаційні заходи для захисту ваших персональних даних від несанкціонованого доступу, зміни, розкриття або знищення. Це включає шифрування, захищені сервери, контроль доступу та регулярні аудити безпеки.',
+
+    'privacy.section6.title': '6. Зберігання даних',
+    'privacy.section6.content': 'Ми зберігаємо ваші персональні дані лише стільки часу, скільки необхідно для цілей, описаних у цій політиці, або скільки вимагається законом. Дані бронювання зазвичай зберігаються протягом 7 років для бухгалтерських та правових цілей. Маркетингові дані зберігаються до тих пір, поки ви не відкличете згоду.',
+
+    'privacy.section7.title': '7. Ваші права',
+    'privacy.section7.content': 'Відповідно до GDPR та інших застосовних законів, ви маєте право на доступ, виправлення, видалення, обмеження обробки, портативність даних, заперечення проти обробки та відкликання згоди. Ви можете реалізувати ці права, зв\'язавшись з нами за адресою privacy@starlines.md.',
+
+    'privacy.section8.title': '8. Файли cookie та відстеження',
+    'privacy.section8.content': 'Ми використовуємо файли cookie та подібні технології для покращення вашого досвіду, аналізу використання та надання персоналізованого контенту. Ви можете контролювати налаштування файлів cookie через налаштування вашого браузера. Дивіться нашу Політику щодо файлів cookie для детальної інформації про файли cookie, які ми використовуємо.',
+
+    'privacy.section9.title': '9. Міжнародна передача даних',
+    'privacy.section9.content': 'Ваші дані можуть бути передані та оброблені в країнах за межами вашого місця проживання. Ми забезпечуємо наявність відповідних гарантій, включаючи рішення про достатність, стандартні договірні умови або інші юридично схвалені механізми.',
+
+    'privacy.section10.title': '10. Конфіденційність дітей',
+    'privacy.section10.content': 'Наші послуги не призначені для дітей віком до 16 років. Ми не збираємо свідомо персональну інформацію від дітей віком до 16 років. Якщо ми дізнаємося, що зібрали таку інформацію, ми негайно видалимо її.',
+
+    'privacy.section11.title': '11. Зміни в Політиці конфіденційності',
+    'privacy.section11.content': 'Ми можемо періодично оновлювати цю Політику конфіденційності. Ми повідомимо вас про значні зміни електронною поштою або через наш веб-сайт. Оновлена політика набуде чинності при публікації. Продовження використання означає прийняття змін.',
+
+    'privacy.section12.title': '12. Контактна інформація',
+    'privacy.section12.content': 'З питаннями, пов\'язаними з конфіденційністю, або для реалізації ваших прав, зв\'яжіться з нашим Спеціалістом з захисту даних за адресою privacy@starlines.md або напишіть нам за адресою: Starlines Data Protection, Str. Ismail 123, Chișinău MD-2001, Moldova.',
+
+    // Refund Policy
+    'refunds.title': 'Політика повернення та скасування',
+    'refunds.subtitle': 'Зрозумійте наші умови повернення та процедури скасування. Ми прагнемо забезпечити справедливу та прозору політику повернення для всіх наших пасажирів.',
+    'refunds.lastUpdated': 'Останнє оновлення: 1 січня 2024',
+    'refunds.version': 'Версія 1.2',
+    'refunds.refundSchedule': 'Графік повернення',
+    'refunds.quickNavigation': 'Швидка навігація',
+    'refunds.requiredDocumentation': 'Необхідна документація для особливих обставин',
+    'refunds.refundProcessingTimes': 'Час обробки повернення',
+    'refunds.needHelpWithRefund': 'Потрібна допомога з поверненням?',
+    'refunds.customerServiceDescription': 'Наша команда обслуговування клієнтів готова допомогти вам зі скасуваннями та запитами на повернення.',
+    'refunds.callCustomerService': 'Зателефонувати в службу підтримки клієнтів',
+    'refunds.submitRefundRequest': 'Подати запит на повернення',
+    'refunds.hours': 'Години роботи: Понеділок-П\'ятниця 8:00 AM - 8:00 PM',
+    'refunds.note': 'Примітка: Вся документація повинна бути офіційною та перевірною. Фотокопії або цифрові копії прийнятні для початкового розгляду, але можуть знадобитися оригінальні документи.',
+
+    // Refund Scenarios
+    'refunds.standardCancellation': 'Стандартне скасування',
+    'refunds.lateCancellation': 'Пізнє скасування',
+    'refunds.veryLateCancellation': 'Дуже пізнє скасування',
+    'refunds.lastMinuteNoShow': 'Остання хвилина / Неявка',
+    'refunds.timeframe': 'Часові рамки',
+    'refunds.refund': 'Повернення',
+    'refunds.fee': 'Комісія',
+    'refunds.processingFee': 'Комісія за обробку',
+    'refunds.noRefund': 'Без повернення',
+    'refunds.na': 'Н/Д',
+
+    // Refund Sections
+    'refunds.section1.title': '1. Огляд політики повернення',
+    'refunds.section1.content': 'Ця Політика повернення описує умови та положення для скасування та повернення автобусних квитків, придбаних через Starlines. Ми прагнемо забезпечити справедливі та прозорі умови повернення, зберігаючи при цьому операційну ефективність. Право на повернення залежить від часу скасування та типу квитка.',
+
+    'refunds.section2.title': '2. Часові рамки скасування',
+    'refunds.section2.content': 'Право на повернення засноване на тому, коли ви скасовуєте своє бронювання: Більше ніж за 24 години до відправлення (Повне повернення мінус комісія за обробку), 12-24 години до відправлення (75% повернення), 2-12 годин до відправлення (50% повернення), Менше ніж за 2 години до відправлення (Без повернення), Неявка (Без повернення).',
+
+    'refunds.section3.title': '3. Обробка повернення',
+    'refunds.section3.content': 'Схвалені повернення обробляються протягом 7-10 робочих днів на оригінальний спосіб оплати. Комісії за обробку від €2 до €5 можуть застосовуватися залежно від способу оплати та часу скасування. Повернення за готівкові платежі обробляються як банківські перекази або ваучери.',
+
+    'refunds.section4.title': '4. Ситуації без повернення',
+    'refunds.section4.content': 'Певні ситуації не мають права на повернення: Неявка без попереднього повідомлення, скасування через неприйнятну поведінку пасажира, рекламні або знижені квитки (якщо не вказано інше), квитки, придбані за ваучери або кредити, форс-мажорні події поза нашим контролем.',
+
+    'refunds.section5.title': '5. Особливі обставини',
+    'refunds.section5.content': 'Ми можемо надати винятки для: Медичних надзвичайних ситуацій (з дійсною документацією), смерті в сім\'ї (зі свідоцтвом про смерть), військового розгортання (з офіційними наказами), стихійних лих, що впливають на подорож, скасувань послуг Starlines (повне повернення включаючи комісії).',
+
+    'refunds.section6.title': '6. Як запросити повернення',
+    'refunds.section6.content': 'Щоб запросити повернення: Увійдіть у свій акаунт та знайдіть своє бронювання, натисніть "Скасувати бронювання" або "Запросити повернення", надайте причину скасування, подайте необхідну документацію (якщо застосовно), дочекайтеся підтвердження електронною поштою з деталями повернення.',
+
+    // Documentation Required
+    'refunds.medicalEmergency': 'Медична надзвичайна ситуація',
+    'refunds.deathInFamily': 'Смерть у сім\'ї',
+    'refunds.militaryDeployment': 'Військове розгортання',
+    'refunds.naturalDisaster': 'Стихійне лихо',
+    'refunds.medicalCertificate': 'Медичний сертифікат',
+    'refunds.doctorsNote': 'Довідка лікаря',
+    'refunds.hospitalDischargePapers': 'Документи про виписку з лікарні',
+    'refunds.deathCertificate': 'Свідоцтво про смерть',
+    'refunds.proofOfRelationship': 'Доказ родинних зв\'язків',
+    'refunds.officialDocumentation': 'Офіційна документація',
+    'refunds.officialDeploymentOrders': 'Офіційні накази про розгортання',
+    'refunds.militaryId': 'Військовий посвідчення',
+    'refunds.commandAuthorization': 'Авторизація командування',
+    'refunds.newsReports': 'Новинні звіти',
+    'refunds.officialEvacuationOrders': 'Офіційні накази про евакуацію',
+    'refunds.governmentAdvisories': 'Урядові поради',
+
+    // Processing Times
+    'refunds.creditCards': 'Кредитні картки',
+    'refunds.bankTransfers': 'Банківські перекази',
+    'refunds.cashPayments': 'Готівкові платежі',
+    'refunds.businessDays': 'робочих днів',
+
+    // Contact Info
+    'refunds.phone': 'Телефон',
+    'refunds.email': 'Електронна пошта',
     'refunds.phoneNumber': '+373 22 123 456',
     'refunds.emailAddress': 'refunds@starlines.md'
   }

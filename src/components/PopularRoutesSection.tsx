@@ -11,55 +11,55 @@ const PopularRoutesSection = () => {
   const popularRoutes = [
     {
       id: "1",
-      from: "Chișinău",
-      to: "Kiev",
+      from: t('cities.chisinau'),
+      to: t('cities.kiev'),
       price: 35,
       duration: "6h 45m",
       departureTime: "08:00",
       arrivalTime: "14:45",
-      operator: "Starlines Express",
+      operator: t('operators.starlinesExpress'),
       rating: 4.8,
       reviews: 1247,
-      amenities: ["WiFi", "USB", "WC", "AC"],
+      amenities: [t('amenities.wifi'), t('amenities.usb'), t('amenities.wc'), t('amenities.ac')],
       stops: 3,
-      popularity: "Very Popular"
+      popularity: t('routes.popularity.veryPopular')
     },
     {
       id: "2",
-      from: "Chișinău",
-      to: "Vinnița",
+      from: t('cities.chisinau'),
+      to: t('cities.vinnytsia'),
       price: 25,
       duration: "4h 30m",
       departureTime: "14:00",
       arrivalTime: "18:30",
-      operator: "Starlines Express",
+      operator: t('operators.starlinesExpress'),
       rating: 4.9,
       reviews: 892,
-      amenities: ["WiFi", "USB", "WC", "AC"],
+      amenities: [t('amenities.wifi'), t('amenities.usb'), t('amenities.wc'), t('amenities.ac')],
       stops: 2,
-      popularity: "Popular Route"
+      popularity: t('routes.popularity.popular')
     },
     {
       id: "3",
-      from: "Chișinău",
-      to: "Jîtomîr",
+      from: t('cities.chisinau'),
+      to: t('cities.zhytomyr'),
       price: 30,
       duration: "5h 15m",
       departureTime: "10:30",
       arrivalTime: "15:45",
-      operator: "Starlines Express",
+      operator: t('operators.starlinesExpress'),
       rating: 4.7,
       reviews: 567,
-      amenities: ["WiFi", "USB", "WC", "AC"],
+      amenities: [t('amenities.wifi'), t('amenities.usb'), t('amenities.wc'), t('amenities.ac')],
       stops: 2,
-      popularity: "Regular Route"
+      popularity: t('routes.popularity.regular')
     }
   ];
 
   const popularityKeyMap: Record<string, string> = {
-    "Very Popular": 'routes.popularity.veryPopular',
-    "Popular Route": 'routes.popularity.popular',
-    "Regular Route": 'routes.popularity.regular'
+    [t('routes.popularity.veryPopular')]: 'routes.popularity.veryPopular',
+    [t('routes.popularity.popular')]: 'routes.popularity.popular',
+    [t('routes.popularity.regular')]: 'routes.popularity.regular'
   };
 
   return (
@@ -113,9 +113,9 @@ const PopularRoutesSection = () => {
                   variant="secondary" 
                   className={`
                     backdrop-blur-sm border shadow-sm font-medium text-xs px-2 py-1
-                    ${route.popularity === "Very Popular" 
+                    ${route.popularity === t('routes.popularity.veryPopular') 
                       ? "bg-red-500/90 text-white border-red-400" 
-                      : route.popularity === "Popular Route"
+                      : route.popularity === t('routes.popularity.popular')
                       ? "bg-blue-500/90 text-white border-blue-400"
                       : "bg-green-500/90 text-white border-green-400"
                     }

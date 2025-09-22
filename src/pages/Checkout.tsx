@@ -353,11 +353,11 @@ const Checkout = () => {
                           <SelectValue placeholder={t('checkout.passengerDetails.nationalityPlaceholder')} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="MD">Moldova</SelectItem>
-                          <SelectItem value="RO">Romania</SelectItem>
-                          <SelectItem value="UA">Ukraine</SelectItem>
-                          <SelectItem value="RU">Russia</SelectItem>
-                          <SelectItem value="EU">Other EU</SelectItem>
+                          <SelectItem value="MD">{t('countries.md')}</SelectItem>
+                          <SelectItem value="RO">{t('countries.ro')}</SelectItem>
+                          <SelectItem value="UA">{t('countries.ua')}</SelectItem>
+                          <SelectItem value="RU">{t('countries.ru')}</SelectItem>
+                          <SelectItem value="EU">{t('countries.eu')}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

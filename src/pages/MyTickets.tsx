@@ -24,6 +24,7 @@ import {
 import { formatBookingPrice } from '@/lib/tripDetailApi';
 import { downloadTicketPDF } from '@/lib/ticketDownload';
 import { cancelOrder, cancelTicket } from '@/lib/cancelTicketApi';
+import { useLocalization } from '@/contexts/LocalizationContext';
 
 interface SavedTicket {
   id: string;
@@ -54,11 +55,27 @@ interface SavedTicket {
 }
 
 export const MyTickets: React.FC = () => {
+  const { t, currentLanguage } = useLocalization();
   const [tickets, setTickets] = useState<SavedTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [downloadingTickets, setDownloadingTickets] = useState<Set<string>>(new Set());
   const [cancellingTickets, setCancellingTickets] = useState<Set<string>>(new Set());
+
+  // Map app language to locale for date formatting
+  const getLocale = (lang: string) => {
+    switch (lang) {
+      case 'ro':
+        return 'ro-RO';
+      case 'ru':
+        return 'ru-RU';
+      case 'uk':
+        return 'uk-UA';
+      case 'en':
+      default:
+        return 'en-GB';
+    }
+  };
 
   // Load tickets from localStorage on component mount
   useEffect(() => {
@@ -85,7 +102,7 @@ export const MyTickets: React.FC = () => {
       }
     } catch (error) {
       console.error('Error loading tickets:', error);
-      setError('Failed to load tickets');
+      setError(t('myTickets.loadError'));
     } finally {
       setLoading(false);
     }
@@ -112,7 +129,8 @@ export const MyTickets: React.FC = () => {
       }
     } catch (error) {
       console.error('Download error:', error);
-      setError(`Failed to download ticket: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setError(`${t('myTickets.downloadError')}: ${msg}`);
     } finally {
       setDownloadingTickets(prev => {
         const newSet = new Set(prev);
@@ -130,10 +148,10 @@ export const MyTickets: React.FC = () => {
       let result;
       if (ticketId) {
         // Cancel specific ticket
-        result = await cancelTicket(parseInt(ticketId), 'en');
+        result = await cancelTicket(parseInt(ticketId), currentLanguage);
       } else {
         // Cancel entire order
-        result = await cancelOrder(ticket.order_id, 'en');
+        result = await cancelOrder(ticket.order_id, currentLanguage);
       }
 
       // Check if cancellation was successful OR if order was already canceled
@@ -143,29 +161,30 @@ export const MyTickets: React.FC = () => {
       
       if (result.success || isAlreadyCanceled) {
         // Remove ticket from local storage
-        const updatedTickets = tickets.filter(t => t.id !== ticket.id);
+        const updatedTickets = tickets.filter(tk => tk.id !== ticket.id);
         setTickets(updatedTickets);
         localStorage.setItem('paid_tickets', JSON.stringify(updatedTickets));
         
-        // Show success message
+        // Clear error
         setError(null);
         } else {
         // Handle error object properly
-        let errorMessage = 'Failed to cancel ticket';
+        let errorMessage = t('myTickets.cancelError');
         if (result.error) {
           if (typeof result.error === 'string') {
-            errorMessage = result.error;
+            errorMessage = `${t('myTickets.cancelError')}: ${result.error}`;
           } else if (result.error.detal) {
-            errorMessage = result.error.detal;
+            errorMessage = `${t('myTickets.cancelError')}: ${result.error.detal}`;
           } else if (result.error.error) {
-            errorMessage = result.error.error;
+            errorMessage = `${t('myTickets.cancelError')}: ${result.error.error}`;
           }
         }
         setError(errorMessage);
       }
     } catch (error) {
       console.error('Cancel error:', error);
-      setError(`Failed to cancel ticket: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error';
+      setError(`${t('myTickets.cancelError')}: ${msg}`);
     } finally {
       setCancellingTickets(prev => {
         const newSet = new Set(prev);
@@ -180,16 +199,16 @@ export const MyTickets: React.FC = () => {
       case 'paid':
       case 'buy_ok':
       case 'buy':
-        return <Badge className="bg-green-100 text-green-800">Paid</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('myTickets.status.paid')}</Badge>;
       case 'reserve_ok':
-        return <Badge className="bg-yellow-100 text-yellow-800">Reserved</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('myTickets.status.reserved')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(getLocale(currentLanguage), {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -203,7 +222,7 @@ export const MyTickets: React.FC = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin mr-2" />
-          <span>Loading your tickets...</span>
+          <span>{t('myTickets.loadingTickets')}</span>
         </div>
       </div>
     );
@@ -212,8 +231,8 @@ export const MyTickets: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">My Tickets</h1>
-        <p className="text-gray-600">Manage your purchased tickets</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myTickets.title')}</h1>
+        <p className="text-gray-600">{t('myTickets.subtitle')}</p>
       </div>
 
       {error && (
@@ -229,12 +248,12 @@ export const MyTickets: React.FC = () => {
               <Card>
           <CardContent className="text-center py-12">
             <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('myTickets.noTicketsTitle')}</h3>
             <p className="text-gray-600 mb-4">
-              You haven't purchased any tickets yet. Book your first trip to see your tickets here.
+              {t('myTickets.noTicketsDescription')}
             </p>
             <Button onClick={() => window.location.href = '/'}>
-              Book a Trip
+              {t('myTickets.bookNewTrip')}
                   </Button>
                 </CardContent>
               </Card>
@@ -246,12 +265,12 @@ export const MyTickets: React.FC = () => {
                 <div className="flex items-center justify-between">
               <div>
                     <CardTitle className="text-lg">
-                      Order #{ticket.order_id}
+                      {t('myTickets.order')} #{ticket.order_id}
                     </CardTitle>
                     <div className="flex items-center gap-2 mt-1">
                         {getStatusBadge(ticket.status)}
                       <span className="text-sm text-gray-500">
-                        Purchased on {formatDate(ticket.created_at)}
+                        {t('myTickets.purchasedOn')} {formatDate(ticket.created_at)}
                           </span>
                         </div>
                       </div>
@@ -260,7 +279,7 @@ export const MyTickets: React.FC = () => {
                       {formatBookingPrice(ticket.price_total, ticket.currency)}
                                 </div>
                     <div className="text-sm text-gray-500">
-                      {ticket.trips.length} trip{ticket.trips.length > 1 ? 's' : ''}
+                      {ticket.trips.length} {ticket.trips.length > 1 ? t('myTickets.trips') : t('myTickets.trip')}
                         </div>
               </div>
             </div>
@@ -273,7 +292,7 @@ export const MyTickets: React.FC = () => {
                     <div className="flex items-center justify-between mb-3">
                       <h4 className="font-medium text-gray-900">{trip.route_name}</h4>
                       <div className="text-sm text-gray-500">
-                        {trip.date_from} at {trip.time_from}
+                        {trip.date_from} {t('common.at')} {trip.time_from}
                       </div>
                     </div>
 
@@ -296,7 +315,7 @@ export const MyTickets: React.FC = () => {
 
                     {/* Passengers */}
                     <div className="space-y-2">
-                      <h5 className="text-sm font-medium text-gray-700">Passengers</h5>
+                      <h5 className="text-sm font-medium text-gray-700">{t('myTickets.passengers')}</h5>
                       {trip.passengers.map((passenger, passengerIndex) => (
                         <div key={passengerIndex} className="flex items-center justify-between bg-gray-50 rounded p-2">
                           <div className="flex items-center gap-2">
@@ -305,7 +324,7 @@ export const MyTickets: React.FC = () => {
                               {passenger.name} {passenger.surname}
                               </span>
                             <Badge variant="outline" className="text-xs">
-                              Seat {passenger.seat}
+                              {t('myTickets.seat')} {passenger.seat}
                             </Badge>
                           </div>
                           <div className="text-sm text-gray-600">
@@ -328,12 +347,12 @@ export const MyTickets: React.FC = () => {
                     {downloadingTickets.has(ticket.order_id.toString()) ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Downloading...
+                        {t('myTickets.downloading')}
                       </>
                     ) : (
                       <>
                         <Download className="h-4 w-4 mr-2" />
-                        Download All Tickets
+                        {t('myTickets.downloadAllTickets')}
               </>
             )}
                   </Button>
@@ -348,12 +367,12 @@ export const MyTickets: React.FC = () => {
                     {cancellingTickets.has(ticket.order_id.toString()) ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Cancelling...
+                        {t('myTickets.cancelling')}
                       </>
                     ) : (
                       <>
                         <X className="h-4 w-4 mr-2" />
-                        Cancel Order
+                        {t('myTickets.cancelOrder')}
                       </>
                     )}
                   </Button>
