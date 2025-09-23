@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import PaymentLogos from "@/components/PaymentLogos";
 
 // Mock FAQ data with translation keys
 const faqData = [
@@ -263,6 +264,11 @@ const FAQ = () => {
                         </AccordionTrigger>
                         <AccordionContent className="text-muted-foreground">
                           {t(item.answer)}
+                          {item.question === 'faq.booking.paymentMethods.question' && (
+                            <div className="mt-4 pt-4 border-t">
+                              <PaymentLogos size="sm" showLabels={false} />
+                            </div>
+                          )}
                         </AccordionContent>
                       </AccordionItem>
                     ))}

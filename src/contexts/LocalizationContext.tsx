@@ -108,6 +108,17 @@ const translations = {
     'auth.or': 'Sau',
     'auth.signInWithGoogle': 'Conectare cu Google',
     'auth.signUpWithGoogle': 'Înregistrare cu Google',
+    'auth.welcome': 'Bun venit',
+    'auth.welcomeBack': 'Bun venit înapoi',
+    'auth.createAccount': 'Creează cont',
+    'auth.alreadyHaveAccount': 'Ai deja cont?',
+    'auth.dontHaveAccount': 'Nu ai cont?',
+    'auth.rememberMe': 'Ține-mă minte',
+    'auth.continueWith': 'Continuă cu',
+    'auth.termsAgreement': 'Înregistrându-te, accepți',
+    'auth.termsOfService': 'Termenii și Condițiile',
+    'auth.and': 'și',
+    'auth.signUp': 'Înregistrare',
 
     // Header
     'header.home': 'Acasă',
@@ -127,6 +138,7 @@ const translations = {
     'common.viewRoutes': 'Vezi Rutele',
     'common.viewTimetable': 'Vezi Programul',
     'common.from': 'De la',
+    'common.at': 'la',
     'common.viewTickets': 'Vezi Biletele',
     'common.searchRoutes': 'Caută Rute',
     'common.allPrices': 'Toate prețurile',
@@ -821,30 +833,6 @@ const translations = {
     'about.communityImpact': 'Impactul asupra Comunității',
     'about.communityDescription': 'Suntem mai mult decât o companie de transport—suntem o punte între comunități. Prin conectarea oamenilor și locurilor, ajutăm la construirea unor societăți mai puternice și mai conectate în toată Europa de Est.',
     
-    // Team Section
-    'about.mindsBehindheMagic': 'Mințile din Spatele Magiei',
-    'about.teamDescription': 'Cunoaște liderii pasionați care transformă viziunea noastră în realitate, conducând inovația și excelența în tot ceea ce facem.',
-    'about.ceoFounder': 'CEO și Fondator',
-    'about.mihaiBio': 'Un antreprenor vizionar cu peste 25 de ani în transport, Mihai a început Starlines cu un vis simplu: să facă călătoria de calitate cu autobuzul accesibilă pentru toată lumea din Europa de Est. Pasiunea sa pentru inovație și servicii pentru clienți conduce compania noastră înainte.',
-    'about.coo': 'Director de Operațiuni',
-    'about.elenaBio': 'Elena aduce precizia militară în operațiunile noastre. Cu o experiență în logistică și o pasiune pentru eficiență, ea se asigură că fiecare călătorie Starlines funcționează ca un ceasornic, menținând reputația noastră de fiabilitate.',
-    'about.cco': 'Director Servicii Clienți',
-    'about.alexandruBio': 'Alexandru crede că serviciul excepțional pentru clienți este o formă de artă. El a construit echipa noastră de experiență pentru clienți de la zero, creând o cultură în care fiecare pasager se simte apreciat și auzit.',
-    'about.cto': 'Director de Tehnologie',
-    'about.mariaBio': 'Maria este arhitectul nostru digital, transformând modul în care oamenii interacționează cu transportul. De la aplicația noastră premiată la optimizarea rutelor cu AI, ea face călătoria mai inteligentă, mai rapidă și mai plăcută.',
-    
-    // Expertise labels
-    'about.strategicVision': 'Viziune Strategică',
-    'about.industryLeadership': 'Lidership în Industrie',
-    'about.customerExperience': 'Experiența Clientului',
-    'about.operationsExcellence': 'Excelența Operațiunilor',
-    'about.logistics': 'Logistică',
-    'about.qualityControl': 'Control de Calitate',
-    'about.teamBuilding': 'Construirea Echipei',
-    'about.serviceInnovation': 'Inovația Serviciilor',
-    'about.digitalTransformation': 'Transformare Digitală',
-    'about.aiMachineLearning': 'AI și Machine Learning',
-    'about.productDevelopment': 'Dezvoltarea Produselor',
     
     // Timeline Section
     'about.journeyThroughTime': 'Călătoria Noastră prin Timp',
@@ -1585,6 +1573,12 @@ const translations = {
     'myTickets.emailAllTickets': 'Trimite Toate Biletele pe Email',
     'myTickets.viewCalendar': 'Vezi Calendarul',
     'myTickets.bookNewTrip': 'Rezervă O Călătorie Nouă',
+    'myTickets.cancelError': 'Eroare la anularea biletului: rata de anulare 100%',
+    'myTickets.status.reserved': 'Status rezervat',
+    'myTickets.purchasedOn': 'Cumpărat pe',
+    'myTickets.trip': 'Călătorie',
+    'myTickets.seat': 'Locul ***',
+    'myTickets.cancelOrder': 'Anulează comanda',
     'myTickets.missingInformation': 'Informații Lipsă',
     'myTickets.enterBothFields': 'Te rog să introduci atât numărul comenzii cât și codul de securitate.',
     'myTickets.ticketFound': 'Bilet Găsit',
@@ -1857,6 +1851,17 @@ const translations = {
     'auth.or': 'Или',
     'auth.signInWithGoogle': 'Войти через Google',
     'auth.signUpWithGoogle': 'Регистрация через Google',
+    'auth.welcome': 'Добро пожаловать',
+    'auth.welcomeBack': 'Добро пожаловать обратно',
+    'auth.createAccount': 'Создать аккаунт',
+    'auth.alreadyHaveAccount': 'Уже есть аккаунт?',
+    'auth.dontHaveAccount': 'Нет аккаунта?',
+    'auth.rememberMe': 'Запомнить меня',
+    'auth.continueWith': 'Продолжить с',
+    'auth.termsAgreement': 'Регистрируясь, вы соглашаетесь с',
+    'auth.termsOfService': 'Условиями использования',
+    'auth.and': 'и',
+    'auth.signUp': 'Регистрация',
 
     // Header
     'header.home': 'Главная',
@@ -1876,6 +1881,7 @@ const translations = {
     'common.viewRoutes': 'Посмотреть маршруты',
     'common.viewTimetable': 'Посмотреть расписание',
     'common.from': 'От',
+    'common.at': 'в',
     'common.viewTickets': 'Посмотреть билеты',
     'common.searchRoutes': 'Поиск маршрутов',
     'common.allPrices': 'Все цены',
@@ -2564,30 +2570,6 @@ const translations = {
     'about.communityImpact': 'Влияние на Сообщество',
     'about.communityDescription': 'Мы больше, чем транспортная компания — мы мост между сообществами. Соединяя людей и места, мы помогаем строить более сильные, более связанные общества по всей Восточной Европе.',
     
-    // Team Section
-    'about.mindsBehindheMagic': 'Умы За Магией',
-    'about.teamDescription': 'Познакомьтесь с страстными лидерами, которые превращают наше видение в реальность, внедряя инновации и совершенство во всем, что мы делаем.',
-    'about.ceoFounder': 'Генеральный директор и основатель',
-    'about.mihaiBio': 'Визионер-предприниматель с более чем 25-летним опытом в транспорте, Михай начал Starlines с простой мечтой: сделать качественные автобусные поездки доступными для всех в Восточной Европе. Его страсть к инновациям и обслуживанию клиентов движет нашу компанию вперед.',
-    'about.coo': 'Операционный директор',
-    'about.elenaBio': 'Елена привносит военную точность в наши операции. С опытом в логистике и страстью к эффективности, она обеспечивает, что каждое путешествие Starlines работает как часы, поддерживая нашу репутацию надежности.',
-    'about.cco': 'Директор по работе с клиентами',
-    'about.alexandruBio': 'Александру верит, что исключительное обслуживание клиентов — это форма искусства. Он построил нашу команду клиентского опыта с нуля, создав культуру, где каждый пассажир чувствует себя ценным и услышанным.',
-    'about.cto': 'Технический директор',
-    'about.mariaBio': 'Мария — наш цифровой архитектор, трансформирующий способ взаимодействия людей с транспортом. От нашего отмеченного наградами приложения до оптимизации маршрутов с помощью ИИ, она делает путешествия умнее, быстрее и приятнее.',
-    
-    // Expertise labels
-    'about.strategicVision': 'Стратегическое Видение',
-    'about.industryLeadership': 'Лидерство в Отрасли',
-    'about.customerExperience': 'Клиентский Опыт',
-    'about.operationsExcellence': 'Операционное Совершенство',
-    'about.logistics': 'Логистика',
-    'about.qualityControl': 'Контроль Качества',
-    'about.teamBuilding': 'Построение Команды',
-    'about.serviceInnovation': 'Инновации в Сервисе',
-    'about.digitalTransformation': 'Цифровая Трансформация',
-    'about.aiMachineLearning': 'ИИ и Машинное Обучение',
-    'about.productDevelopment': 'Разработка Продуктов',
     
     // Timeline Section
     'about.journeyThroughTime': 'Наше Путешествие во Времени',
@@ -3238,6 +3220,12 @@ const translations = {
     'myTickets.emailAllTickets': 'Отправить Все Билеты по Email',
     'myTickets.viewCalendar': 'Посмотреть Календарь',
     'myTickets.bookNewTrip': 'Забронировать Новую Поездку',
+    'myTickets.cancelError': 'Ошибка удаления билета: ставка удаления 100%',
+    'myTickets.status.reserved': 'Статус зарезервирован',
+    'myTickets.purchasedOn': 'Куплено',
+    'myTickets.trip': 'Поездка',
+    'myTickets.seat': 'Место ***',
+    'myTickets.cancelOrder': 'Отменить заказ',
     'myTickets.missingInformation': 'Отсутствует Информация',
     'myTickets.enterBothFields': 'Пожалуйста, введите номер заказа и код безопасности.',
     'myTickets.ticketFound': 'Билет Найден',
@@ -3610,6 +3598,17 @@ const translations = {
     'auth.or': 'Or',
     'auth.signInWithGoogle': 'Sign in with Google',
     'auth.signUpWithGoogle': 'Sign up with Google',
+    'auth.welcome': 'Welcome',
+    'auth.welcomeBack': 'Welcome back',
+    'auth.createAccount': 'Create account',
+    'auth.alreadyHaveAccount': 'Already have an account?',
+    'auth.dontHaveAccount': "Don't have an account?",
+    'auth.rememberMe': 'Remember me',
+    'auth.continueWith': 'Continue with',
+    'auth.termsAgreement': 'By signing up, you agree to our',
+    'auth.termsOfService': 'Terms of Service',
+    'auth.and': 'and',
+    'auth.signUp': 'Sign Up',
 
     // Header
     'header.home': 'Home',
@@ -3629,6 +3628,7 @@ const translations = {
     'common.viewRoutes': 'View Routes',
     'common.viewTimetable': 'View Timetable',
     'common.from': 'From',
+    'common.at': 'at',
     'common.viewTickets': 'View Tickets',
     'common.searchRoutes': 'Search Routes',
     'common.allPrices': 'All Prices',
@@ -4222,6 +4222,12 @@ const translations = {
     'myTickets.emailAllTickets': 'Email All Tickets',
     'myTickets.viewCalendar': 'View Calendar',
     'myTickets.bookNewTrip': 'Book New Trip',
+    'myTickets.cancelError': 'Ticket cancellation error: cancellation rate 100%',
+    'myTickets.status.reserved': 'Status reserved',
+    'myTickets.purchasedOn': 'Purchased on',
+    'myTickets.trip': 'Trip',
+    'myTickets.seat': 'Seat ***',
+    'myTickets.cancelOrder': 'Cancel order',
     'myTickets.missingInformation': 'Missing Information',
     'myTickets.enterBothFields': 'Please enter both order number and security code.',
     'myTickets.ticketFound': 'Ticket Found',
@@ -4391,30 +4397,6 @@ const translations = {
     'about.communityImpact': 'Community Impact',
     'about.communityDescription': 'We\'re more than a transportation company—we\'re a bridge between communities. By connecting people and places, we\'re helping to build stronger, more connected societies across Eastern Europe.',
     
-    // Team Section
-    'about.mindsBehindheMagic': 'The Minds Behind the Magic',
-    'about.teamDescription': 'Meet the passionate leaders who turn our vision into reality, driving innovation and excellence in everything we do.',
-    'about.ceoFounder': 'CEO & Founder',
-    'about.mihaiBio': 'A visionary entrepreneur with 25+ years in transportation, Mihai started Starlines with a simple dream: to make quality bus travel accessible to everyone in Eastern Europe. His passion for innovation and customer service drives our company forward.',
-    'about.coo': 'Chief Operations Officer',
-    'about.elenaBio': 'Elena brings military precision to our operations. With a background in logistics and a passion for efficiency, she ensures that every Starlines journey runs like clockwork, maintaining our reputation for reliability.',
-    'about.cco': 'Chief Customer Officer',
-    'about.alexandruBio': 'Alexandru believes that exceptional customer service is an art form. He\'s built our customer experience team from the ground up, creating a culture where every passenger feels valued and heard.',
-    'about.cto': 'Chief Technology Officer',
-    'about.mariaBio': 'Maria is our digital architect, transforming how people interact with transportation. From our award-winning app to AI-powered route optimization, she\'s making travel smarter, faster, and more enjoyable.',
-    
-    // Expertise labels
-    'about.strategicVision': 'Strategic Vision',
-    'about.industryLeadership': 'Industry Leadership',
-    'about.customerExperience': 'Customer Experience',
-    'about.operationsExcellence': 'Operations Excellence',
-    'about.logistics': 'Logistics',
-    'about.qualityControl': 'Quality Control',
-    'about.teamBuilding': 'Team Building',
-    'about.serviceInnovation': 'Service Innovation',
-    'about.digitalTransformation': 'Digital Transformation',
-    'about.aiMachineLearning': 'AI & Machine Learning',
-    'about.productDevelopment': 'Product Development',
     
     // Timeline Section
     'about.journeyThroughTime': 'Our Journey Through Time',
@@ -5362,6 +5344,15 @@ const translations = {
     'auth.termsOfService': 'Умовами використання',
     'auth.and': 'та',
     'auth.privacyPolicy': 'Політикою конфіденційності',
+    'auth.phone': 'Телефон',
+    'auth.phonePlaceholder': 'Введіть номер телефону',
+    'auth.loggingIn': 'Вхід...',
+    'auth.signingUp': 'Створення акаунту...',
+    'auth.noAccount': 'Немає акаунту?',
+    'auth.haveAccount': 'Вже маєте акаунт?',
+    'auth.signUp': 'Зареєструватися',
+    'auth.signInWithGoogle': 'Увійти через Google',
+    'auth.signUpWithGoogle': 'Реєстрація через Google',
 
     // Header
     'header.home': 'Головна',
@@ -5375,9 +5366,11 @@ const translations = {
     'header.trust.safe': 'Безпечний транспорт',
     'header.trust.experience': 'Досвід роботи',
     'header.tagline': 'Надійний транспорт по всій Східній Європі',
+    'header.infoPages': 'Інформаційні сторінки',
     
     // Common actions
     'common.from': 'Звідки',
+    'common.at': 'о',
 
     // Hero Section
     'hero.title': 'Подорожуйте безпечно',
@@ -5628,6 +5621,15 @@ const translations = {
     'myTickets.noTicketsTitle': 'У вас немає квитків',
     'myTickets.noTicketsDescription': 'У вас поки немає заброньованих квитків. Забронюйте свій перший квиток, щоб почати подорожувати з нами!',
     'myTickets.bookNewTrip': 'Забронювати нову поїздку',
+    'myTickets.cancelError': 'Ошибка удаления билета: ставка удаления 100%',
+    'myTickets.order': 'Замовлення #1060493',
+    'myTickets.status.reserved': 'Статус зарезервовано',
+    'myTickets.purchasedOn': 'Придбано',
+    'myTickets.passengers': 'Пасажири',
+    'myTickets.seat': 'Місце ***',
+    'myTickets.downloadAllTickets': 'Завантажити всі квитки',
+    'myTickets.cancelOrder': 'Скасувати замовлення',
+    'myTickets.trip': 'Поїздка',
 
     'search.oneWay': 'В один бік',
     'search.roundTrip': 'Туди і назад',
@@ -5795,11 +5797,494 @@ const translations = {
 
     // About
     'about.title': 'Про нас',
-    'about.subtitle': 'Дізнайтеся більше про Starlines',
+    'about.subtitle': 'Наша історія успіху в міжнародному транспорті',
+    'about.mission': 'Наша місія',
+    'about.vision': 'Наше бачення',
+    'about.values': 'Наші цінності',
+    
+    // About Page Content
+    'about.ourStory': 'Наша історія',
+    'about.connectingDreams': 'З\'єднуючи мрії,',
+    'about.oneJourneyAtTime': 'Одна подорож за раз',
+    'about.heroDescription': 'Понад 15 років Starlines був більше ніж просто автобусна компанія. Ми - міст між людьми та можливостями, з\'єднуючи спільноти Східної Європи з надійністю, комфортом та турботою.',
+    'about.missionStatement': '"Демократизувати якісний транспорт, надаючи безпечні, комфортні та надійні автобусні подорожі для всіх у Східній Європі, одночасно будучи мости між спільнотами та сприяючи стабільному розвитку."',
+    
+    // Stats Section
+    'about.yearsOfService': 'Років служби',
+    'about.buildingTrust': 'Будуємо довіру з 2009 року',
+    'about.routesCovered': 'Покриті маршрути',
+    'about.acrossCountries': 'У 12 країнах',
+    'about.happyCustomers': 'Задоволені клієнти',
+    'about.satisfiedTravelers': 'Задоволені мандрівники',
+    'about.safetyRecord': 'Рекорд безпеки',
+    'about.perfectSafetyScore': 'Ідеальний показник безпеки',
+    
+    // Values Section
+    'about.whatDrivesUs': 'Що нас мотивує',
+    'about.valuesDescription': 'Наші цінності - це не просто слова на стіні - це принципи, які керують кожною нашою рішенням та кожною дією.',
+    'about.safetyAboveAll': 'Безпека понад усе',
+    'about.safetyDescription': 'Ми віримо, що безпека - це не просто пріоритет, а наша основа. Кожна подорож починається з суворих протоколів безпеки, обслуговування сучасних транспортних засобів та добре підготовлених водіїв, які ставлять ваш добробут понад усе інше.',
+    'about.passengerCentric': 'Орієнтованість на пасажирів',
+    'about.passengerDescription': 'Кожне наше рішення керується одним питанням: "Як це покращує досвід наших пасажирів?" Від комфортних сидінь до безпроблемного бронювання, ми ставимо вас в центр усього, що робимо.',
+    'about.reliabilityPromise': 'Обіцянка надійності',
+    'about.reliabilityDescription': 'Коли ви обираєте Starlines, ви обираєте надійність. Наш показник пунктуальності 99,9% - це не просто статистика, а наше зобов\'язання доставити вас туди, де ви повинні бути, коли ви повинні бути.',
+    'about.innovationDriven': 'Рухаємося інноваціями',
+    'about.innovationDescription': 'Ми не просто йдемо в ногу з технологіями - ми на передовій прогресу. Від оптимізації маршрутів зі штучним інтелектом до екологічних транспортних засобів, ми постійно розширюємо межі, щоб створити майбутнє транспорту.',
+    'about.sustainabilityFirst': 'Сталість понад усе',
+    'about.sustainabilityDescription': 'Наш обов\'язок перед навколишнім середовищем перевищує відповідність. Ми активно зменшуємо наш вуглецевий слід через електричні автобуси, відновлювану енергію та сталі практики, які захищають нашу планету для майбутніх поколінь.',
+    'about.communityImpact': 'Вплив на спільноту',
+    'about.communityDescription': 'Ми більше ніж транспортна компанія - ми міст між спільнотами. З\'єднуючи людей та місця, ми допомагаємо будувати сильніші та більш пов\'язані суспільства по всій Східній Європі.',
+    
+    
+    // Timeline Section
+    'about.journeyThroughTime': 'Наша подорож крізь час',
+    'about.timelineDescription': 'Кожна важлива віха розповідає історію зростання, інновацій та непохитної відданості нашим пасажирам та спільнотам.',
+    'about.dreamBegins': 'Мрія починається',
+    'about.dreamDescription': 'Starlines народився з простого спостереження: якісна автобусна подорож у Східній Європі була або занадто дорогою, або занадто небезпечною. Ми почали з 3 автобусів та великої мрії.',
+    'about.dreamImpact': '3 маршрути, 3 автобуси, необмежена амбіція',
+    'about.breakingBorders': 'Руйнування кордонів',
+    'about.bordersDescription': 'Наше перше міжнародне розширення довело, що якість не знає кордонів. Ми з\'єднали Молдову з Румунією та Україною, продемонструвавши, що відмінний сервіс виходить за межі.',
+    'about.bordersImpact': 'Понад 50 маршрутів у 3 країнах',
+    'about.digitalRevolution': 'Цифрова революція',
+    'about.digitalDescription': 'Ми запустили нашу першу онлайн-платформу, зробивши бронювання таким же простим, як кілька кліків. Це було не просто покращення - це було повне переосмислення того, як люди бронюють подорожі.',
+    'about.digitalImpact': 'Перша онлайн-платформа бронювання в регіоні',
+    'about.europeanExpansion': 'Європейське розширення',
+    'about.expansionDescription': 'Наша мережа розширилася, щоб охопити серце Східної Європи. Від Балтики до Чорного моря, Starlines став синонімом надійних міжнародних подорожей.',
+    'about.expansionImpact': 'Понад 200 маршрутів у 8 країнах',
+    'about.greenRevolution': 'Зелена революція',
+    'about.greenDescription': 'Ми впровадили наші перші електричні автобуси та запустили програми компенсації вуглецю. Сталість - це не просто хороша справа, а наша відповідальність перед майбутніми поколіннями.',
+    'about.greenImpact': 'Перший флот електричних автобусів в регіоні',
+    'about.industryLeadershipTitle': 'Лідерство в галузі',
+    'about.leadershipDescription': 'Сьогодні Starlines стоїть як найнадійніше ім\'я в автобусному транспорті Східної Європи. Але ми не спочиваємо на лаврах - ми будуємо транспортну мережу завтрашнього дня.',
+    'about.leadershipImpact': 'Понад 300 маршрутів, понад 2 мільйони задоволених клієнтів',
+    
+    // Fun Facts Section
+    'about.didYouKnow': 'Чи знали ви?',
+    'about.factsDescription': 'Кілька захоплюючих фактів про Starlines, які роблять нас унікальними',
+    'about.earthTrips': 'Наші автобуси проїжджають еквівалент 15 подорожей навколо Землі щодня',
+    'about.coffeeServed': 'Ми подавали каву понад 500 000 пасажирам у наших преміум-залах',
+    'about.languagesSpoken': 'Наші водії колективно розмовляють 8 різними мовами',
+    'about.familiesReunited': 'Ми допомогли воз\'єднати понад 2 000 сімей через наші доступні варіанти подорожей',
+    
+    // CTA Section
+    'about.readyToBePartOfStory': 'Готові стати частиною нашої історії?',
+    'about.ctaDescription': 'Приєднуйтеся до мільйонів задоволених мандрівників, які відкрили, що з Starlines кожна подорож - це пригода, яка чекає на свій час.',
+    'about.startYourJourney': 'Почніть свою подорож',
+    'about.learnMore': 'Дізнатися більше',
 
     // Blog
     'blog.title': 'Блог',
-    'blog.subtitle': 'Останні новини та статті',
+    'blog.subtitle': 'Статті та гіди для подорожей',
+    
+    // Blog Page Content
+    'blog.travelBlog': 'Блог про подорожі',
+    'blog.discoverTravelTips': 'Відкрийте для себе поради для подорожей, гіди по напрямках та ідеї, які зроблять ваші подорожі незабутніми.',
+    'blog.searchArticles': 'Пошук статей...',
+    'blog.allCategories': 'Всі категорії',
+    'blog.filterByTags': 'Фільтрувати за тегами',
+    'blog.clearFilters': 'Очистити фільтри',
+    'blog.articlesFound': 'статей знайдено',
+    'blog.articleFound': 'статтю знайдено',
+    'blog.noArticlesFound': 'Статті не знайдені',
+    'blog.tryAdjusting': 'Спробуйте змінити критерії пошуку або фільтри',
+    'blog.clearAllFilters': 'Очистити всі фільтри',
+    'blog.readMore': 'Читати далі',
+    'blog.blogImage': 'Зображення блогу',
+    'blog.featured': 'Рекомендоване',
+    
+    // Blog Categories
+    'blog.category.all': 'Всі',
+    'blog.category.travelGuides': 'Гіди для подорожей',
+    'blog.category.travelTips': 'Поради для подорожей',
+    'blog.category.budgetTravel': 'Бюджетні подорожі',
+    'blog.category.travelPlanning': 'Планування подорожей',
+    
+    // Blog Tags
+    'blog.tag.easternEurope': 'Східна Європа',
+    'blog.tag.culture': 'Культура',
+    'blog.tag.history': 'Історія',
+    'blog.tag.travelTips': 'Поради для подорожей',
+    'blog.tag.comfort': 'Комфорт',
+    'blog.tag.longDistance': 'Довгі відстані',
+    'blog.tag.romania': 'Румунія',
+    'blog.tag.busNetwork': 'Автобусна мережа',
+    'blog.tag.featured': 'Рекомендоване',
+    
+    // Blog Articles
+    'blog.article.top10Destinations.title': 'Топ-10 місць для відвідування в Східній Європі',
+    'blog.article.top10Destinations.excerpt': 'Відкрийте для себе приховані перлини та культурні скарби Східної Європи. Від історичних міст до захоплюючих пейзажів, ці місця залишать вас без слів.',
+    'blog.article.top10Destinations.author': 'Марія Попеску',
+    'blog.article.top10Destinations.readTime': '8 хв читання',
+    
+    'blog.article.comfortableTravel.title': 'Як комфортно подорожувати на великі відстані автобусом',
+    'blog.article.comfortableTravel.excerpt': 'Основні поради та хитрощі для комфортної та приємної подорожі автобусом на великі відстані. Дізнайтеся про сидіння, розваги та комфорт.',
+    'blog.article.comfortableTravel.author': 'Олександру Іонеску',
+    'blog.article.comfortableTravel.readTime': '6 хв читання',
+    
+    'blog.article.romaniaGuide.title': 'Повний гід для подорожі автобусом в Румунії',
+    'blog.article.romaniaGuide.excerpt': 'Все, що потрібно знати про подорожі автобусом в Румунії. Від бронювання квитків до розуміння мережі та пошуку найкращих пропозицій.',
+    'blog.article.romaniaGuide.author': 'Олена Думітреску',
+    'blog.article.romaniaGuide.readTime': '10 хв читання',
+    
+    'blog.article.bestTimeToVisit.title': 'Найкращий час для відвідування Східної Європи',
+    'blog.article.bestTimeToVisit.excerpt': 'Відкрийте для себе, коли найкраще відвідувати Східну Європу. Від туристичних сезонів до культурних подій, наш гід допоможе спланувати ідеальну подорож.',
+    'blog.article.bestTimeToVisit.author': 'Міхай Попеску',
+    'blog.article.bestTimeToVisit.readTime': '7 хв читання',
+    
+    'blog.article.budgetTravel.title': 'Як подорожувати Східною Європою з малим бюджетом',
+    'blog.article.budgetTravel.excerpt': 'Практичні поради для доступних подорожей Східною Європою. Від проживання до транспорту та їжі, економте гроші без жертвування досвідом.',
+    'blog.article.budgetTravel.author': 'Ана Василеску',
+    'blog.article.budgetTravel.readTime': '9 хв читання',
+    
+    'blog.article.localCuisine.title': 'Кулінарний гід Східної Європи',
+    'blog.article.localCuisine.excerpt': 'Досліджуйте автентичні смаки Східної Європи. Від румунських сармале до польських перогів, відкрийте кулінарні традиції, що визначають цей захоплюючий регіон.',
+    'blog.article.localCuisine.author': 'Діана Мунтяну',
+    'blog.article.localCuisine.readTime': '11 хв читання',
+    
+    'blog.article.safetyTips.title': 'Поради з безпеки для подорожей автобусом',
+    'blog.article.safetyTips.excerpt': 'Забезпечте свою безпеку під час подорожі автобусом. Від збереження багажу до взаємодії з незнайомцями, ці поради допоможуть вам залишитися в безпеці.',
+    'blog.article.safetyTips.author': 'Крістіан Думітру',
+    'blog.article.safetyTips.readTime': '5 хв читання',
+    
+    'blog.article.winterTravel.title': 'Подорожі Східною Європою в холодний сезон',
+    'blog.article.winterTravel.excerpt': 'Відкрийте для себе красу Східної Європи взимку. Від замерзлих міст до гірськолижних курортів, наш гід допоможе насолодитися магією холодного сезону.',
+    'blog.article.winterTravel.author': 'Лаура Іонеску',
+    'blog.article.winterTravel.readTime': '8 хв читання',
+    
+    'blog.article.culturalEtiquette.title': 'Культурний етикет в Східній Європі',
+    'blog.article.culturalEtiquette.excerpt': 'Навчіться навігувати через культурні нюанси Східної Європи. Від привітань до звичаїв за столом, ці поради допоможуть вам інтегруватися з місцевими жителями.',
+    'blog.article.culturalEtiquette.author': 'Влад Попа',
+    'blog.article.culturalEtiquette.readTime': '6 хв читання',
+    
+    // Blog Modal
+    'blog.articleBy': 'Стаття від',
+    'blog.close': 'Закрити',
+    
+    // Blog Article Content
+    'blog.article.top10Destinations.content': `
+      <h2>Відкрийте для себе Східну Європу</h2>
+      <p>Східна Європа - це скарбниця прихованих перлин, які чекають на відкриття. Від архітектурних чудес до природних красот, цей регіон пропонує незабутні враження для кожного мандрівника.</p>
+      
+      <h3>1. Прага, Чехія</h3>
+      <p>Золоте місто зі своїми вежами та мостами є однією з найкрасивіших столиць Європи. Прогулянка по Карловому мосту на світанку - це досвід, який ви не забудете.</p>
+      
+      <h3>2. Краків, Польща</h3>
+      <p>Історичне місто з найкраще збереженим середньовічним центром в Європі. Ринкова площа та Вавельський замок - це обов'язкові місця для відвідування.</p>
+      
+      <h3>3. Будапешт, Угорщина</h3>
+      <p>Перлина Дунаю з своїми термальними ваннами та неоготичним парламентом. Не пропустіть круїз по річці в сутінках.</p>
+      
+      <h3>4. Дубровнік, Хорватія</h3>
+      <p>Перлина Адріатики зі своїми середньовічними стінами. Прогулянка по стінах міста пропонує захоплюючі види на море.</p>
+      
+      <h3>5. Таллінн, Естонія</h3>
+      <p>Середньовічне місто зі своїми вежами та вузькими вуличками. Старе місто - це справжня казка.</p>
+    `,
+    
+    'blog.article.comfortableTravel.content': `
+      <h2>Комфортна подорож на великі відстані</h2>
+      <p>Подорожі автобусом на великі відстані можуть бути комфортними та приємними, якщо ви знаєте, як правильно підготуватися. Ось наші найкращі поради.</p>
+      
+      <h3>Вибір сидіння</h3>
+      <p>Оберіть сидіння біля вікна для кращого виду або біля проходу для легшого доступу до туалету. Сидіння в передній частині автобуса зазвичай менше схильні до тряски.</p>
+      
+      <h3>Одяг та аксесуари</h3>
+      <p>Одягайтеся шарами для адаптації до різних температур. Візьміть з собою подушку для шиї та плед для комфорту.</p>
+      
+      <h3>Розваги</h3>
+      <p>Завантажте фільми, книги або музику на ваш пристрій. Багато автобусів мають Wi-Fi, але не завжди стабільний.</p>
+      
+      <h3>Харчування та напої</h3>
+      <p>Візьміть з собою легкі закуски та воду. Уникайте важкої їжі, яка може викликати нудоту.</p>
+    `,
+    
+    'blog.article.romaniaGuide.content': `
+      <h2>Повний гід для подорожі автобусом в Румунії</h2>
+      <p>Румунія пропонує розвинену автобусну мережу, яка з'єднує всі основні міста та туристичні напрямки. Ось все, що вам потрібно знати.</p>
+      
+      <h3>Основні оператори</h3>
+      <p>Starlines, FlixBus та місцеві оператори забезпечують регулярні рейси між містами. Перевірте розклади та забронюйте квитки заздалегідь.</p>
+      
+      <h3>Популярні маршрути</h3>
+      <p>Бухарест-Клуж, Бухарест-Тімішоара, Бухарест-Констанца - це одні з найпопулярніших маршрутів. Час в дорозі зазвичай становить 3-8 годин.</p>
+      
+      <h3>Бронювання квитків</h3>
+      <p>Квитки можна придбати онлайн, в касах автобусних станцій або безпосередньо у водія. Рекомендується бронювання заздалегідь.</p>
+      
+      <h3>Ціни та знижки</h3>
+      <p>Ціни варіюються від 15 до 50 EUR залежно від відстані та оператора. Студенти та пенсіонери мають право на знижки.</p>
+    `,
+    
+    'blog.article.bestTimeToVisit.content': `
+      <h2>Найкращий час для відвідування Східної Європи</h2>
+      <p>Кожен сезон в Східній Європі має свої переваги. Ось коли найкраще планувати вашу подорож.</p>
+      
+      <h3>Весна (березень-травень)</h3>
+      <p>Ідеальний час для відвідування садів та парків. Погода м'яка, туристів менше, а ціни нижчі. Чудовий час для культурних подорожей.</p>
+      
+      <h3>Літо (червень-серпень)</h3>
+      <p>Найпопулярніший сезон з теплою погодою та багатьма фестивалями. Однак очікуйте більше туристів та вищі ціни.</p>
+      
+      <h3>Осінь (вересень-листопад)</h3>
+      <p>Чудовий час для фотографії з осінніми кольорами. Погода все ще приємна, а туристичні місця менш переповнені.</p>
+      
+      <h3>Зима (грудень-лютий)</h3>
+      <p>Магічний час з різдвяними ярмарками та зимовими пейзажами. Ідеально для любителів зими та різдвяної атмосфери.</p>
+    `,
+    
+    'blog.article.budgetTravel.content': `
+      <h2>Як подорожувати Східною Європою з малим бюджетом</h2>
+      <p>Східна Європа пропонує відмінне співвідношення ціни та якості для бюджетних мандрівників. Ось як максимально використати ваш бюджет.</p>
+      
+      <h3>Проживання</h3>
+      <p>Хостели, готелі типу "постель та сніданок" та Airbnb пропонують доступні варіанти. Бронюйте заздалегідь для кращих цін.</p>
+      
+      <h3>Транспорт</h3>
+      <p>Автобуси Starlines пропонують відмінне співвідношення ціни та якості. Шукайте акції та знижки для студентів.</p>
+      
+      <h3>Харчування</h3>
+      <p>Їжте в місцевих ресторанах та кафе, уникайте туристичних місць. Місцеві ринки пропонують свіжі та дешеві продукти.</p>
+      
+      <h3>Розваги</h3>
+      <p>Багато музеїв пропонують безкоштовні дні або знижки для студентів. Пішохідні екскурсії часто безкоштовні або дуже дешеві.</p>
+    `,
+    
+    'blog.article.localCuisine.content': `
+      <h2>Кулінарний гід Східної Європи</h2>
+      <p>Кухня Східної Європи відображає багату історію та культурну різноманітність регіону. Відкрийте для себе унікальні смаки.</p>
+      
+      <h3>Румунія</h3>
+      <p>Сармале (горнятка з капусти), мітітей (румунські ковбаски), папанаші (сирні галушки) - це обов'язкові страви для дегустації.</p>
+      
+      <h3>Польща</h3>
+      <p>Пероги, борщ, бигос та польська ковбаса. Не пропустіть традиційний польський обід з супом та другою стравою.</p>
+      
+      <h3>Чехія</h3>
+      <p>Свійське пиво, гуляш, кнедліки та чеські палачинки. Чеська кухня відома своїми ситними та смачними стравами.</p>
+      
+      <h3>Угорщина</h3>
+      <p>Гуляш, паприкаш, лангош та угорське вино. Угорська кухня відома своїми пікантними стравами та спеціями.</p>
+    `,
+    
+    'blog.article.safetyTips.content': `
+      <h2>Поради з безпеки для подорожей автобусом</h2>
+      <p>Безпека має бути пріоритетом номер один під час будь-якої подорожі. Ось наші рекомендації для безпечних автобусних подорожей.</p>
+      
+      <h3>Збереження багажу</h3>
+      <p>Ніколи не залишайте цінні речі без нагляду. Використовуйте замки для багажу та тримайте важливі документи при собі.</p>
+      
+      <h3>Особиста безпека</h3>
+      <p>Будьте обережні з незнайомцями та не розголошуйте особисту інформацію. Довіряйте своїй інтуїції.</p>
+      
+      <h3>Документи</h3>
+      <p>Завжди майте при собі копії важливих документів. Зберігайте оригінали в безпечному місці.</p>
+      
+      <h3>Екстрені ситуації</h3>
+      <p>Зберігайте контактні дані посольства вашої країни та знайте, як зв'язатися з екстреними службами.</p>
+    `,
+    
+    'blog.article.winterTravel.content': `
+      <h2>Подорожі Східною Європою в холодний сезон</h2>
+      <p>Зима в Східній Європі може бути магічним часом для подорожей. Від різдвяних ярмарків до зимових видів спорту.</p>
+      
+      <h3>Різдвяні ярмарки</h3>
+      <p>Прага, Краків та Будапешт відомі своїми чудовими різдвяними ярмарками. Не пропустіть гаряче вино та місцеві ласощі.</p>
+      
+      <h3>Зимові види спорту</h3>
+      <p>Татри в Словаччині, Татри в Польщі та Карпати в Румунії пропонують чудові можливості для катання на лижах.</p>
+      
+      <h3>Підготовка до зими</h3>
+      <p>Одягайтеся тепло та візьміть водонепроникний одяг. Перевірте погодні умови перед поїздкою.</p>
+      
+      <h3>Зимова атмосфера</h3>
+      <p>Зимові пейзажі та атмосфера створюють унікальний досвід, який ви не отримаєте в інші сезони.</p>
+    `,
+    
+    'blog.article.culturalEtiquette.content': `
+      <h2>Культурний етикет в Східній Європі</h2>
+      <p>Розуміння місцевих звичаїв та етикету допоможе вам краще інтегруватися та отримати позитивний досвід.</p>
+      
+      <h3>Привітання</h3>
+      <p>Рукопожаття є стандартним привітанням. У деяких країнах прийнято цілуватися в щоки серед друзів.</p>
+      
+      <h3>Звичаї за столом</h3>
+      <p>Дочекайтеся, поки господар запросить вас сісти. Не покладайте лікті на стіл та не починайте їсти, поки всі не отримають їжу.</p>
+      
+      <h3>Подарунки</h3>
+      <p>Якщо вас запросили в гості, принесіть невеликий подарунок. Квіти, вино або солодощі завжди прийнятні.</p>
+      
+      <h3>Релігійні звичаї</h3>
+      <p>Поважайте місцеві релігійні традиції. Одягайтеся скромно при відвідуванні церков та святих місць.</p>
+    `,
+
+    // FAQ
+    'faq.title': 'Часті питання',
+    'faq.subtitle': 'Знайдіть відповіді на найпоширеніші питання про бронювання, подорожі та використання наших послуг. Не можете знайти те, що шукаєте? Зв\'яжіться з нашою командою підтримки.',
+    'faq.searchPlaceholder': 'Пошук питань та відповідей...',
+    'faq.allCategories': 'Всі категорії',
+    'faq.clearFilters': 'Очистити фільтри',
+    'faq.questionsFound': 'питань знайдено',
+    'faq.questionFound': 'питання знайдено',
+    'faq.noQuestionsFound': 'Питання не знайдені',
+    'faq.tryAdjusting': 'Спробуйте змінити критерії пошуку або переглянути всі категорії',
+    'faq.clearAllFilters': 'Очистити всі фільтри',
+    'faq.stillHaveQuestions': 'Все ще є питання?',
+    'faq.supportDescription': 'Наша команда підтримки клієнтів готова допомогти вам 24/7',
+    'faq.contactSupport': 'Зв\'язатися з підтримкою',
+    'faq.liveChat': 'Живий чат',
+    
+    // FAQ Categories
+    'faq.category.bookingTickets': 'Бронювання та квитки',
+    'faq.category.travelRoutes': 'Подорожі та маршрути',
+    'faq.category.schedulesTimetables': 'Розклади та графіки',
+    'faq.category.safetySecurity': 'Безпека та захист',
+    'faq.category.customerService': 'Обслуговування клієнтів',
+    'faq.category.pricingDiscounts': 'Ціни та знижки',
+    
+    // FAQ Questions and Answers
+    'faq.booking.howToBook.question': 'Як я можу забронювати квиток на автобус?',
+    'faq.booking.howToBook.answer': 'Ви можете забронювати квитки через наш веб-сайт, мобільний додаток або зателефонувавши до нашого сервісу клієнтів. Просто введіть міста відправлення та призначення, оберіть дату поїздки, виберіть бажану маршрут та завершіть процес оплати.',
+    'faq.booking.changeCancel.question': 'Чи можу я змінити або скасувати мій квиток?',
+    'faq.booking.changeCancel.answer': 'Так, ви можете змінити або скасувати квиток до 2 годин до відправлення. Зміни підлягають наявності та можуть включати додаткові збори. Скасування, зроблені більше ніж за 24 години до відправлення, зазвичай підлягають поверненню.',
+    'faq.booking.paymentMethods.question': 'Які способи оплати ви приймаєте?',
+    'faq.booking.paymentMethods.answer': 'Ми приймаємо всі основні кредитні картки (Visa, MasterCard, American Express), дебетові картки та цифрові гаманці, такі як PayPal. Ми також приймаємо банківські перекази для заздалегідь заброньованих поїздок.',
+    'faq.booking.printTicket.question': 'Чи потрібно мені друкувати мій квиток?',
+    'faq.booking.printTicket.answer': 'Ні, вам не потрібно друкувати квиток. Ви можете показати цифровий квиток на вашому мобільному пристрої, або ми можемо надіслати вам SMS з посиланням на бронювання. Однак друк рекомендований як резервна копія.',
+    
+    'faq.travel.arriveEarly.question': 'Наскільки рано я повинен прибути на автобусну станцію?',
+    'faq.travel.arriveEarly.answer': 'Ми рекомендуємо прибути принаймні за 30 хвилин до відправлення для внутрішніх маршрутів та за 45 хвилин для міжнародних маршрутів. Це дозволяє час для реєстрації, обробки багажу та процедур посадки.',
+    'faq.travel.missBus.question': 'Що станеться, якщо я пропущу автобус?',
+    'faq.travel.missBus.answer': 'Якщо ви пропустите автобус, негайно зв\'яжіться з нашим сервісом клієнтів. Залежно від наявності та типу вашого квитка, ми можемо перенести вас на наступний доступний рейс, хоча можуть застосовуватися додаткові збори.',
+    'faq.travel.luggageRestrictions.question': 'Чи є обмеження для багажу?',
+    'faq.travel.luggageRestrictions.answer': 'Кожен пасажир має право на ручну поклажу (макс. 10 кг) та зареєстрований багаж (макс. 20 кг). Додатковий багаж може перевозитися за додаткову плату. Великі предмети слід влаштовувати заздалегідь.',
+    'faq.travel.pets.question': 'Чи можу я взяти домашніх тварин на борт?',
+    'faq.travel.pets.answer': 'Малі тварини в переносках дозволені на більшості маршрутів, але повинні бути зарезервовані заздалегідь. Службові тварини подорожують безкоштовно. Будь ласка, перевірте специфічні політики маршрутів, оскільки деякі міжнародні маршрути можуть мати обмеження.',
+    
+    'faq.schedules.frequency.question': 'Наскільки часто курсують автобуси?',
+    'faq.schedules.frequency.answer': 'Частота залежить від маршруту. Популярні маршрути, такі як Київ-Бухарест, можуть мати кілька відправлень щодня, тоді як менш часті маршрути можуть курсувати один або два рази на день. Перевірте наш розклад для конкретних розкладів.',
+    'faq.schedules.weekendsHolidays.question': 'Чи відрізняються розклади у вихідні та святкові дні?',
+    'faq.schedules.weekendsHolidays.answer': 'Так, деякі маршрути мають знижену частоту у вихідні та святкові дні. Ми рекомендуємо перевірити наш святковий розклад або зв\'язатися з сервісом клієнтів для найбільш актуальної інформації.',
+    'faq.schedules.journeyTime.question': 'Скільки зазвичай тривають поїздки?',
+    'faq.schedules.journeyTime.answer': 'Час поїздки залежить від відстані та маршруту. Наприклад, Київ до Бухареста займає приблизно 8-10 годин, тоді як коротші внутрішні маршрути можуть тривати 2-4 години. Перевірте деталі індивідуальних маршрутів для точного часу.',
+    
+    'faq.safety.measures.question': 'Які заходи безпеки впроваджено?',
+    'faq.safety.measures.answer': 'Всі наші автобуси регулярно інспектуються та обслуговуються. Водії професійно навчені та мають ліцензії. У нас є системи моніторингу 24/7 та реагування на надзвичайні ситуації. Ремні безпеки доступні на всіх місцях.',
+    'faq.safety.insurance.question': 'Чи включена страхування подорожей?',
+    'faq.safety.insurance.answer': 'Базова страхування подорожей включена з усіма квитками. Це покриває медичні надзвичайні ситуації та скасування поїздок. Додаткова комплексна страхування може бути придбана під час бронювання для покращеного покриття.',
+    'faq.safety.emergency.question': 'Що я повинен робити у випадку надзвичайної ситуації?',
+    'faq.safety.emergency.answer': 'У випадку надзвичайної ситуації негайно зв\'яжіться з нашою лінією екстрених викликів 24/7. Всі автобуси оснащені аварійними виходами та аптечками першої допомоги. Водії навчені процедурам екстрених ситуацій та можуть зв\'язатися з екстреними службами.',
+    
+    'faq.service.contact.question': 'Як я можу зв\'язатися з сервісом клієнтів?',
+    'faq.service.contact.answer': 'Ви можете зв\'язатися з нами через кілька каналів: телефонна підтримка 24/7, живий чат на нашому веб-сайті, підтримка по електронній пошті або через наш мобільний додаток. У нас також є офіси обслуговування клієнтів на основних автобусних станціях.',
+    'faq.service.hours.question': 'Які години роботи сервісу клієнтів?',
+    'faq.service.hours.answer': 'Наш сервіс клієнтів доступний 24/7 для термінових проблем. Загальні питання обробляються з 6:00 до 22:00 щодня. Підтримка в надзвичайних ситуаціях завжди доступна.',
+    'faq.service.complaints.question': 'Як я можу подати скаргу?',
+    'faq.service.complaints.answer': 'Ви можете подати скарги через форму зворотного зв\'язку на нашому веб-сайті, надіслати нам електронний лист безпосередньо або поговорити з представником сервісу клієнтів. Ми прагнемо відповідати на всі скарги протягом 48 годин.',
+    
+    'faq.pricing.studentDiscounts.question': 'Чи є знижки для студентів або пенсіонерів?',
+    'faq.pricing.studentDiscounts.answer': 'Так, ми пропонуємо знижки для студентів (з дійсним студентським квитком), пенсіонерів (65+) та дітей до 12 років. У нас також є спеціальні тарифи для групових бронювань на 10 або більше пасажирів.',
+    'faq.pricing.loyaltyPrograms.question': 'Чи пропонуєте ви програми лояльності?',
+    'faq.pricing.loyaltyPrograms.answer': 'Так, наша програма Starlines Rewards пропонує бали за кожну поїздку, які можуть бути обміняні на знижки для майбутніх бронювань. Учасники також мають доступ до ексклюзивних пропозицій та можливостей раннього бронювання.',
+    'faq.pricing.seasonalPromotions.question': 'Чи є сезонні акції?',
+    'faq.pricing.seasonalPromotions.answer': 'Так, ми регулярно проводимо сезонні акції та спеціальні пропозиції. Це включає літні пропозиції подорожей, святкові пакети та знижки останньої хвилини. Підпишіться на нашу розсилку, щоб залишатися в курсі.',
+
+    // Contacts
+    'contacts.title': 'Контакти',
+    'contacts.description': 'Ми тут, щоб допомогти вам спланувати ідеальну подорож',
+    'contacts.breadcrumbHome': 'Головна',
+    'contacts.breadcrumbContacts': 'Контакти',
+    
+    // Contact Information Section
+    'contacts.weAreHereToHelp.title': 'Ми тут, щоб допомогти вам',
+    'contacts.weAreHereToHelp.description': 'Наша команда спеціалістів готова надати вам персональну допомогу в плануванні ідеальної подорожі по Європі.',
+    
+    // Contact Cards
+    'contacts.email.title': 'Електронна пошта',
+    'contacts.email.description': 'Для загальних питань та допомоги',
+    'contacts.phone.title': 'Телефон',
+    'contacts.phone.description': 'Телефонна підтримка в робочий час',
+    'contacts.schedule.title': 'Розклад',
+    'contacts.schedule.weekdays': 'Понеділок - П\'ятниця: 9:00 - 18:00',
+    'contacts.schedule.saturday': 'Субота: 9:00 - 14:00',
+    
+    // Contact Form Section
+    'contacts.form.title': 'Комплексна контактна форма',
+    'contacts.form.description': 'Заповніть форму нижче, щоб отримати персональну пропозицію для вашої подорожі по Європі.',
+    
+    // Success Message
+    'contacts.success.title': 'Дякуємо за повідомлення!',
+    'contacts.success.description': 'Ми отримали ваш запит і зв\'яжемося з вами найближчим часом для обговорення вашої подорожі.',
+    'contacts.success.responseTime': 'Відповідь протягом 24 годин',
+    
+    // Form Sections
+    'contacts.form.personalInfo.title': 'Особиста інформація та деталі подорожі',
+    'contacts.form.personalInfo.section': 'Особиста інформація',
+    'contacts.form.travelDetails.section': 'Деталі подорожі',
+    'contacts.form.passengers.section': 'Пасажири',
+    'contacts.form.contactInfo.section': 'Контактна інформація',
+    'contacts.form.additionalMessage.section': 'Додаткове повідомлення',
+    
+    // Form Fields
+    'contacts.form.firstName.label': 'Ім\'я',
+    'contacts.form.firstName.placeholder': 'Введіть ваше ім\'я',
+    'contacts.form.lastName.label': 'Прізвище',
+    'contacts.form.lastName.placeholder': 'Введіть ваше прізвище',
+    'contacts.form.destination.label': 'Напрямок',
+    'contacts.form.destination.placeholder': 'Оберіть напрямок',
+    'contacts.form.destination.other': 'Інший напрямок',
+    'contacts.form.destination.otherPlaceholder': 'Вкажіть напрямок',
+    'contacts.form.date.label': 'Дата подорожі',
+    'contacts.form.adults.label': 'Дорослі',
+    'contacts.form.minors.label': 'Діти',
+    'contacts.form.minorAge.label': 'Вік дитини',
+    'contacts.form.minorAge.placeholder': 'Наприклад: 12 років',
+    'contacts.form.phone.label': 'Номер телефону',
+    'contacts.form.phone.placeholder': '+373 60 12 34 56',
+    'contacts.form.email.label': 'Електронна пошта',
+    'contacts.form.email.placeholder': 'приклад@email.com',
+    'contacts.form.message.label': 'Повідомлення (необов\'язково)',
+    'contacts.form.message.placeholder': 'Опишіть особливі вимоги, переваги розміщення або інші важливі деталі для вашої подорожі...',
+    
+    // Form Validation Messages
+    'contacts.form.validation.firstName.required': 'Ім\'я обов\'язкове',
+    'contacts.form.validation.lastName.required': 'Прізвище обов\'язкове',
+    'contacts.form.validation.destination.required': 'Напрямок обов\'язковий',
+    'contacts.form.validation.date.required': 'Дата обов\'язкова',
+    'contacts.form.validation.minorAge.required': 'Вік дитини обов\'язковий, коли подорожує дитина',
+    'contacts.form.validation.phone.required': 'Номер телефону обов\'язковий',
+    'contacts.form.validation.phone.invalid': 'Номер телефону недійсний (формат: +373XXXXXXXX або 0XXXXXXXX)',
+    'contacts.form.validation.email.required': 'Електронна пошта обов\'язкова',
+    'contacts.form.validation.email.invalid': 'Електронна пошта недійсна',
+    
+    // Form Actions
+    'contacts.form.submit.sending': 'Відправляється...',
+    'contacts.form.submit.send': 'Відправити запит',
+    
+    // Company Information
+    'contacts.company.about.title': 'Про Starlines',
+    'contacts.company.about.description': 'Ми - міжнародна транспортна компанія з досвідом понад 10 років у організації автобусних подорожей по Європі. Ми пишаємося якісним сервісом та увагою до деталей для кожного пасажира.',
+    'contacts.company.registered': 'Компанія зареєстрована в Республіці Молдова',
+    'contacts.company.routes': 'Маршрути в 15+ європейських країнах',
+    'contacts.company.passengers': 'Понад 50,000 задоволених пасажирів',
+    
+    // Why Choose Us
+    'contacts.company.whyChoose.title': 'Чому варто обрати Starlines?',
+    'contacts.company.competitivePrices.title': 'Конкурентні ціни',
+    'contacts.company.competitivePrices.description': 'Спеціальні пропозиції та знижки для груп',
+    'contacts.company.personalizedService.title': 'Персоналізований сервіс',
+    'contacts.company.personalizedService.description': 'Індивідуальна допомога для кожної подорожі',
+    'contacts.company.guaranteedSafety.title': 'Гарантована безпека',
+    'contacts.company.guaranteedSafety.description': 'Сучасні автобуси з усіма стандартами безпеки',
+    'contacts.company.support24.title': 'Підтримка 24/7',
+    'contacts.company.support24.description': 'Телефонна підтримка під час подорожі',
+    
+    // Popular Destinations
+    'contacts.popularDestinations.title': 'Популярні напрямки',
+    'contacts.popularDestinations.description': 'Наші найпопулярніші маршрути в Європі',
+    'contacts.popularDestinations.bucharest': 'Бухарест',
+    'contacts.popularDestinations.kiev': 'Київ',
+    'contacts.popularDestinations.moscow': 'Москва',
+    'contacts.popularDestinations.istanbul': 'Стамбул',
 
     // Contact
     'contact.title': 'Контакти',

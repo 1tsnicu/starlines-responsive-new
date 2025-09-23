@@ -17,7 +17,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001
 /**
  * Cancel entire order (all tickets)
  */
-export async function cancelOrder(orderId: number, lang: string = 'en'): Promise<CancelTicketResult> {
+export async function cancelOrder(orderId: number, lang: 'en' | 'ru' | 'ua' | 'de' | 'pl' | 'cz' = 'en'): Promise<CancelTicketResult> {
   try {
     const request: CancelTicketRequest = {
       order_id: orderId,
@@ -70,7 +70,7 @@ export async function cancelOrder(orderId: number, lang: string = 'en'): Promise
 /**
  * Cancel specific ticket
  */
-export async function cancelTicket(ticketId: number, lang: string = 'en'): Promise<CancelTicketResult> {
+export async function cancelTicket(ticketId: number, lang: 'en' | 'ru' | 'ua' | 'de' | 'pl' | 'cz' = 'en'): Promise<CancelTicketResult> {
   try {
     const request: CancelTicketRequest = {
       ticket_id: ticketId,

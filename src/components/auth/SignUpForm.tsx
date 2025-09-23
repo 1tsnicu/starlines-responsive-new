@@ -5,12 +5,12 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLocalization } from '@/contexts/LocalizationContext'
-import { Eye, EyeOff, Loader2, CheckCircle, Chrome } from 'lucide-react'
+import { Eye, EyeOff, Loader2, CheckCircle } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 
 const SignUpForm = () => {
   const { t } = useLocalization()
-  const { signUp, signInWithGoogle } = useAuth()
+  const { signUp } = useAuth()
   const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: '',
@@ -76,19 +76,6 @@ const SignUpForm = () => {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    try {
-      const { error } = await signInWithGoogle()
-      if (error) {
-        setError(error.message)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (success) {
     return (
@@ -253,27 +240,6 @@ const SignUpForm = () => {
             )}
           </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t('auth.or')}
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <Chrome className="mr-2 h-4 w-4" />
-            {t('auth.signUpWithGoogle')}
-          </Button>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">{t('auth.haveAccount')} </span>

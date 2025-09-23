@@ -148,10 +148,10 @@ export const MyTickets: React.FC = () => {
       let result;
       if (ticketId) {
         // Cancel specific ticket
-        result = await cancelTicket(parseInt(ticketId), currentLanguage);
+        result = await cancelTicket(parseInt(ticketId), currentLanguage as 'en' | 'ru' | 'ua' | 'de' | 'pl' | 'cz');
       } else {
         // Cancel entire order
-        result = await cancelOrder(ticket.order_id, currentLanguage);
+        result = await cancelOrder(ticket.order_id, currentLanguage as 'en' | 'ru' | 'ua' | 'de' | 'pl' | 'cz');
       }
 
       // Check if cancellation was successful OR if order was already canceled
@@ -262,19 +262,19 @@ export const MyTickets: React.FC = () => {
           {tickets.map((ticket) => (
             <Card key={ticket.id} className="border border-gray-200">
               <CardHeader className="pb-4">
-                <div className="flex items-center justify-between">
-              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex-1">
                     <CardTitle className="text-lg">
                       {t('myTickets.order')} #{ticket.order_id}
                     </CardTitle>
-                    <div className="flex items-center gap-2 mt-1">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 mt-1">
                         {getStatusBadge(ticket.status)}
                       <span className="text-sm text-gray-500">
                         {t('myTickets.purchasedOn')} {formatDate(ticket.created_at)}
                           </span>
                         </div>
                       </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <div className="text-lg font-semibold text-gray-900">
                       {formatBookingPrice(ticket.price_total, ticket.currency)}
                                 </div>
@@ -289,7 +289,7 @@ export const MyTickets: React.FC = () => {
                 {/* Trip Details */}
                 {ticket.trips.map((trip, tripIndex) => (
                   <div key={tripIndex} className="border border-gray-100 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
                       <h4 className="font-medium text-gray-900">{trip.route_name}</h4>
                       <div className="text-sm text-gray-500">
                         {trip.date_from} {t('common.at')} {trip.time_from}
@@ -317,7 +317,7 @@ export const MyTickets: React.FC = () => {
                     <div className="space-y-2">
                       <h5 className="text-sm font-medium text-gray-700">{t('myTickets.passengers')}</h5>
                       {trip.passengers.map((passenger, passengerIndex) => (
-                        <div key={passengerIndex} className="flex items-center justify-between bg-gray-50 rounded p-2">
+                        <div key={passengerIndex} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 rounded p-2 gap-2">
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-gray-400" />
                             <span className="text-sm">
@@ -337,7 +337,7 @@ export const MyTickets: React.FC = () => {
                 ))}
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+                <div className="flex flex-col sm:flex-row gap-2 pt-4 border-t border-gray-100">
                   <Button
                     onClick={() => handleDownloadTicket(ticket)}
                     disabled={downloadingTickets.has(ticket.order_id.toString())}

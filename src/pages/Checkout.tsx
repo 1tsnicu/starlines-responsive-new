@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { routes, fareTypes, verifyOTP, validatePromoCode } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import PaymentLogos from "@/components/PaymentLogos";
 
 const Checkout = () => {
   const { formatPrice, t } = useLocalization();
@@ -683,6 +684,11 @@ const Checkout = () => {
                   <p className="text-sm text-muted-foreground">
                     {t('checkout.payment.totalAmount')}
                   </p>
+                  
+                  {/* Payment Methods Logos */}
+                  <div className="pt-4 border-t">
+                    <PaymentLogos size="md" showLabels={false} className="justify-center" />
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -698,15 +704,15 @@ const Checkout = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="bg-surface border-b border-border">
-        <div className="container py-6">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
+        <div className="container py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+            <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('checkout.back')}
             </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{t('checkout.title')}</h1>
-              <p className="text-muted-foreground">
+            <div className="flex-1">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">{t('checkout.title')}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-1">
                 {route.from.name} → {route.to.name} • {passengers} {passengers === 1 ? t('checkout.passenger') : t('checkout.passengers')}
               </p>
             </div>
@@ -714,9 +720,9 @@ const Checkout = () => {
         </div>
       </div>
 
-      <div className="container py-8">
+      <div className="container py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
         {/* Stepper */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Stepper
             steps={steps}
             currentStep={currentStep}
@@ -730,7 +736,7 @@ const Checkout = () => {
         </div>
 
         {/* Navigation */}
-        <div className="max-w-4xl mx-auto mt-8">
+        <div className="max-w-4xl mx-auto mt-6 sm:mt-8">
           {/* Validation Error Message - Only show when user tries to proceed */}
           {validationErrors && Object.keys(validationErrors).length > 0 && currentStep < steps.length - 1 && (
             <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md">
@@ -740,11 +746,12 @@ const Checkout = () => {
             </div>
           )}
           
-          <div className="flex justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 sm:justify-between">
             <Button
               variant="outline"
               onClick={prevStep}
               disabled={currentStep === 0}
+              className="w-full sm:w-auto"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('checkout.payment.previous')}
@@ -754,13 +761,13 @@ const Checkout = () => {
               <Button 
                 onClick={nextStep}
                 disabled={!canProceedToNextStep()}
-                className={!canProceedToNextStep() ? "opacity-50 cursor-not-allowed" : ""}
+                className={`w-full sm:w-auto ${!canProceedToNextStep() ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 Next
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             ) : (
-              <Button size="lg" className="px-8">
+              <Button size="lg" className="w-full sm:w-auto px-8">
                 {t('checkout.payment.proceed')}
               </Button>
             )}

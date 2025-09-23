@@ -69,14 +69,6 @@ const HeroSection = () => {
         {/* Enhanced USP Bar removed per request */}
 
         
-        <div className="absolute bottom-20 left-10 pointer-events-none">
-          <div className="bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-white/20">
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4 text-blue-500" />
-              <span className="text-xs font-medium text-foreground">{t('hero.fastBooking')}</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Bottom decorative wave - redesigned */}

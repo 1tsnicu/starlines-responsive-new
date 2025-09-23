@@ -25,6 +25,7 @@ import type {
   PaymentTimer, 
   TimerCallbacks 
 } from '@/types/buyTicket';
+import PaymentLogos from '@/components/PaymentLogos';
 
 export function PaymentFlow({ 
   reservation, 
@@ -256,6 +257,11 @@ export function PaymentFlow({
 
             <div className="text-xs text-muted-foreground text-center">
               Prin completarea plății, confirmi rezervarea și accepti termenii și condițiile.
+            </div>
+            
+            {/* Payment Methods Logos */}
+            <div className="pt-4 border-t">
+              <PaymentLogos size="sm" showLabels={false} className="justify-center" />
             </div>
           </div>
         </CardContent>

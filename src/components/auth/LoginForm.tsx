@@ -5,12 +5,12 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLocalization } from '@/contexts/LocalizationContext'
-import { Eye, EyeOff, Loader2, Chrome } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 const LoginForm = () => {
   const { t } = useLocalization()
-  const { signIn, signInWithGoogle } = useAuth()
+  const { signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -35,19 +35,6 @@ const LoginForm = () => {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    try {
-      const { error } = await signInWithGoogle()
-      if (error) {
-        setError(error.message)
-      }
-    } catch (err) {
-      setError('An unexpected error occurred')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -116,27 +103,6 @@ const LoginForm = () => {
             )}
           </Button>
 
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {t('auth.or')}
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={handleGoogleSignIn}
-            disabled={loading}
-          >
-            <Chrome className="mr-2 h-4 w-4" />
-            {t('auth.signInWithGoogle')}
-          </Button>
 
           <div className="text-center text-sm">
             <span className="text-muted-foreground">{t('auth.noAccount')} </span>

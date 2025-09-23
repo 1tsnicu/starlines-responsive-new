@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import PaymentLogos from "@/components/PaymentLogos";
 
 const About = () => {
   const { t } = useLocalization();
@@ -53,36 +54,6 @@ const About = () => {
     }
   ];
 
-  const team = [
-    {
-      name: "Mihai Popescu",
-      position: t('about.ceoFounder'),
-      bio: t('about.mihaiBio'),
-      expertise: [t('about.strategicVision'), t('about.industryLeadership'), t('about.customerExperience')],
-      image: "/api/placeholder/150/150"
-    },
-    {
-      name: "Elena Dumitrescu",
-      position: t('about.coo'),
-      bio: t('about.elenaBio'),
-      expertise: [t('about.operationsExcellence'), t('about.logistics'), t('about.qualityControl')],
-      image: "/api/placeholder/150/150"
-    },
-    {
-      name: "Alexandru Ionescu",
-      position: t('about.cco'),
-      bio: t('about.alexandruBio'),
-      expertise: [t('about.customerExperience'), t('about.teamBuilding'), t('about.serviceInnovation')],
-      image: "/api/placeholder/150/150"
-    },
-    {
-      name: "Maria Radu",
-      position: t('about.cto'),
-      bio: t('about.mariaBio'),
-      expertise: [t('about.digitalTransformation'), t('about.aiMachineLearning'), t('about.productDevelopment')],
-      image: "/api/placeholder/150/150"
-    }
-  ];
 
   const achievements = [
     {
@@ -252,51 +223,6 @@ const About = () => {
         </div>
       </div>
 
-      {/* Our Team */}
-      <div className="py-12 sm:py-16 lg:py-20 bg-surface">
-        <div className="container px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-3 sm:mb-4">
-              {t('about.mindsBehindheMagic')}
-            </h2>
-            <p className="text-base sm:text-lg text-foreground/70 max-w-3xl mx-auto px-2">
-              {t('about.teamDescription')}
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-            {team.map((member) => (
-              <Card key={member.name} className="border-border hover-lift bg-white">
-                <CardContent className="p-4 sm:p-6 lg:p-8">
-                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                    <div className="w-20 h-20 sm:w-24 sm:h-24 bg-muted rounded-full flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-                      <div className="text-muted-foreground text-xs sm:text-sm">Photo</div>
-                    </div>
-                    <div className="flex-1 text-center sm:text-left">
-                      <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1">
-                        {member.name}
-                      </h3>
-                      <p className="text-primary font-medium mb-2 sm:mb-3">
-                        {member.position}
-                      </p>
-                      <p className="text-foreground/70 text-sm mb-3 sm:mb-4 leading-relaxed">
-                        {member.bio}
-                      </p>
-                      <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                        {member.expertise.map((skill) => (
-                          <Badge key={skill} variant="outline" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
 
       {/* Timeline */}
       <div className="py-12 sm:py-16 lg:py-20">
@@ -441,6 +367,14 @@ const About = () => {
               <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
               {t('about.learnMore')}
             </Button>
+          </div>
+          
+          {/* Payment Methods Logos */}
+          <div className="mt-8 pt-6 border-t border-white/20">
+            <div className="flex items-center justify-center gap-4 text-white/80">
+              <span className="text-sm">{t('tripDetails.multiplePaymentMethods')}</span>
+              <PaymentLogos size="sm" showLabels={false} className="opacity-90" />
+            </div>
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocalization } from "@/contexts/LocalizationContext";
+import PaymentLogos from "@/components/PaymentLogos";
 
 const Footer = () => {
   const { t } = useLocalization();
@@ -168,11 +169,16 @@ const Footer = () => {
       <div className="border-t border-background/20 bg-foreground/90">
         <div className="container py-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-background/70">
-            <div className="flex items-center gap-4">
-              <span>&copy; {currentYear} Starlines. {t('footer.rights')}</span>
-              <span>•</span>
-              <span>{t('hero.subtitle')}</span>
-        </div>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="flex items-center gap-4">
+                <span>&copy; {currentYear} Starlines. {t('footer.rights')}</span>
+                <span>•</span>
+                <span>{t('hero.subtitle')}</span>
+              </div>
+              
+              {/* Payment Methods Logos */}
+              <PaymentLogos size="sm" showLabels={false} className="opacity-80" />
+            </div>
         
             <div className="flex items-center gap-4">
               <Link to="/legal/terms" className="hover:text-background transition-colors">

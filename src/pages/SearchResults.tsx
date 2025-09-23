@@ -394,19 +394,19 @@ const SearchResults = () => {
         <div className="container py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-xl sm:text-2xl font-bold text-foreground">
                 {from} → {to}
               </h1>
-              <p className="text-foreground/70">
+              <p className="text-sm sm:text-base text-foreground/70 mt-1">
                 {date} • {passengers} {parseInt(passengers) === 1 ? t('search.passenger') : t('search.passengers')}
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               {/* Mobile Filter Button */}
               <Sheet open={showFilters} onOpenChange={setShowFilters}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" className="md:hidden">
+                  <Button variant="outline" className="md:hidden w-full sm:w-auto">
                     <Filter className="h-4 w-4 mr-2" />
                     {t('search.filters')}
                     {filters.amenities.length > 0 && (
@@ -428,7 +428,7 @@ const SearchResults = () => {
 
               {/* Sort Options */}
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

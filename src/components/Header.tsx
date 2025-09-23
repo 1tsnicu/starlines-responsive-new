@@ -364,24 +364,24 @@ const Header = () => {
             <nav className="space-y-4">
               {/* Main Navigation */}
               <div className="space-y-2">
-                {mainNavigation.map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                      isActive(item.href)
+              {mainNavigation.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                    isActive(item.href)
                         ? 'bg-primary text-primary-foreground'
                         : 'text-foreground/70 hover:text-foreground hover:bg-muted'
-                    }`}
-                  >
-                    {item.icon}
-                    <div>
-                      <div className="font-medium">{item.title}</div>
-                      <div className="text-xs opacity-80">{item.description}</div>
-                    </div>
-                  </Link>
-                ))}
+                  }`}
+                >
+                  {item.icon}
+                  <div>
+                    <div className="font-medium">{item.title}</div>
+                    <div className="text-xs opacity-80">{item.description}</div>
+                  </div>
+                </Link>
+              ))}
               </div>
 
               {/* Additional Pages */}

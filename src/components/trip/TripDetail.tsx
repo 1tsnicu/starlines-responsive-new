@@ -1076,21 +1076,21 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
   const hasMultipleSegments = Object.keys(seatMaps).length > 1;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
-        <Button onClick={() => navigate(-1)} variant="outline" size="sm">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        <Button onClick={() => navigate(-1)} variant="outline" size="sm" className="w-fit">
           <ArrowLeft className="w-4 h-4 mr-2" />
           {t('common.back')}
         </Button>
-        <div>
-          <h1 className="text-2xl font-bold">
+        <div className="flex-1">
+          <h1 className="text-xl sm:text-2xl font-bold">
             {isRoundTrip ? t('search.roundTrip') : 
              route.point_from && route.point_to ? 
               `${route.point_from} - ${route.point_to}` : 
               t('tripDetails.selectYourSeats')}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
             {isRoundTrip ? 
               `${route.point_from} - ${route.point_to} - ${route.point_from}` : 
               route.carrier
@@ -1099,9 +1099,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
         {/* Trip Summary */}
-        <div className="xl:col-span-1">
+        <div className="lg:col-span-1 order-2 lg:order-1">
           <TripSummary
             route={{
               route_name: route.route_name,
@@ -1163,14 +1163,14 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
         </div>
 
         {/* Seat Selection */}
-        <div className="xl:col-span-2">
+        <div className="lg:col-span-2 order-1 lg:order-2">
           <Card>
             <CardHeader>
               <CardTitle>{t('tripDetails.selectYourSeats')}</CardTitle>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-gray-600">
                 <span>{t('booking.passengers')}: {passengers}</span>
-                <Separator orientation="vertical" className="h-4" />
-                <span>
+                <Separator orientation="vertical" className="h-4 hidden sm:block" />
+                <span className="hidden sm:inline">
                   {t('seatMap.selectSeats')} {passengers} {t('checkout.passengers')}
                 </span>
               </div>
@@ -1239,7 +1239,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                     {Object.keys(returnSeatMaps).length > 0 ? (
                       Object.keys(returnSeatMaps).length > 1 ? (
                         <Tabs value={activeSegment || undefined} onValueChange={setActiveSegment}>
-                          <TabsList className="grid w-full grid-cols-2">
+                          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2">
                               {Object.entries(returnSeatMaps).map(([bustype_id, seatMapData], index) => (
                                 <TabsTrigger key={bustype_id} value={bustype_id}>
                                   {t('tripDetails.returnJourney')} {index + 1}
@@ -1372,7 +1372,7 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
 
                   {/* Total Price */}
                   <div className="p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                       <span className="font-medium text-blue-800">{t('booking.total')}:</span>
                       <span className="text-lg font-bold text-blue-900">
                         {(outboundTotalPrice + returnTotalPrice).toFixed(2)} {outboundCurrency}
@@ -1400,11 +1400,11 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
                 <Button
                   onClick={handleContinue}
                   disabled={isRoundTrip ? (!isOutboundSelectionValid || !isReturnSelectionValid) : !isOutboundSelectionValid}
-                  className="w-full"
+                  className="w-full flex flex-col sm:flex-row items-center gap-2"
                   size="lg"
                 >
-                  {t('tripDetails.continueToCheckout')}
-                  <Badge variant="secondary" className="ml-2">
+                  <span>{t('tripDetails.continueToCheckout')}</span>
+                  <Badge variant="secondary" className="ml-0 sm:ml-2">
                     {bookingData.bookingSummary.totalPrice.toFixed(2)} {bookingData.bookingSummary.currency}
                   </Badge>
                 </Button>
@@ -1418,10 +1418,10 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       {showBookingForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">{t('bookingForm.completeYourBooking')}</h2>
-                <Button variant="ghost" onClick={handleBackToSeats}>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <h2 className="text-xl sm:text-2xl font-bold">{t('bookingForm.completeYourBooking')}</h2>
+                <Button variant="ghost" onClick={handleBackToSeats} className="w-fit">
                   ← {t('bookingForm.backToSeats')}
                 </Button>
               </div>
@@ -1444,9 +1444,9 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
       {bookingResponse && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-2 sm:p-4 z-50">
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-2xl font-bold">{t('bookingForm.bookingConfirmed')}</h2>
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <h2 className="text-xl sm:text-2xl font-bold">{t('bookingForm.bookingConfirmed')}</h2>
                 <Button variant="ghost" onClick={handleBackToSeats}>
                   {t('bookingForm.close')}
                 </Button>
