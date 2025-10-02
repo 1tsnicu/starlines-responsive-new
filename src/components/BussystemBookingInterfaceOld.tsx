@@ -6,6 +6,7 @@ import { BookingFlow } from '@/components/BookingFlow';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { isDevelopment } from '@/config/env';
 
 type ViewState = 'search' | 'results' | 'booking' | 'confirmation';
 
@@ -144,7 +145,7 @@ export function BussystemBookingInterface() {
       )}
       
       {/* Demo/Development info */}
-      {process.env.NODE_ENV === 'development' && (
+      {isDevelopment() && (
         <Card className="mt-8 border-dashed">
           <CardContent className="p-4">
             <div className="text-sm text-muted-foreground">

@@ -238,6 +238,13 @@ const SeatMap: React.FC<SeatMapProps> = ({
     // Fallback: create dynamic seat layout based on available seats only
     const availableSeats = freeSeats.filter(seat => seat.seat_free === 1);
     
+    console.log(`🗺️ SeatMap DEBUG:`, {
+      totalFreeSeats: freeSeats.length,
+      availableSeats: availableSeats.length,
+      hasPlan,
+      firstFewSeats: availableSeats.slice(0, 10).map(s => s.seat_number)
+    });
+    
     if (availableSeats.length === 0) {
       return [];
     }

@@ -17,7 +17,8 @@ import {
   Ticket,
   Clock,
   HelpCircle,
-  FileText
+  FileText,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,18 @@ const Header = () => {
     t 
   } = useLocalization();
   const { user, profile, signOut, isAdmin } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   // Complete navigation structure with ALL pages (no admin)
   const mainNavigation = [
@@ -313,8 +326,15 @@ const Header = () => {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={signOut}>
-                    {t('auth.logout')}
+                  <DropdownMenuItem onClick={handleSignOut} disabled={isLoggingOut}>
+                    {isLoggingOut ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        {t('auth.loggingOut')}
+                      </>
+                    ) : (
+                      t('auth.logout')
+                    )}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -444,9 +464,17 @@ const Header = () => {
                       variant="outline"
                       size="sm"
                       className="mx-4 w-[calc(100%-2rem)]"
-                      onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                      onClick={() => { handleSignOut(); setIsMobileMenuOpen(false); }}
+                      disabled={isLoggingOut}
                     >
-                      {t('auth.logout')}
+                      {isLoggingOut ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          {t('auth.loggingOut')}
+                        </>
+                      ) : (
+                        t('auth.logout')
+                      )}
                     </Button>
                   </div>
                 ) : (

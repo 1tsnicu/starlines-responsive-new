@@ -104,6 +104,7 @@ const translations = {
     'auth.haveAccount': 'Ai deja cont?',
     'auth.forgotPassword': 'Ai uitat parola?',
     'auth.logout': 'Deconectare',
+    'auth.loggingOut': 'Se deconectează...',
     'auth.profile': 'Profil',
     'auth.or': 'Sau',
     'auth.signInWithGoogle': 'Conectare cu Google',
@@ -411,6 +412,7 @@ const translations = {
     
     // Seat Map
     'seatMap.selectSeats': 'Selectează Locuri',
+    'seatMap.selectedSeatsLabel': 'Locuri selectate:',
     'seatMap.selectedCount': 'selectate',
     'seatMap.noData': 'Nu există date disponibile',
     
@@ -1847,6 +1849,7 @@ const translations = {
     'auth.haveAccount': 'Уже есть аккаунт?',
     'auth.forgotPassword': 'Забыли пароль?',
     'auth.logout': 'Выйти',
+    'auth.loggingOut': 'Выход...',
     'auth.profile': 'Профиль',
     'auth.or': 'Или',
     'auth.signInWithGoogle': 'Войти через Google',
@@ -3594,6 +3597,7 @@ const translations = {
     'auth.haveAccount': 'Already have an account?',
     'auth.forgotPassword': 'Forgot password?',
     'auth.logout': 'Sign Out',
+    'auth.loggingOut': 'Signing out...',
     'auth.profile': 'Profile',
     'auth.or': 'Or',
     'auth.signInWithGoogle': 'Sign in with Google',
@@ -5331,6 +5335,7 @@ const translations = {
     'auth.lastNamePlaceholder': 'Введіть ваше прізвище',
     'auth.profile': 'Профіль',
     'auth.logout': 'Вийти',
+    'auth.loggingOut': 'Вихід...',
     'auth.welcome': 'Ласкаво просимо',
     'auth.welcomeBack': 'З поверненням',
     'auth.createAccount': 'Створити акаунт',

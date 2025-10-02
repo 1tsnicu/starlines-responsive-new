@@ -25,6 +25,8 @@ const SignUpForm = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [emailConfirmationSent, setEmailConfirmationSent] = useState(false)
+  const [userExists, setUserExists] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -52,7 +54,7 @@ const SignUpForm = () => {
     }
 
     try {
-      const { error } = await signUp(
+      const { error, needsEmailConfirmation, userExists } = await signUp(
         formData.email,
         formData.password,
         formData.firstName,
@@ -62,6 +64,14 @@ const SignUpForm = () => {
       
       if (error) {
         setError(error.message)
+      } else if (userExists) {
+        setUserExists(true)
+        // Redirect to home page after 3 seconds
+        setTimeout(() => {
+          navigate('/')
+        }, 3000)
+      } else if (needsEmailConfirmation) {
+        setEmailConfirmationSent(true)
       } else {
         setSuccess(true)
         // Redirect to home page after 3 seconds
@@ -92,6 +102,84 @@ const SignUpForm = () => {
           <Button onClick={() => navigate('/')}>
             Mergi la Pagina Principală
           </Button>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (emailConfirmationSent) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="p-8 text-center">
+          <div className="h-16 w-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Confirmă Email-ul</h2>
+          <p className="text-muted-foreground mb-4">
+            Am trimis un email de confirmare la <strong>{formData.email}</strong>
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Te rugăm să verifici inbox-ul și să dai click pe linkul de confirmare pentru a activa contul.
+          </p>
+          <div className="space-y-2">
+            <Button onClick={() => navigate('/login')} variant="outline" className="w-full">
+              Mergi la Login
+            </Button>
+            <Button onClick={() => {
+              setEmailConfirmationSent(false)
+              setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                password: '',
+                confirmPassword: ''
+              })
+            }} variant="ghost" className="w-full">
+              Încearcă din nou
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (userExists) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardContent className="p-8 text-center">
+          <div className="h-16 w-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold mb-2">Cont Există Deja</h2>
+          <p className="text-muted-foreground mb-4">
+            Un cont cu email-ul <strong>{formData.email}</strong> există deja în sistem.
+          </p>
+          <p className="text-sm text-muted-foreground mb-4">
+            Te rugăm să te autentifici cu credențialele existente sau să folosești un alt email.
+          </p>
+          <div className="space-y-2">
+            <Button onClick={() => navigate('/login')} className="w-full">
+              Mergi la Login
+            </Button>
+            <Button onClick={() => {
+              setUserExists(false)
+              setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                phone: '',
+                password: '',
+                confirmPassword: ''
+              })
+            }} variant="outline" className="w-full">
+              Încearcă cu Alt Email
+            </Button>
+          </div>
         </CardContent>
       </Card>
     )

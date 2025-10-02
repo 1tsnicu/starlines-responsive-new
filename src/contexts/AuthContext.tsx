@@ -69,6 +69,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (session?.user) {
         await fetchProfile(session.user.id)
+        
+        // If user just confirmed email, redirect to home
+        if (event === 'SIGNED_IN' && session.user.email_confirmed_at) {
+          navigate('/')
+        }
       } else {
         setProfile(null)
       }
@@ -77,7 +82,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     })
 
     return () => subscription.unsubscribe()
-  }, [])
+  }, [navigate])
 
   const fetchProfile = async (userId: string) => {
     try {
@@ -104,12 +109,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     firstName: string, 
     lastName: string, 
     phone: string
-  ): Promise<{ error: AuthError | null }> => {
+  ): Promise<{ error: AuthError | null; needsEmailConfirmation?: boolean; userExists?: boolean }> => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             first_name: firstName,
             last_name: lastName,
@@ -119,13 +125,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       })
 
       if (error) {
+        // Check if user already exists
+        if (error.message.includes('already registered') || error.message.includes('already been registered')) {
+          return { error: null, userExists: true }
+        }
         return { error }
       }
       
-      // Redirect to home page after successful login
-      navigate('/')
+      if (data.user && !data.user.email_confirmed_at) {
+        // User created but needs email confirmation
+        return { error: null, needsEmailConfirmation: true }
+      }
 
       if (data.user) {
+        // User is immediately confirmed (for development/testing)
         // Create profile in profiles table
         const { error: profileError } = await supabase
           .from('profiles')
@@ -186,6 +199,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = async (): Promise<void> => {
     try {
       await supabase.auth.signOut()
+      // Clear local state
+      setUser(null)
+      setProfile(null)
+      setSession(null)
+      // Redirect to home page
+      navigate('/')
     } catch (error) {
       console.error('Sign out error:', error)
     }

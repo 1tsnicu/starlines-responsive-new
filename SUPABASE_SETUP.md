@@ -1,183 +1,261 @@
-# 🚀 **Configurarea Supabase pentru Starlines Routes**
+# 🚀 Supabase Setup pentru Starlines
 
-## 📋 **Pași de Configurare**
+Acest ghid vă va ajuta să configurați Supabase pentru aplicația Starlines.
 
-### **1. Accesare Supabase Dashboard**
-- Mergi la [supabase.com](https://supabase.com)
-- Conectează-te la contul tău
-- Accesează proiectul: `vrxwhyvyodvxovpbenpr`
+## 📋 Pași de Configurare
 
-### **2. Configurarea Bazei de Date**
-1. **Deschide SQL Editor** din meniul din stânga
-2. **Copiază și rulează** conținutul din `supabase-setup.sql`
-3. **Verifică** că tabelele au fost create:
-   - `profiles` - profilurile utilizatorilor
-   - `bookings` - rezervările
-   - `routes` - rutele de transport
+### 1. **Configurarea Variabilelor de Mediu**
 
-### **3. Configurarea Autentificării**
-1. **Authentication > Settings** din meniul din stânga
-2. **Enable Email Auth** dacă nu este activat
-3. **Configure Email Templates** (opțional)
+Creați un fișier `.env` în directorul root al proiectului:
 
-### **4. Configurarea RLS (Row Level Security)**
-- RLS este deja configurat prin scriptul SQL
-- Utilizatorii pot vedea doar propriile date
-- Adminii pot vedea toate datele
-
-## 🗄️ **Structura Bazei de Date**
-
-### **Tabela `profiles`**
-```sql
-- id (UUID) - referință la auth.users
-- email (TEXT) - email-ul utilizatorului
-- first_name (TEXT) - prenumele
-- last_name (TEXT) - numele
-- phone (TEXT) - numărul de telefon
-- is_admin (BOOLEAN) - dacă este admin
-- created_at, updated_at (TIMESTAMP)
+```env
+REACT_APP_SUPABASE_URL=https://vrxwhyvyodvxovpbenpr.supabase.co
+REACT_APP_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyeHdoeXZ5b2R2eG92cGJlbnByIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDUxNDYsImV4cCI6MjA3MTY4MTE0Nn0.04QxU-lZspdz-PybBJAd3h26av9tPViscHPwaT0xEns
 ```
 
-### **Tabela `bookings`**
-```sql
-- id (UUID) - ID-ul rezervării
-- user_id (UUID) - referință la profiles
-- route_id (TEXT) - ID-ul rutei
-- fare_type (TEXT) - tipul tarifului
-- passengers (INTEGER) - numărul de pasageri
-- total_price (DECIMAL) - prețul total
-- currency (TEXT) - moneda
-- status (TEXT) - statusul rezervării
-- departure_date, return_date (DATE)
-```
-
-### **Tabela `routes`**
-```sql
-- id (UUID) - ID-ul rutei
-- from_city, to_city (TEXT) - orașele
-- operator (TEXT) - operatorul
-- departure_time, arrival_time (TIME)
-- duration (TEXT) - durata
-- price_economy, price_premium, price_business (DECIMAL)
-- amenities (TEXT[]) - facilitățile
-- is_active (BOOLEAN) - dacă ruta este activă
-```
-
-## 🔐 **Politici de Securitate (RLS)**
-
-### **Profiles**
-- Utilizatorii pot vedea și edita doar propriul profil
-- Adminii pot vedea toate profilele
-
-### **Bookings**
-- Utilizatorii pot vedea doar propriile rezervări
-- Adminii pot vedea toate rezervările
-
-### **Routes**
-- Toată lumea poate vedea rutele active
-- Doar adminii pot crea/edita/șterge rute
-
-## 👥 **Crearea Primului Admin**
-
-### **Metoda 1: Prin Aplicație**
-1. Creează un cont normal prin `/signup`
-2. Conectează-te la baza de date
-3. Execută:
-```sql
-UPDATE public.profiles 
-SET is_admin = TRUE 
-WHERE email = 'emailul_tau@example.com';
-```
-
-### **Metoda 2: Prin Supabase Dashboard**
-1. **Authentication > Users**
-2. Creează un utilizator nou
-3. **Table Editor > profiles**
-4. Adaugă un rând cu `is_admin = TRUE`
-
-## 🧪 **Testarea Autentificării**
-
-### **1. Testare Înregistrare**
-- Mergi la `/signup`
-- Completează formularul
-- Verifică că contul este creat în `profiles`
-
-### **2. Testare Conectare**
-- Mergi la `/login`
-- Conectează-te cu contul creat
-- Verifică că ești redirecționat corect
-
-### **3. Testare Admin**
-- Conectează-te cu un cont admin
-- Verifică că vezi link-ul "Admin Panel" în header
-- Accesează `/admin/routes`
-
-## 🔧 **Configurarea de Producție**
-
-### **1. Variabile de Mediu**
+#### **Pentru Vite (opțional):**
 ```env
 VITE_SUPABASE_URL=https://vrxwhyvyodvxovpbenpr.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
-### **2. Securitate**
-- Activează **2FA** pentru conturile admin
-- Configurează **rate limiting**
-- Monitorizează **audit logs**
+**Notă:** Aplicația folosește un sistem de configurare hibrid (`src/config/env.ts`) care funcționează cu atât Vite cât și Create React App, cu fallback-uri pentru toate variabilele de mediu.
 
-### **3. Backup**
-- Configurează **backup automat** în Supabase
-- Exportă datele periodic
+### 2. **Configurarea Bazei de Date**
 
-## 📱 **Funcționalități Implementate**
+1. Accesați [Supabase Dashboard](https://supabase.com/dashboard)
+2. Selectați proiectul `vrxwhyvyodvxovpbenpr`
+3. Mergeți la **SQL Editor**
+4. Copiați și rulați conținutul din `supabase-setup.sql`
 
-### **✅ Autentificare**
-- Înregistrare utilizatori noi
-- Conectare utilizatori existenți
-- Gestionare sesiuni
-- Deconectare
+### 3. **Structura Tabelelor**
 
-### **✅ Profil Utilizator**
-- Informații personale
-- Actualizare profil
-- Avatar (opțional)
+#### **📊 Tabelul `profiles`**
+```sql
+- id (uuid) - ID-ul utilizatorului din auth.users
+- email (text) - Emailul utilizatorului
+- first_name (text) - Prenumele
+- last_name (text) - Numele
+- phone (text) - Numărul de telefon
+- created_at (timestamp) - Data creării
+- updated_at (timestamp) - Data ultimei modificări
+- is_admin (boolean) - Dacă este administrator
+- avatar_url (text) - URL-ul avatarului
+```
 
-### **✅ Sistem Admin**
-- Acces la toate datele
-- Gestionare rute
-- Gestionare utilizatori
-- Panel administrativ
+#### **📊 Tabelul `bookings`**
+```sql
+- id (uuid) - ID-ul rezervării
+- user_id (uuid) - ID-ul utilizatorului
+- route_id (text) - ID-ul rutei
+- fare_type (text) - Tipul tarifului
+- passengers (integer) - Numărul de pasageri
+- total_price (numeric) - Prețul total
+- currency (text) - Moneda
+- status (text) - Statusul rezervării
+- departure_date (date) - Data plecării
+- return_date (date) - Data întoarcerii
+- payment_status (text) - Statusul plății
+```
 
-### **✅ Securitate**
-- Row Level Security (RLS)
-- Politici de acces
-- Validare date
-- Protecție CSRF
+#### **📊 Tabelul `routes`**
+```sql
+- id (uuid) - ID-ul rutei
+- from_city (text) - Orașul de plecare
+- to_city (text) - Orașul de sosire
+- operator (text) - Operatorul
+- departure_time (time) - Ora plecării
+- arrival_time (time) - Ora sosirii
+- duration (text) - Durata călătoriei
+- price_economy (numeric) - Prețul economie
+- price_premium (numeric) - Prețul premium
+- price_business (numeric) - Prețul business
+- amenities (text[]) - Facilitățile
+- frequency (text) - Frecvența
+- is_active (boolean) - Dacă ruta este activă
+```
 
-## 🚨 **Troubleshooting**
+### 4. **Row Level Security (RLS)**
 
-### **Eroare: "Invalid JWT"**
-- Verifică cheia anonimă
-- Verifică URL-ul Supabase
-- Verifică configurația RLS
+Toate tabelele au RLS activat cu următoarele politici:
 
-### **Eroare: "Permission denied"**
-- Verifică politicile RLS
-- Verifică dacă utilizatorul este autentificat
-- Verifică dacă utilizatorul are permisiunile necesare
+- **profiles**: Utilizatorii pot vedea/modifica doar propriul profil
+- **bookings**: Utilizatorii pot vedea/modifica doar propriile rezervări
+- **routes**: Toate rutele sunt vizibile publicului
 
-### **Eroare: "Table not found"**
-- Rulează din nou scriptul SQL
-- Verifică că tabelele au fost create
-- Verifică numele tabelelor
+### 5. **Trigger-e și Funcții**
 
-## 📞 **Suport**
+#### **🔄 Trigger pentru `updated_at`**
+```sql
+-- Actualizează automat câmpul updated_at la modificare
+CREATE TRIGGER update_profiles_updated_at BEFORE
+UPDATE ON profiles FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+```
 
-Pentru probleme tehnice:
-1. Verifică **Supabase Status**
-2. Consultează **Supabase Docs**
-3. Contactează **echipa de dezvoltare**
+#### **🔄 Trigger pentru utilizatori noi**
+```sql
+-- Creează automat profilul când se înregistrează un utilizator nou
+CREATE TRIGGER on_auth_user_created
+AFTER INSERT ON auth.users
+FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+```
+
+## 🔐 Autentificare
+
+### **Funcționalități Disponibile:**
+
+1. **Înregistrare** (`/login`)
+   - Email și parolă
+   - Prenume, nume, telefon
+   - Validare automată
+   - **Confirmare prin email** (opțional)
+   - **Detectare utilizator existent**
+
+2. **Autentificare** (`/login`)
+   - Email și parolă
+   - Persistența sesiunii
+
+3. **Confirmare Email**
+   - **Email automat** la înregistrare
+   - **Pagina de callback** (`/auth/callback`)
+   - **Crearea automată** a profilului după confirmare
+
+4. **Profil Utilizator**
+   - Vizualizare și editare
+   - Informații personale
+   - Istoricul rezervărilor
+
+5. **Deconectare**
+   - Buton în header
+   - Ștergerea sesiunii
+
+### **Context API**
+
+Aplicația folosește `AuthContext` pentru gestionarea autentificării:
+
+```typescript
+const { user, profile, signIn, signUp, signOut, isAdmin } = useAuth();
+```
+
+## 🛠️ Testare
+
+### **Testarea Înregistrării:**
+1. Accesați `/login`
+2. Click pe "Sign Up"
+3. Completați formularul
+4. Verificați în Supabase că profilul a fost creat
+
+### **Testarea Autentificării:**
+1. Accesați `/login`
+2. Click pe "Login"
+3. Introduceți credențialele
+4. Verificați că header-ul afișează numele utilizatorului
+
+### **Testarea Profilului:**
+1. După autentificare, click pe numele din header
+2. Verificați dropdown-ul cu opțiunile
+3. Testați deconectarea
+
+## 📱 Integrare în Aplicație
+
+### **Header-ul**
+- Afișează numele utilizatorului când este autentificat
+- Buton de login când nu este autentificat
+- Dropdown cu opțiuni de profil
+
+### **Pagina de Login**
+- Toggle între Login și Sign Up
+- Formulare responsive
+- Validare și mesaje de eroare
+
+### **Protecția Rutelor**
+- Rutele protejate pot fi implementate cu:
+```typescript
+const { user, loading } = useAuth();
+if (loading) return <Loading />;
+if (!user) return <Navigate to="/login" />;
+```
+
+## 🔧 Configurații Avansate
+
+### **Configurarea OAuth (Google)**
+1. În Supabase Dashboard, mergeți la Authentication > Providers
+2. Activați Google Provider
+3. Configurați Client ID și Client Secret
+
+### **Configurarea Email-urilor**
+1. În Supabase Dashboard, mergeți la Authentication > Settings
+2. Configurați SMTP pentru email-uri de confirmare
+3. Personalizați template-urile de email
+
+#### **Pentru Confirmarea Email-ului:**
+1. În Authentication > Settings > Email Templates
+2. Selectați "Confirm signup"
+3. Personalizați template-ul cu:
+   ```html
+   <h2>Confirmă contul tău Starlines</h2>
+   <p>Bună {{ .Email }}!</p>
+   <p>Te rugăm să confirmi contul tău făcând click pe linkul de mai jos:</p>
+   <a href="{{ .ConfirmationURL }}">Confirmă Contul</a>
+   <p>Dacă nu ai creat acest cont, te rugăm să ignori acest email.</p>
+   ```
+
+#### **Pentru Resetarea Parolei:**
+1. În Authentication > Settings > Email Templates
+2. Selectați "Reset password"
+3. Personalizați template-ul cu:
+   ```html
+   <h2>Resetează parola Starlines</h2>
+   <p>Ai solicitat resetarea parolei pentru contul {{ .Email }}.</p>
+   <p>Fă click pe linkul de mai jos pentru a reseta parola:</p>
+   <a href="{{ .ConfirmationURL }}">Resetează Parola</a>
+   <p>Dacă nu ai solicitat această acțiune, te rugăm să ignori acest email.</p>
+   ```
+
+## 🚨 Troubleshooting
+
+### **Probleme Comune:**
+
+1. **"Invalid credentials"**
+   - Verificați că utilizatorul există în `auth.users`
+   - Verificați că parola este corectă
+
+2. **"Profile not found"**
+   - Verificați că trigger-ul `on_auth_user_created` este activ
+   - Verificați că funcția `handle_new_user()` funcționează
+
+3. **"Permission denied"**
+   - Verificați că RLS este configurat corect
+   - Verificați că politicele RLS sunt active
+
+4. **"Email confirmation not working"**
+   - Verificați că SMTP este configurat în Supabase
+   - Verificați că email-urile nu ajung în spam
+   - Verificați că URL-ul de callback este corect
+
+5. **"User already exists" message**
+   - Verificați că mesajul apare pentru utilizatori existenti
+   - Verificați că redirectarea funcționează corect
+
+6. **"process is not defined" error**
+   - Verificați că folosiți `src/config/env.ts` pentru variabilele de mediu
+   - Asigurați-vă că variabilele sunt configurate în `.env`
+   - Pentru Vite, folosiți prefixul `VITE_` pentru variabilele publice
+
+### **Log-uri pentru Debug:**
+```typescript
+// În AuthContext.tsx
+console.log('Auth state:', { user, profile, session });
+```
+
+## 📚 Resurse Utile
+
+- [Supabase Documentation](https://supabase.com/docs)
+- [Supabase Auth Guide](https://supabase.com/docs/guides/auth)
+- [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security)
+- [React Auth Patterns](https://supabase.com/docs/guides/auth/auth-helpers/react)
 
 ---
 
-**🎯 Obiectiv:** Aplicația Starlines Routes este acum conectată la Supabase cu autentificare completă și sistem de administrare!
+**✅ După completarea acestor pași, aplicația va avea autentificare completă funcțională cu Supabase!**

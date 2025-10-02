@@ -1,90 +1,97 @@
--- Supabase Database Setup Script
+-- Supabase Setup for Starlines Application
 -- Run this in your Supabase SQL Editor
 
--- Enable Row Level Security
-ALTER TABLE IF EXISTS public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.bookings ENABLE ROW LEVEL SECURITY;
-ALTER TABLE IF EXISTS public.routes ENABLE ROW LEVEL SECURITY;
+-- 1. Create profiles table
+CREATE TABLE public.profiles (
+  id uuid not null,
+  email text not null,
+  first_name text not null,
+  last_name text not null,
+  phone text not null,
+  created_at timestamp with time zone null default now(),
+  updated_at timestamp with time zone null default now(),
+  is_admin boolean null default false,
+  avatar_url text null,
+  constraint profiles_pkey primary key (id),
+  constraint profiles_id_fkey foreign KEY (id) references auth.users (id) on delete CASCADE
+) TABLESPACE pg_default;
 
--- Create profiles table
-CREATE TABLE IF NOT EXISTS public.profiles (
-    id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-    email TEXT NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    is_admin BOOLEAN DEFAULT FALSE,
-    avatar_url TEXT
-);
+-- 2. Create index on email
+CREATE INDEX IF not exists idx_profiles_email on public.profiles using btree (email) TABLESPACE pg_default;
 
--- Create bookings table
-CREATE TABLE IF NOT EXISTS public.bookings (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-    route_id TEXT NOT NULL,
-    fare_type TEXT NOT NULL CHECK (fare_type IN ('economy', 'premium', 'business')),
-    passengers INTEGER NOT NULL CHECK (passengers > 0),
-    total_price DECIMAL(10,2) NOT NULL CHECK (total_price > 0),
-    currency TEXT NOT NULL DEFAULT 'EUR',
-    status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    departure_date DATE NOT NULL,
-    return_date DATE,
-    payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'failed', 'refunded'))
-);
+-- 3. Create update_updated_at_column function if it doesn't exist
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
 
--- Create routes table
-CREATE TABLE IF NOT EXISTS public.routes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    from_city TEXT NOT NULL,
-    to_city TEXT NOT NULL,
-    operator TEXT NOT NULL,
-    departure_time TIME NOT NULL,
-    arrival_time TIME NOT NULL,
-    duration TEXT NOT NULL,
-    price_economy DECIMAL(10,2) NOT NULL CHECK (price_economy > 0),
-    price_premium DECIMAL(10,2) NOT NULL CHECK (price_premium > 0),
-    price_business DECIMAL(10,2) NOT NULL CHECK (price_business > 0),
-    amenities TEXT[] DEFAULT '{}',
-    frequency TEXT NOT NULL DEFAULT 'daily',
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
+-- 4. Create trigger for updating updated_at
+CREATE TRIGGER update_profiles_updated_at BEFORE
+update on profiles for EACH row
+execute FUNCTION update_updated_at_column ();
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_profiles_email ON public.profiles(email);
-CREATE INDEX IF NOT EXISTS idx_bookings_user_id ON public.bookings(user_id);
-CREATE INDEX IF NOT EXISTS idx_bookings_route_id ON public.bookings(route_id);
-CREATE INDEX IF NOT EXISTS idx_routes_from_city ON public.routes(from_city);
-CREATE INDEX IF NOT EXISTS idx_routes_to_city ON public.routes(to_city);
-CREATE INDEX IF NOT EXISTS idx_routes_operator ON public.routes(operator);
+-- 5. Enable Row Level Security (RLS)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Row Level Security Policies
-
--- Profiles: Users can only see and edit their own profile
+-- 6. Create RLS policies
+-- Users can view their own profile
 CREATE POLICY "Users can view own profile" ON public.profiles
     FOR SELECT USING (auth.uid() = id);
 
+-- Users can update their own profile
 CREATE POLICY "Users can update own profile" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
 
+-- Users can insert their own profile
 CREATE POLICY "Users can insert own profile" ON public.profiles
     FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Admins can view all profiles
-CREATE POLICY "Admins can view all profiles" ON public.profiles
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND is_admin = TRUE
-        )
-    );
+-- 7. Create function to handle new user signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email, first_name, last_name, phone, is_admin)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'phone', ''),
+    false
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Bookings: Users can only see their own bookings
+-- 8. Create trigger for new user signup
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 9. Create bookings table (if not exists)
+CREATE TABLE IF NOT EXISTS public.bookings (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE,
+  route_id text NOT NULL,
+  fare_type text NOT NULL,
+  passengers integer NOT NULL,
+  total_price numeric(10,2) NOT NULL,
+  currency text NOT NULL DEFAULT 'EUR',
+  status text NOT NULL DEFAULT 'pending',
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now(),
+  departure_date date NOT NULL,
+  return_date date,
+  payment_status text NOT NULL DEFAULT 'pending'
+);
+
+-- 10. Enable RLS for bookings
+ALTER TABLE public.bookings ENABLE ROW LEVEL SECURITY;
+
+-- 11. Create RLS policies for bookings
 CREATE POLICY "Users can view own bookings" ON public.bookings
     FOR SELECT USING (auth.uid() = user_id);
 
@@ -94,86 +101,82 @@ CREATE POLICY "Users can insert own bookings" ON public.bookings
 CREATE POLICY "Users can update own bookings" ON public.bookings
     FOR UPDATE USING (auth.uid() = user_id);
 
--- Admins can view all bookings
-CREATE POLICY "Admins can view all bookings" ON public.bookings
-    FOR SELECT USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND is_admin = TRUE
-        )
-    );
+-- 12. Create routes table (if not exists)
+CREATE TABLE IF NOT EXISTS public.routes (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  from_city text NOT NULL,
+  to_city text NOT NULL,
+  operator text NOT NULL,
+  departure_time time NOT NULL,
+  arrival_time time NOT NULL,
+  duration text NOT NULL,
+  price_economy numeric(10,2) NOT NULL,
+  price_premium numeric(10,2) NOT NULL,
+  price_business numeric(10,2) NOT NULL,
+  amenities text[] DEFAULT '{}',
+  frequency text NOT NULL,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT now()
+);
 
--- Routes: Everyone can view active routes
-CREATE POLICY "Everyone can view active routes" ON public.routes
-    FOR SELECT USING (is_active = TRUE);
+-- 13. Enable RLS for routes
+ALTER TABLE public.routes ENABLE ROW LEVEL SECURITY;
 
--- Only admins can manage routes
-CREATE POLICY "Only admins can insert routes" ON public.routes
-    FOR INSERT WITH CHECK (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND is_admin = TRUE
-        )
-    );
+-- 14. Create RLS policies for routes (public read access)
+CREATE POLICY "Routes are viewable by everyone" ON public.routes
+  FOR SELECT USING (true);
 
-CREATE POLICY "Only admins can update routes" ON public.routes
-    FOR UPDATE USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND is_admin = TRUE
-        )
-    );
+-- 15. Create trigger for routes updated_at
+CREATE TRIGGER update_routes_updated_at BEFORE
+UPDATE ON public.routes FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
 
-CREATE POLICY "Only admins can delete routes" ON public.routes
-    FOR DELETE USING (
-        EXISTS (
-            SELECT 1 FROM public.profiles 
-            WHERE id = auth.uid() AND is_admin = TRUE
-        )
-    );
+-- 16. Create trigger for bookings updated_at
+CREATE TRIGGER update_bookings_updated_at BEFORE
+UPDATE ON public.bookings FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
 
--- Functions for automatic updates
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- 17. Configure email settings (run these in Supabase Dashboard > Authentication > Settings)
+-- Enable email confirmations
+-- UPDATE auth.config SET email_confirm_enabled = true;
+
+-- 18. Create function to handle email confirmation
+CREATE OR REPLACE FUNCTION public.handle_email_confirmation()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = NOW();
+  -- Check if this is an email confirmation
+  IF NEW.email_confirmed_at IS NOT NULL AND OLD.email_confirmed_at IS NULL THEN
+    -- User just confirmed their email, ensure profile exists
+    INSERT INTO public.profiles (
+      id, 
+      email, 
+      first_name, 
+      last_name, 
+      phone, 
+      is_admin,
+      created_at,
+      updated_at
+    )
+    VALUES (
+      NEW.id,
+      NEW.email,
+      COALESCE(NEW.raw_user_meta_data->>'first_name', ''),
+      COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+      COALESCE(NEW.raw_user_meta_data->>'phone', ''),
+      false,
+      NOW(),
+      NOW()
+    )
+    ON CONFLICT (id) DO UPDATE SET
+      updated_at = NOW();
+  END IF;
+  
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Create triggers for updated_at
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_bookings_updated_at BEFORE UPDATE ON public.bookings
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_routes_updated_at BEFORE UPDATE ON public.routes
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Insert sample admin user (password: admin123)
--- Note: This should be done through the auth system in production
--- INSERT INTO auth.users (id, email, encrypted_password, email_confirmed_at, created_at, updated_at)
--- VALUES (
---     gen_random_uuid(),
---     'admin@starlines.com',
---     crypt('admin123', gen_salt('bf')),
---     NOW(),
---     NOW(),
---     NOW()
--- );
-
--- Insert sample routes
-INSERT INTO public.routes (from_city, to_city, operator, departure_time, arrival_time, duration, price_economy, price_premium, price_business, amenities, frequency) VALUES
-('Chișinău', 'Berlin', 'Starlines Express', '08:00:00', '22:00:00', '14h', 85.00, 120.00, 180.00, ARRAY['WiFi', 'USB', 'WC', 'Refreshments'], 'daily'),
-('Chișinău', 'Munich', 'Starlines Express', '10:30:00', '01:30:00', '15h', 90.00, 130.00, 190.00, ARRAY['WiFi', 'USB', 'WC', 'Entertainment'], 'daily'),
-('Chișinău', 'Frankfurt', 'Starlines Express', '12:00:00', '03:00:00', '15h', 88.00, 125.00, 185.00, ARRAY['WiFi', 'USB', 'WC'], 'daily'),
-('Chișinău', 'Vienna', 'Starlines Custom', '14:00:00', '04:00:00', '14h', 100.00, 140.00, 200.00, ARRAY['WiFi', 'USB', 'WC', 'Premium Service'], '2x weekly')
-ON CONFLICT DO NOTHING;
-
--- Grant necessary permissions
-GRANT USAGE ON SCHEMA public TO anon, authenticated;
-GRANT ALL ON public.profiles TO anon, authenticated;
-GRANT ALL ON public.bookings TO anon, authenticated;
-GRANT ALL ON public.routes TO anon, authenticated;
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+-- 19. Create trigger for email confirmation
+CREATE TRIGGER on_email_confirmation
+  AFTER UPDATE ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_email_confirmation();

@@ -866,6 +866,13 @@ const TripDetailContent: React.FC<TripDetailProps> = (props) => {
     freeSeats: seatMapData.freeSeats,
   }));
 
+  console.log(`🚌 TripDetail DEBUG:`, {
+    passengers,
+    seatMapsKeys: Object.keys(seatMaps),
+    outboundSegmentsCount: outboundSegments.length,
+    firstSegmentFreeSeats: outboundSegments[0]?.freeSeats?.length || 0
+  });
+
   const {
     selectedSeats: outboundSelectedSeats,
     canSelectSeat: canSelectOutboundSeat,

@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { RouteSchedulePage } from '@/components/RouteSchedulePage';
 import { RouteSearchPage } from '@/components/RouteSearchPage';
+import { env } from '@/config/env';
 import type { RouteOption } from '@/types/routes';
 import type { RouteSchedule, BaggageSelection } from '@/types/getAllRoutes';
 
@@ -512,8 +513,8 @@ app.post('/api/proxy/get-all-routes', async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        login: process.env.BUS_LOGIN,
-        password: process.env.BUS_PASSWORD,
+        login: env.BUS_LOGIN,
+        password: env.BUS_PASSWORD,
         timetable_id,
         lang,
         json: 1

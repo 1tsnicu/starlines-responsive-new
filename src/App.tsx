@@ -27,6 +27,7 @@ import RefundPolicy from "@/pages/RefundPolicy";
 import AdminRoutes from "@/pages/AdminRoutes";
 import Login from "@/pages/Login";
 import PaymentDemo from "@/pages/PaymentDemo";
+import AuthCallback from "@/pages/AuthCallback";
 
 // Create a client
 const queryClient = new QueryClient({
@@ -67,6 +68,7 @@ function App() {
                   <Route path="/legal/refunds" element={<RefundPolicy />} />
                   <Route path="/admin/routes" element={<AdminRoutes />} />
                   <Route path="/login" element={<Login />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/payment-demo" element={<PaymentDemo />} />
                 </Routes>
               </main>

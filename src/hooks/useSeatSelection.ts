@@ -54,14 +54,24 @@ export const useSeatSelection = ({
     const currentSelection = seatSelection[bustype_id];
     const currentSelected = currentSelection?.selectedSeats || [];
     
+    console.log(`🔍 canSelectSeat DEBUG:`, {
+      bustype_id,
+      seatNumber,
+      currentSelected,
+      passengers,
+      segmentsCount: segments.length
+    });
+    
     // Check if already selected - can always deselect
     if (currentSelected.includes(seatNumber)) {
+      console.log(`✅ Seat ${seatNumber} already selected, can deselect`);
       return true; // Can deselect
     }
     
     // Check if seat is available
     const segment = segments.find(s => s.bustype_id === bustype_id);
     if (!segment) {
+      console.log(`❌ No segment found for bustype_id: ${bustype_id}`);
       return false;
     }
     
@@ -70,19 +80,35 @@ export const useSeatSelection = ({
       seat => normalizeSeatNumber(seat.seat_number) === normalizedSeat && seat.seat_free === 1
     );
     
+    console.log(`🔍 Seat availability check:`, {
+      seatNumber,
+      normalizedSeat,
+      isAvailable,
+      freeSeatsCount: segment.freeSeats.length,
+      freeSeats: segment.freeSeats.slice(0, 5) // Show first 5 seats
+    });
+    
     if (!isAvailable) {
+      console.log(`❌ Seat ${seatNumber} not available`);
       return false;
     }
     
     // For round trips, each trip (outbound/return) needs exactly 'passengers' seats
     // So we can always select if we haven't reached the limit for this specific trip
-    return currentSelected.length < passengers;
+    const canSelect = currentSelected.length < passengers;
+    console.log(`🔍 Can select more seats: ${currentSelected.length} < ${passengers} = ${canSelect}`);
+    return canSelect;
   }, [seatSelection, passengers, segments]);
 
   // Select a seat
   const selectSeat = useCallback((bustype_id: string, seatNumber: string) => {
-    if (!canSelectSeat(bustype_id, seatNumber)) return;
+    console.log(`🎯 selectSeat called: bustype_id=${bustype_id}, seatNumber=${seatNumber}`);
+    if (!canSelectSeat(bustype_id, seatNumber)) {
+      console.log(`❌ Cannot select seat ${seatNumber}`);
+      return;
+    }
     
+    console.log(`✅ Selecting seat ${seatNumber}`);
     setSeatSelection(prev => {
       const currentSelection = prev[bustype_id] || {
         bustype_id,
